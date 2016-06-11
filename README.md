@@ -21,15 +21,15 @@ Installed by running script.
 Add user account as defined in hosts and site.yml
 
 ```
-$ sudo adduser dpdk-user
+$ sudo adduser dpdk
 
-$ sudo gpasswd -a dpdk-user sudo
+$ sudo gpasswd -a dpdk sudo
 ```
 
 Delete account by userdel if it's no need. You should add -r option to delete home directory.
 
 ```
-$ sudo userdel -r dpdk-user
+$ sudo userdel -r dpdk
 ```
 
 (2) Run ansible-playbook.
