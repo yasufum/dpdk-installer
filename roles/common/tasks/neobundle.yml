@@ -1,11 +1,12 @@
 ---
 - name: get neobundle
   command: wget https://raw.githubusercontent.com/Shougo/neobundle.vim/master/bin/install.sh
-  #get_url: url=https://raw.githubusercontent.com/Shougo/neobundle.vim/master/bin/install.sh 
-  #           dest={{ ansible_env.HOME }}
 
 - name: install neobundle
   command: sh {{ ansible_env.HOME }}/install.sh
 
+- name: remove install.sh of neobundle
+  command: rm {{ ansible_env.HOME }}/install.sh
+
 - name: put .vimrc
-  copy: src=templates/vimrc dest={{ ansible_env.HOME }}/.vimrc mode=664
+  copy: src=templates/vimrc_neobundle dest={{ ansible_env.HOME }}/.vimrc mode=664

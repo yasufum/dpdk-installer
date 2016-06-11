@@ -1,7 +1,0 @@
----
-- name: get dpdk
-  git: repo=http://dpdk.org/git/dpdk
-       dest={{ dpdk_dir }}
-
-- name: install dpdk
-  command: make install T={{ dpdk_target }} chdir={{ dpdk_dir }}

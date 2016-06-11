@@ -1,0 +1,22 @@
+---
+- name: install libtool
+  become: yes
+  apt: pkg=libtool update_cache=no state=present
+
+- name: install zlib1g-dev
+  become: yes
+  apt: pkg=zlib1g-dev update_cache=no state=present
+
+
+- name: libglib2.0-dev
+  become: yes
+  apt: pkg=libglib2.0-dev update_cache=no state=present
+
+
+- name: install dh-autoreconf
+  become: yes
+  apt: pkg=dh-autoreconf update_cache=no state=present
+
+- name: get specialized qemu for dpdk
+  git: repo=https://github.com/garogers01/soft-patch-panel.git
+       dest={{ dpdk_dir }}

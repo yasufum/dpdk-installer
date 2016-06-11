@@ -11,10 +11,6 @@
 #  become: yes
 #  apt: name=emacs state=present
 
-- name: install ruby 
-  become: yes
-  apt: name=ruby state=present
-
 - name: install curl
   become: yes
   apt: name=curl state=present
@@ -23,22 +19,5 @@
   become: yes
   apt: name=wget state=present
 
-- name: install tmux
-  become: yes
-  apt: name=tmux state=present
-
-- name: install nmon
-  become: yes
-  apt: name=nmon state=present
-
 - name: create install_dir
   file: path={{ install_dir }} state=directory
-
-- name: put .tmux.conf
-  copy: src=templates/tmux.conf dest={{ ansible_env.HOME }}/.tmux.conf mode=664
-
-- name: put do_after_reboot.sh
-  copy: src=templates/do_after_reboot.sh dest={{ install_dir }} mode=775
-
-- name: put env.sh
-  template: src=templates/env.j2 dest={{ install_dir }}/env.sh mode=775
