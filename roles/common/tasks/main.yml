@@ -6,4 +6,3 @@
 - include: rbenv.yml
 - include: hugepage-setup.yml
 - include: dpdk.yml
-- include: qemu.yml

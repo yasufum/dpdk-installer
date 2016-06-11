@@ -19,4 +19,13 @@
 
 - name: get specialized qemu for dpdk
   git: repo=https://github.com/garogers01/soft-patch-panel.git
-       dest={{ dpdk_dir }}
+       dest={{ qemu_tmpdir }}
+
+- name: copy qemu from tmpdir
+  command: mv {{ qemu_tmpdir }}/{{ qemu }} {{ qemu_dir }}
+
+- name: configure qemu
+  command: ./configure chdir={{ qemu_dir }}
+
+- name: make qemu
+  command: make chdir={{ qemu_dir }}

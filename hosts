@@ -1,9 +1,8 @@
 [common]
-129.60.13.99
 #127.0.0.1
 
-#[pktgen]
-#127.0.0.1
+[pktgen]
+129.60.13.99
 
 [all:vars]
 ansible_ssh_port=22

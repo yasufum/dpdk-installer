@@ -14,6 +14,19 @@
   roles:
     - common
 
+- name: install qemu 
+  hosts: qemu 
+  remote_user: dpdk
+  vars:
+    install_dir: "{{ ansible_env.HOME }}/dpdk-home"
+    dpdk_dir: "{{ install_dir }}/dpdk"
+    qemu: "qemu-2.3.0"
+    qemu_tmpdir: "{{ install_dir }}/qemu_tmp"
+    qemu_dir: "{{ install_dir }}/{{ qemu }}"
+    dpdk_target: x86_64-ivshmem-linuxapp-gcc
+  roles:
+    - qemu
+
 - name: install pktgen
   hosts: pktgen 
   remote_user: dpdk
