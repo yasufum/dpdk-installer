@@ -2,11 +2,13 @@
 
 echo "Setup port for dpdk."
 
+sudo mount -t hugetlbfs nodev /mnt/huge
+
 # modprobe
 echo sudo modprobe uio_pci_generic 
 sudo modprobe uio_pci_generic 
-#echo sudo modprobe vfio-pci
-#sudo modprobe vfio-pci
+echo sudo modprobe vfio-pci
+sudo modprobe vfio-pci
 
 # setup vars for nic bind.
 #script=${RTE_SDK}/tools/dpdk_nic_bind.py
