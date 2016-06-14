@@ -24,6 +24,9 @@
 - name: copy qemu from tmpdir
   command: mv {{ qemu_tmpdir }}/{{ qemu }} {{ qemu_dir }}
 
+- name: remove qemu_tmpdir
+  command: rm -rf {{ qemu_tmpdir }}
+
 - name: configure qemu
   command: ./configure chdir={{ qemu_dir }}
 
