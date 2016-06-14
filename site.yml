@@ -20,6 +20,7 @@
   vars:
     install_dir: "{{ ansible_env.HOME }}/dpdk-home"
     dpdk_dir: "{{ install_dir }}/dpdk"
+    spp_dir: "{{ install_dir }}/spp"
     qemu: "qemu-2.3.0"
     qemu_tmpdir: "{{ install_dir }}/qemu_tmp"
     qemu_dir: "{{ install_dir }}/{{ qemu }}"
