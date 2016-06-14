@@ -1,0 +1,10 @@
+---
+- name: get spp
+  git: repo=http://dpdk.org/git/apps/spp
+       dest={{ install_dir }}
+
+- name: install dpdk in spp
+  command: make install T={{ dpdk_target }} chdir={{ install_dir }}/spp
+
+- name: make spp
+  command: make -C examples/multi_process/patch_panel chdir={{ install_dir }}/spp
