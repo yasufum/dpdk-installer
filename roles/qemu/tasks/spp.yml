@@ -7,4 +7,4 @@
   command: make install T={{ dpdk_target }} chdir={{ spp_dir }}
 
 - name: make spp
-  command: make -C examples/multi_process/patch_panel chdir={{ spp_dir }}
+  command: make RTE_SDK={{ spp_dir }} RTE_TARGET={{ dpdk_target }} -C examples/multi_process/patch_panel chdir={{ spp_dir }}
