@@ -84,21 +84,23 @@ $ rake
 
 #### 2.4. Run DPDK applications.
 
-Login as dpdk, then compile and run applications as following.
+Login as dpdk, then compile and run applications.
+Following example is for running helloworld example.
+
 ```
 $ ssh dpdk@localhost
 Welcome to Ubuntu 16.04.4 LTS (GNU/Linux 4.2.0-35-generic x86_64)
 
  * Documentation:  https://help.ubuntu.com/
 Last login: Sun May  8 01:38:50 2016 from 192.168.33.1
-vagrant@vagrant:~$ cd dpdk/examples/helloworld/
-vagrant@vagrant:~/dpdk/examples/helloworld$
-vagrant@vagrant:~/dpdk/examples/helloworld$ make
+dpdk@localhost:~$ cd ddpdk_home/pdk/examples/helloworld/
+dpdk@localhost:~/dpdk_home/dpdk/examples/helloworld$
+dpdk@localhost:~/dpdk_home/dpdk/examples/helloworld$ make
   CC main.o
   LD helloworld
   INSTALL-APP helloworld
   INSTALL-MAP helloworld.map
-vagrant@vagrant:~/dpdk/examples/helloworld$ sudo ./build/helloworld -c f -n 4
+dpdk@localhost:~/dpdk_home/dpdk/examples/helloworld$ sudo ./build/helloworld -c f -n 4
 EAL: Detected 4 lcore(s)
 EAL: Probing VFIO support...
 EAL: VFIO support initialized
@@ -121,22 +123,23 @@ hello from core 0
 ```
 
 #### (5) Run pktgen-dpdk.
-Login h3 (if you don't change default configuration) and move to pktgen's directory.
+Login as dpdk, then move to pktgen-dpdk directory.
+
 ```
 $ ssh dpdk@localhost
 Welcome to Ubuntu 16.04.4 LTS (GNU/Linux 4.2.0-35-generic x86_64)
 
  * Documentation:  https://help.ubuntu.com/
 Last login: Sun May  8 01:44:03 2016 from 10.0.2.2
-vagrant@vagrant:~$ ls
+dpdk@localhost:~$ ls
 do_after_reboot.sh  dpdk  install.sh  netsniff-ng  pktgen-dpdk
-vagrant@vagrant:~$ cd pktgen-dpdk/
+dpdk@localhost:~$ cd dpdk_home/pktgen-dpdk/
 ```
 
 Run pktgen located on $HOME/pktgen-dpdk/app/app/x86_64-native-linuxapp-gcc/pktgen.
 You can run it directory, but it better to use `doit` script.
 ```
-vagrant@vagrant:~/pktgen-dpdk$ sudo -E ./doit
+dpdk@localhost:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
 ```
 
 if you change options for pktgen, edit `doit` script. Please refer to pktgen-dpdk's [README](http://dpdk.org/browse/apps/pktgen-dpdk/tree/README.md) for details.
