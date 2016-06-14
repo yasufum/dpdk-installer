@@ -1,4 +1,8 @@
 ---
+- name: install libarchive-dev for archive.h
+  become: yes
+  apt: pkg=libarchive-dev update_cache=no state=present
+
 - name: install build-essential
   become: yes
   apt: pkg=build-essential update_cache=no state=present
