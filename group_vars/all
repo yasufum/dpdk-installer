@@ -1,0 +1,8 @@
+---
+# Variables are applicable to all host groups
+
+install_dir: "{{ ansible_env.HOME }}/dpdk-home"
+
+dpdk_dir: "{{ install_dir }}/dpdk"
+dpdk_ver: v16.07
+dpdk_target: x86_64-ivshmem-linuxapp-gcc

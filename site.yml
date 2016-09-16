@@ -4,40 +4,17 @@
 - name: apply all base packages
   hosts: all
   remote_user: dpdk
-  vars:
-    nr_hugepages: 4096
-    uname_r: 4.4.0-36-generic
-    install_dir: "{{ ansible_env.HOME }}/dpdk-home"
-    netsniff_dir: "{{ install_dir }}/netsniff-ng"
-    dpdk_dir: "{{ install_dir }}/dpdk"
-    dpdk_ver: v16.07
-    dpdk_target: x86_64-ivshmem-linuxapp-gcc
   roles:
     - common
 
 - name: install spp and qemu 
   hosts: spp
   remote_user: dpdk
-  vars:
-    install_dir: "{{ ansible_env.HOME }}/dpdk-home"
-    dpdk_dir: "{{ install_dir }}/dpdk"
-    spp_dir: "{{ install_dir }}/spp"
-    spp_ver: v16.07
-    qemu: qemu-2.3.0
-    qemu_tmpdir: "{{ install_dir }}/qemu_tmp"
-    qemu_dir: "{{ install_dir }}/{{ qemu }}"
-    dpdk_target: x86_64-ivshmem-linuxapp-gcc
   roles:
     - spp
 
 - name: install pktgen
   hosts: pktgen 
   remote_user: dpdk
-  vars:
-    install_dir: "{{ ansible_env.HOME }}/dpdk-home"
-    dpdk_dir: "{{ install_dir }}/dpdk"
-    pktgen_dir: "{{ install_dir }}/pktgen-dpdk"
-    pktgen_ver: pktgen-3.0.14
-    dpdk_target: x86_64-ivshmem-linuxapp-gcc
   roles:
     - pktgen

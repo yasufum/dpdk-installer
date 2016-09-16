@@ -3,8 +3,8 @@
 This program setup following tools with ansible.
 
 - DPDK 16.07
-- pktge-dpdk 3.0.02
-- qemu-2.3.0 (specialized for dpdk vhost)
+- pktge-dpdk 3.0.14
+- qemu-2.3.0 (specialized for dpdk's ivshmem)
 
 
 ### 1. Installation
