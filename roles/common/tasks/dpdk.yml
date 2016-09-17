@@ -11,8 +11,8 @@
   become: yes
   apt: pkg=linux-headers-{{ uname_r }} update_cache=no state=present
 
-- name: get dpdk
-  git: repo=http://dpdk.org/git/dpdk
+- name: git clone {{ dpdk_repo }}
+  git: repo={{ dpdk_repo }}
        dest={{ dpdk_dir }}
        version={{ dpdk_ver }}
 
