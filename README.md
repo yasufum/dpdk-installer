@@ -31,19 +31,19 @@ other tools.
 
 First of all, edit "hosts" to register IP addresses under the roles.
 
-There are three two roles in "hosts", common, qemu and pktgen.
+There are three two roles in "hosts", common, spp and pktgen.
 Role is a kind of group of installation processes.
 Each of processes are defined in "roles/[role_name]/tasks/main.yml".
 
 ##### (1) common role
 
 common is a basic role and applied for all of roles.
-If you run qemu's task, common's task is run before qemu's.
+If you run spp's task, common's task is run before spp's.
 
-##### (2) qemu role
+##### (2) spp role
 
 First, install DPDK and other tools with common role.
-Then nstall qemu for running VMs.
+Then install qemu for running VMs.
 
 
 ##### (3) pktgen role
