@@ -1,4 +1,0 @@
----
-
-pktgen_dir: "{{ install_dir }}/pktgen-dpdk"
-pktgen_ver: pktgen-3.0.14
