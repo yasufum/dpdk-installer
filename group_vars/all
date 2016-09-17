@@ -23,4 +23,4 @@ spp_dir: "{{ install_dir }}/spp"
 spp_ver: v16.07
 qemu_ver: qemu-2.3.0
 qemu_tmpdir: "{{ install_dir }}/qemu_tmp"
-qemu_dir: "{{ install_dir }}/{{ qemu }}"
+qemu_dir: "{{ install_dir }}/{{ qemu_ver }}"
