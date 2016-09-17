@@ -1,5 +1,0 @@
----
-
-nr_hugepages: 4096
-uname_r: 4.4.0-36-generic
-netsniff_dir: "{{ install_dir }}/netsniff-ng"
