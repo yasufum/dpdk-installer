@@ -11,7 +11,6 @@ netsniff_dir: '{{ install_dir }}/netsniff-ng'
 
 # common
 nr_hugepages: 4096
-uname_r: 4.4.0-36-generic
 
 # pktgen
 pktgen_dir: "{{ install_dir }}/pktgen-dpdk"

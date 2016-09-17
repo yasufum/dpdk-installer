@@ -10,9 +10,6 @@
 [pktgen]
 #192.168.11.58
 
-[pktgen]
-#192.168.11.58
-
 [all:vars]
 ansible_ssh_port=22
 ansible_ssh_user=dpdk
