@@ -17,12 +17,12 @@
   become: yes
   apt: pkg=dh-autoreconf update_cache=no state=present
 
-- name: get specialized qemu for dpdk
+- name: get specialized qemu for dpdk's ivshmem
   git: repo=https://github.com/garogers01/soft-patch-panel.git
        dest={{ qemu_tmpdir }}
 
-- name: copy qemu from tmpdir
-  command: mv {{ qemu_tmpdir }}/{{ qemu }} {{ qemu_dir }}
+- name: move only qemu from tmpdir to delete others
+  command: mv {{ qemu_tmpdir }}/{{ qemu_ver }} {{ qemu_dir }}
 
 - name: remove qemu_tmpdir
   command: rm -rf {{ qemu_tmpdir }}
