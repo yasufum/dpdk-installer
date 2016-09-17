@@ -15,6 +15,7 @@ uname_r: 4.4.0-36-generic
 
 # pktgen
 pktgen_dir: "{{ install_dir }}/pktgen-dpdk"
+pktgen_repo: "http://dpdk.org/git/apps/pktgen-dpdk"
 pktgen_ver: pktgen-3.0.14
 
 # spp
