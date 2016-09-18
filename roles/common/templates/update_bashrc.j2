@@ -14,5 +14,7 @@ f.close()
 
 if re.search(ptn, contents) == None:
     f = open(bashrc, "a")
+    f.write("\n")
+    f.write("# Add shell environments for DPDK.\n")
     f.write(ptn)
     f.close()
