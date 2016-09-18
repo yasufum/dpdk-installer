@@ -33,3 +33,11 @@
   template: src=templates/env_dpdk.j2
             dest={{ install_dir }}/env.sh
             mode=775
+
+- name: put update_bashrc.py for env.sh
+  template: src=templates/update_bashrc.j2
+            dest={{ install_dir }}/update_bashrc.py
+            mode=775
+
+- name: update .bashrc
+  command: python update_bashrc.py chdir={{ install_dir }}

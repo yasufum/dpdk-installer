@@ -1,0 +1,18 @@
+#!/usr/bin/env python
+
+# Add "source $HOME/dpdk-home/env.sh" in $HOME/.bashrc
+# if doesn't exits.
+
+import re
+
+bashrc = "{{ ansible_env.HOME }}/.bashrc"
+ptn = "source {{ install_dir }}/env.sh"
+
+f = open(bashrc, "r")
+contents = f.read()
+f.close()
+
+if re.search(ptn, contents) == None:
+    f = open(bashrc, "a")
+    f.write(ptn)
+    f.close()
