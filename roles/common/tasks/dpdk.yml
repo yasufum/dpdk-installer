@@ -7,19 +7,37 @@
   become: yes
   apt: pkg=build-essential update_cache=no state=present
 
+- name: put install_linux_headers.sh
+  copy: src=templates/install_linux_headers.sh
+        dest={{ install_dir }}
+        mode=775
+
 - name: install linux-headers
   become: yes
-  apt: pkg=linux-headers-{{ uname_r }} update_cache=no state=present
+  command: sh install_linux_headers.sh chdir={{ install_dir }}
 
-- name: get dpdk
-  git: repo=http://dpdk.org/git/dpdk
+- name: git clone {{ dpdk_repo }}
+  git: repo={{ dpdk_repo }}
        dest={{ dpdk_dir }}
+       version={{ dpdk_ver }}
 
 - name: install dpdk
   command: make install T={{ dpdk_target }} chdir={{ dpdk_dir }}
 
 - name: put do_after_reboot.sh
-  copy: src=templates/do_after_reboot.sh dest={{ install_dir }} mode=775
+  copy: src=templates/do_after_reboot.sh
+        dest={{ install_dir }}
+        mode=775
 
 - name: put env.sh
-  template: src=templates/env_dpdk.j2 dest={{ install_dir }}/env.sh mode=775
+  template: src=templates/env_dpdk.j2
+            dest={{ install_dir }}/env.sh
+            mode=775
+
+- name: put update_bashrc.py for env.sh
+  template: src=templates/update_bashrc.j2
+            dest={{ install_dir }}/update_bashrc.py
+            mode=775
+
+- name: update .bashrc
+  command: python update_bashrc.py chdir={{ install_dir }}

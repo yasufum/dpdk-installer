@@ -2,9 +2,9 @@
 
 This program setup following tools with ansible.
 
-- DPDK 16.04 
-- pktge-dpdk 3.0.02
-- qemu-2.3.0 (specialized for dpdk vhost)
+- DPDK 16.07
+- pktge-dpdk 3.0.14
+- qemu-2.3.0 (specialized for dpdk's ivshmem)
 
 
 ### 1. Installation
@@ -14,7 +14,7 @@ You have to install ansible to run ansible-playbook which is a instruction for b
 #### (1) ansible
 
 Install ansible  >= 2.0 by following this [instruction](http://docs.ansible.com/ansible/intro_installation.html#installation).
-I only tested version 2.0.1.0 but other versions might work.
+I only tested version 2.0.0.2 and 2.0.1.0 but other versions might work.
 
 #### (2) ssh
 
@@ -29,35 +29,35 @@ other tools.
 
 #### 2.1. Understand roles
 
-First of all, edit "hosts" to register IP addresses under the roles.
+First of all, edit "hosts" to register IP addresses under each of roles.
 
-There are three two roles in "hosts", common, qemu and pktgen.
-Role is a kind of group of installation processes.
-Each of processes are defined in "roles/[role_name]/tasks/main.yml".
+There are three roles in hosts file, common, spp and pktgen.
+Role is a kind of group of installation tasks.
+Each of tasks is listed in "roles/[role_name]/tasks/main.yml".
 
 ##### (1) common role
 
-common is a basic role and applied for all of roles.
-If you run qemu's task, common's task is run before qemu's.
+Applied for all of roles as common tasks.
+If you run other tasks, common is run before them.
 
-##### (2) qemu role
+##### (2) spp role
 
-First, install DPDK and other tools with common role.
-Then nstall qemu for running VMs.
+Setup environment for running [spp](http://www.dpdk.org/browse/apps/spp/) and qemu for dpdk apps on VMs. 
 
 
 ##### (3) pktgen role
 
-First, install DPDK and other tools with common role.
-Then install pktgen.
+Setup environment for [pktgen](http://www.dpdk.org/browse/apps/pktgen-dpdk/).
 
 
-#### 2.2. Add user
+#### 2.2. Add an user
 
-On each of ansible-clients, add user account as defined in hosts.
-Then make it as sudoer.
+On each of ansible-clients, you should create an account.
+Default user is "dpdk" as defined in hosts file and 
+you might edit username and password defined in hosts.
+Then make it as sudoer as following.
 
-[NOTE] Add http_proxy in .bashrc if you are in proxy environment.
+[NOTE] Add http_proxy in .bashrc after create user if you are in proxy environment.
 
 ```
 $ sudo adduser dpdk
@@ -71,58 +71,18 @@ Delete account by userdel if it's no need. You should add -r option to delete ho
 $ sudo userdel -r dpdk
 ```
 
-  
 
 #### 2.3. Run ansible-playbook.
 ```
 $ ansible-playbook -i hosts site.yml
 ```
-or use rake if you installed it.
+or use rake for short.
 ```
 $ rake
 ```
 
-#### 2.4. Run DPDK applications.
 
-Login as dpdk, then compile and run applications.
-Following example is for running helloworld example.
-
-```
-$ ssh dpdk@localhost
-Welcome to Ubuntu 16.04.4 LTS (GNU/Linux 4.2.0-35-generic x86_64)
-
- * Documentation:  https://help.ubuntu.com/
-Last login: Sun May  8 01:38:50 2016 from 192.168.33.1
-dpdk@localhost:~$ cd ddpdk_home/pdk/examples/helloworld/
-dpdk@localhost:~/dpdk_home/dpdk/examples/helloworld$
-dpdk@localhost:~/dpdk_home/dpdk/examples/helloworld$ make
-  CC main.o
-  LD helloworld
-  INSTALL-APP helloworld
-  INSTALL-MAP helloworld.map
-dpdk@localhost:~/dpdk_home/dpdk/examples/helloworld$ sudo ./build/helloworld -c f -n 4
-EAL: Detected 4 lcore(s)
-EAL: Probing VFIO support...
-EAL: VFIO support initialized
-EAL: PCI device 0000:00:03.0 on NUMA socket -1
-EAL:   probe driver: 8086:100e rte_em_pmd
-EAL: PCI device 0000:00:08.0 on NUMA socket -1
-EAL:   probe driver: 8086:100e rte_em_pmd
-EAL: PCI device 0000:00:09.0 on NUMA socket -1
-EAL:   probe driver: 8086:100e rte_em_pmd
-EAL: PCI device 0000:00:0a.0 on NUMA socket -1
-EAL:   probe driver: 8086:100e rte_em_pmd
-EAL: PCI device 0000:00:10.0 on NUMA socket -1
-EAL:   probe driver: 8086:100e rte_em_pmd
-EAL: PCI device 0000:00:11.0 on NUMA socket -1
-EAL:   probe driver: 8086:100e rte_em_pmd
-hello from core 1
-hello from core 2
-hello from core 3
-hello from core 0
-```
-
-#### (5) Run pktgen-dpdk.
+#### (4) Run pktgen-dpdk.
 Login as dpdk, then move to pktgen-dpdk directory.
 
 ```
@@ -144,6 +104,7 @@ dpdk@localhost:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
 
 if you change options for pktgen, edit `doit` script. Please refer to pktgen-dpdk's [README](http://dpdk.org/browse/apps/pktgen-dpdk/tree/README.md) for details.
 ```
+# doit
 
 dpdk_opts="-c 3  -n 2 --proc-type auto --log-level 7"
 #dpdk_opts="-l 18-26 -n 3 --proc-type auto --log-level 7 --socket-mem 256,256 --file-prefix pg"
