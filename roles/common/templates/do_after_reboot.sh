@@ -1,8 +1,11 @@
 #!/bin/sh
 
+HUGEPAGES=4096
+
 echo "Setup port for dpdk."
 
 sudo mount -t hugetlbfs nodev /mnt/huge
+sudo sh -c "echo $HUGEPAGES > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages"
 
 # modprobe
 echo sudo modprobe uio_pci_generic 
