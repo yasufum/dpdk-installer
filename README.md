@@ -2,9 +2,9 @@
 
 This program setup following tools with ansible.
 
-- DPDK 16.04 
-- pktge-dpdk 3.0.02
-- qemu-2.3.0 (specialized for dpdk vhost)
+- DPDK 16.07
+- pktge-dpdk 3.0.14
+- qemu-2.3.0 (specialized for dpdk's ivshmem)
 
 
 ### 1. Installation
@@ -14,7 +14,7 @@ You have to install ansible to run ansible-playbook which is a instruction for b
 #### (1) ansible
 
 Install ansible  >= 2.0 by following this [instruction](http://docs.ansible.com/ansible/intro_installation.html#installation).
-I only tested version 2.0.1.0 but other versions might work.
+I only tested version 2.0.0.2 and 2.0.1.0 but other versions might work.
 
 #### (2) ssh
 

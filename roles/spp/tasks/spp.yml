@@ -1,0 +1,11 @@
+---
+- name: get spp
+  git: repo=http://dpdk.org/git/apps/spp
+       dest={{ spp_dir }}
+       ver={{ spp_ver }}
+
+#- name: install dpdk in spp
+#  command: make install T={{ dpdk_target }} chdir={{ dpdk_dir }}
+
+- name: make spp
+  command: make RTE_SDK={{ dpdk_dir }} RTE_TARGET={{ dpdk_target }} chdir={{ spp_dir }}
