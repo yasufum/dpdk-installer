@@ -7,18 +7,15 @@
   roles:
     - common
 
+- name: install dpdk
+  hosts: dpdk 
+  remote_user: dpdk
+  roles:
+    - dpdk 
+
 - name: install spp and qemu 
   hosts: spp
   remote_user: dpdk
-  vars:
-    install_dir: "{{ ansible_env.HOME }}/dpdk-home"
-    dpdk_dir: "{{ install_dir }}/dpdk"
-    qemu: "qemu-2.3.0"
-    qemu_tmpdir: "{{ install_dir }}/qemu_tmp"
-    qemu_dir: "{{ install_dir }}/{{ qemu }}"
-    dpdk_target: x86_64-ivshmem-linuxapp-gcc
-    spp_dir: "{{ install_dir }}/spp"
-    
   roles:
     - spp
 
