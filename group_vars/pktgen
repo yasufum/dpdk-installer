@@ -1,6 +1,14 @@
 ---
 # pktgen
 
-pktgen_dir: "{{ dpdk_home }}/pktgen-dpdk"
-pktgen_repo: "http://dpdk.org/git/apps/pktgen-dpdk"
+dpdk_ver: v16.07
+dpdk_target: x86_64-ivshmem-linuxapp-gcc
+nr_hugepages: 4096
+
+dpdk_repo: "http://dpdk.org/git/dpdk"
+dpdk_home: "{{ ansible_env.HOME }}/dpdk-home"
+dpdk_dir: "{{ dpdk_home }}/dpdk"
+
 pktgen_ver: pktgen-3.0.14
+pktgen_repo: "http://dpdk.org/git/apps/pktgen-dpdk"
+pktgen_dir: "{{ dpdk_home }}/pktgen-dpdk"

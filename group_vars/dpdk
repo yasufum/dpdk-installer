@@ -1,6 +1,10 @@
 ---
 # dpdk
 
+dpdk_ver: v16.07
+nr_hugepages: 4096
+
+dpdk_home: "{{ ansible_env.HOME }}/dpdk-home"
 dpdk_dir: "{{ dpdk_home }}/dpdk"
 dpdk_repo: "http://dpdk.org/git/dpdk"
 dpdk_target: x86_64-ivshmem-linuxapp-gcc
