@@ -2,5 +2,7 @@
 # Variables are applicable to all host groups
 # all
 
+ansible_ssh_pass: dpdk3388
 ansible_sudo_pass: dpdk3388
 dein_home: "{{ ansible_env.HOME }}/dein"
+http_proxy: "http://proxy-bcp.ecl.ntt.co.jp:20066"

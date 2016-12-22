@@ -6,7 +6,7 @@
 import re
 
 bashrc = "{{ ansible_env.HOME }}/.bashrc"
-ptn = "source {{ install_dir }}/env.sh"
+ptn = "source {{ dpdk_home }}/env.sh"
 
 f = open(bashrc, "r")
 contents = f.read()
