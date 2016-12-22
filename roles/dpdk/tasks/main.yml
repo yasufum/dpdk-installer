@@ -1,0 +1,3 @@
+---
+- include: hugepage-setup.yml
+- include: dpdk.yml
