@@ -1,26 +1,7 @@
 ---
 # Variables are applicable to all host groups
-
 # all
-install_dir: "{{ ansible_env.HOME }}/dpdk-home"
-dpdk_repo: "http://dpdk.org/git/dpdk"
-dpdk_dir: "{{ install_dir }}/dpdk"
-dpdk_ver: v16.07
-dpdk_target: x86_64-ivshmem-linuxapp-gcc
-netsniff_dir: '{{ install_dir }}/netsniff-ng'
 
-# common
+dpdk_home: "{{ ansible_env.HOME }}/dpdk-home"
 nr_hugepages: 4096
-
-# pktgen
-pktgen_dir: "{{ install_dir }}/pktgen-dpdk"
-pktgen_repo: "http://dpdk.org/git/apps/pktgen-dpdk"
-pktgen_ver: pktgen-3.0.14
-
-# spp
-spp_repo: "http://dpdk.org/git/apps/spp"
-spp_dir: "{{ install_dir }}/spp"
-spp_ver: v16.07
-qemu_ver: qemu-2.3.0
-qemu_tmpdir: "{{ install_dir }}/qemu_tmp"
-qemu_dir: "{{ install_dir }}/{{ qemu_ver }}"
+dpdk_ver: v16.07

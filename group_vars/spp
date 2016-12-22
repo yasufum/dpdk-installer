@@ -1,0 +1,10 @@
+---
+# spp
+
+spp_repo: "http://dpdk.org/git/apps/spp"
+spp_dir: "{{ dpdk_home }}/spp"
+spp_ver: "{{ dpdk_ver }}"
+
+qemu_ver: qemu-2.3.0
+qemu_tmpdir: "{{ dpdk_home }}/qemu_tmp"
+qemu_dir: "{{ dpdk_home }}/{{ qemu_ver }}"
