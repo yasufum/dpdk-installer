@@ -2,3 +2,4 @@
 # Variables are applicable to all host groups
 # all
 
+dein_home: "{{ ansible_env.HOME }}/dein"
