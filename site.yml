@@ -3,7 +3,7 @@
 
 - name: apply all base packages
   hosts: all
-  remote_user: dpdk
+  remote_user: dpdk 
   roles:
     - common
 
