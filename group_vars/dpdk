@@ -1,0 +1,6 @@
+---
+# dpdk
+
+dpdk_dir: "{{ dpdk_home }}/dpdk"
+dpdk_repo: "http://dpdk.org/git/dpdk"
+dpdk_target: x86_64-ivshmem-linuxapp-gcc

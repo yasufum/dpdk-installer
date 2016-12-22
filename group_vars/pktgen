@@ -1,0 +1,6 @@
+---
+# pktgen
+
+pktgen_dir: "{{ dpdk_home }}/pktgen-dpdk"
+pktgen_repo: "http://dpdk.org/git/apps/pktgen-dpdk"
+pktgen_ver: pktgen-3.0.14
