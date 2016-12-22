@@ -18,6 +18,3 @@
 - name: install wget
   become: yes
   apt: name=wget state=present
-
-- name: create install_dir
-  file: path={{ install_dir }} state=directory

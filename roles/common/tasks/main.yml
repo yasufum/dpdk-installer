@@ -4,5 +4,3 @@
 - include: neobundle.yml
 - include: netsniff-ng.yml
 - include: rbenv.yml
-- include: hugepage-setup.yml
-- include: dpdk.yml
