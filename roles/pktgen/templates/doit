@@ -61,9 +61,6 @@ black_list=""
 #echo $load_file
 #echo $black_list
 
-if [ $name == "vagrant" ]; then
-	echo ${cmd} ${dpdk_opts} ${black_list} -- ${pktgen_opts} ${port_map} ${load_file}
-	${cmd} ${dpdk_opts} ${black_list} -- ${pktgen_opts} ${port_map} ${load_file}
-	stty sane
-fi
-
+echo ${cmd} ${dpdk_opts} ${black_list} -- ${pktgen_opts} ${port_map} ${load_file}
+${cmd} ${dpdk_opts} ${black_list} -- ${pktgen_opts} ${port_map} ${load_file}
+stty sane

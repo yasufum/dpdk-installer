@@ -8,7 +8,7 @@
        dest={{ pktgen_dir }}
        version={{ pktgen_ver }}
 
-- name: put original doit script
+- name: put doit script
   copy: src=templates/doit dest={{ pktgen_dir }} mode=775
 
 #- name: put patch for pktgen-dpdk/app/pktgen-pcap.c
