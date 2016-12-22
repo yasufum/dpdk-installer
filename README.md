@@ -2,8 +2,8 @@
 
 This program setup following tools with ansible.
 
-- DPDK 16.07
-- pktge-dpdk 3.0.14
+- DPDK 16.07 (configurable in group_vars/dpdk)
+- pktge-dpdk 3.0.16 (configurable in group_vars/pktgen)
 - qemu-2.3.0 (specialized for dpdk's ivshmem)
 
 
@@ -19,9 +19,9 @@ I only tested version 2.0.0.2 and 2.0.1.0 but other versions might work.
 #### (2) ssh
 
 Ansible uses ssh to install tools on remote server,
-so you have to ssh client into ansible-server in which ansible is installed.
+so you have to ssh client into ansible server in which ansible is installed.
 
-You also have to install sshd into ansible-clients to install DPDK or
+You also have to install sshd in ansible clients before install DPDK or
 other tools.
 
 
@@ -29,23 +29,27 @@ other tools.
 
 #### 2.1. Understand roles
 
-First of all, edit "hosts" to register IP addresses under each of roles.
+First of all, edit "hosts" to register IP addresses or hostname under each of roles.
 
-There are three roles in hosts file, common, spp and pktgen.
+There are several roles in hosts file.
 Role is a kind of group of installation tasks.
-Each of tasks is listed in "roles/[role_name]/tasks/main.yml".
+Each of tasks of the role is listed in "roles/[role_name]/tasks/main.yml".
 
 ##### (1) common role
 
 Applied for all of roles as common tasks.
 If you run other tasks, common is run before them.
 
-##### (2) spp role
+##### (2) dpdk role
+
+Setup environment for running [dpdk](http://www.dpdk.org/).
+
+##### (3) spp role
 
 Setup environment for running [spp](http://www.dpdk.org/browse/apps/spp/) and qemu for dpdk apps on VMs. 
 
 
-##### (3) pktgen role
+##### (4) pktgen role
 
 Setup environment for [pktgen](http://www.dpdk.org/browse/apps/pktgen-dpdk/).
 
