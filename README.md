@@ -21,8 +21,11 @@ I only tested version 2.0.0.2 and 2.0.1.0 but other versions might work.
 Ansible uses ssh to install tools on remote server,
 so you have to ssh client into ansible server in which ansible is installed.
 
-You also have to install sshd in ansible clients before install DPDK or
-other tools.
+You also have to install sshd on ansible clients and to be able to ssh-key login from the server
+before install DPDK and other applications. 
+
+In order to ssh-key login, you generate with `ssh-keygen` on the server and copy content of it to 
+`$HOME/.ssh/authorized_keys` on the clients.
 
 
 ### 2. How to use
