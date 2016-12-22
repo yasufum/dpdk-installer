@@ -2,6 +2,3 @@
 # Variables are applicable to all host groups
 # all
 
-dpdk_home: "{{ ansible_env.HOME }}/dpdk-home"
-nr_hugepages: 4096
-dpdk_ver: v16.07
