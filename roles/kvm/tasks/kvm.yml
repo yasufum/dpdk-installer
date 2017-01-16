@@ -1,0 +1,17 @@
+---
+- name: install kvm
+  become: yes
+  apt: pkg=kvm update_cache=no state=present
+
+- name: install virt-manager
+  become: yes
+  apt: pkg=virt-manager update_cache=no state=present
+
+- name: install libvirt-bin
+  become: yes
+  apt: pkg=libvirt-bin update_cache=no state=present
+
+- name: install bridge-utils
+  become: yes
+  apt: pkg=bridge-utils update_cache=no state=present
+

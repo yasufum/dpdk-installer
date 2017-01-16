@@ -13,6 +13,12 @@
   roles:
     - dpdk 
 
+- name: install kvm 
+  hosts: dpdk 
+  remote_user: dpdk
+  roles:
+    - kvm
+
 - name: install spp and qemu 
   hosts: spp
   remote_user: dpdk
