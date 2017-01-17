@@ -28,7 +28,8 @@
   command: rm -rf {{ qemu_tmpdir }}
 
 - name: configure qemu
-  command: ./configure chdir={{ qemu_dir }}
+  command: ./configure --enable-kvm --target-list=x86_64-softmmu --enable-vhost-net
+           chdir={{ qemu_dir }}
 
 - name: make qemu
   command: make chdir={{ qemu_dir }}
