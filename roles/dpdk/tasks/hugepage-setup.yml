@@ -1,7 +1,7 @@
 ---
 - name: set hugepages size
   become: yes
-  command: sh -c "echo {{ nr_hugepages }} > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages"
+  command: sh -c "echo {{ nr_hugepages }} > /sys/kernel/mm/hugepages/hugepages-{{ hugepage_size }}/nr_hugepages"
 
 - name: mkdir -p /mnt/huge
   become: yes
