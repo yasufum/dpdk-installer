@@ -21,7 +21,8 @@ end
 task :default => [
   :confirm_sshkey,
   :confirm_http_proxy,
-  :dummy
+  #:dummy
+  :install
 ] do
   puts "done" 
 end
