@@ -1,13 +1,13 @@
 ---
 - name: get dein
-  get_url: url=https://raw.githubusercontent.com/Shougo/dein.vim/master/bin/installer.sh
-           dest={{ ansible_env.HOME }}
+  git: repo={{ dein_repo }}
+       dest={{ dein_dir }}
 
 - name: install dein 
-  command: sh {{ ansible_env.HOME }}/installer.sh {{ dein_home }}
+  command: sh {{ dein_dir }}/bin/installer.sh {{ dein_home }}
 
-- name: remove installer.sh
-  command: rm {{ ansible_env.HOME }}/installer.sh
+- name: remove install.sh
+  command: rm -rf {{ dein_dir }}
 
 - name: put .vimrc
   template: src=templates/vimrc_dein.j2 dest={{ ansible_env.HOME }}/.vimrc mode=664
