@@ -6,27 +6,42 @@
   remote_user: dpdk 
   roles:
     - common
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ http_proxy }}"
 
 - name: install dpdk
   hosts: dpdk 
   remote_user: dpdk
   roles:
     - dpdk 
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ http_proxy }}"
 
 - name: install kvm 
   hosts: dpdk 
   remote_user: dpdk
   roles:
     - kvm
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ http_proxy }}"
 
 - name: install spp and qemu 
   hosts: spp
   remote_user: dpdk
   roles:
     - spp
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ http_proxy }}"
 
 - name: install pktgen
   hosts: pktgen 
   remote_user: dpdk
   roles:
     - pktgen
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ http_proxy }}"
