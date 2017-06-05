@@ -1,18 +1,42 @@
 require "yaml"
 require "fileutils"
 
+# Set up variables for use specific info
+#
+# [memo]
+# This script asks user specific params and is sensitive for the difference
+# between "" and nil loaded from YAML to recognize it is already
+# set or not("" means already set).
+# It doesn't ask for params which are set "" to avoid redundant question.
+# If you run 'rake clean', target params are set to nil.
+
 # Overwrite conf in a vars_file stored in group_vars.
-def update_var(vars_file, key, val)
+# Last arg 'clean_flg' is true if running 'rake clean' to make val empty,
+# or false to set val as "" which means it's set to no value
+# but not empty for recognizing it's already set.
+#   key:     # true
+#   key: ""  # false
+def update_var(vars_file, key, val, clean_flg=false)
   str = ""
   open(vars_file, "r") {|f|
     f.each_line {|l|
       if l.include? "#{key}:"
-        str += "#{key}: #{val}\n"
+        if clean_flg == false
+          str += "#{key}: \"#{val}\"\n"
+        else
+          str += "#{key}: #{val}\n"
+        end
       else
         str += l
       end
     }
   }
+
+  # Check if key is included in vars_file
+  if !str.include? key
+    raise "Error: There is no attribute '#{key}'!"
+  end
+
   open(vars_file, "w+"){|f| f.write(str)}
 end
 
@@ -34,7 +58,7 @@ task :confirm_sshkey do
   target = "./roles/common/templates/id_rsa.pub"
   sshkey = "#{ENV['HOME']}/.ssh/id_rsa.pub"
   if not File.exists? target 
-    puts "SSH key ocnfiguration."
+    puts "SSH key configuration."
     puts "> '#{target}' doesn't exist."
     puts "> Please put your public key as '#{target}' for login spp VMs."
 
@@ -63,34 +87,36 @@ task :confirm_http_proxy do
   vars_file = "group_vars/all"
   yaml = YAML.load_file(vars_file)
   # Check if http_proxy same as your env is described in the vars_file
-  if (http_proxy != "") or (http_proxy != yaml['http_proxy'])
-    puts "Check proxy configuration."
-    puts  "> 'http_proxy' is set to be '#{yaml['http_proxy']}'"
-    print "> or use default? (#{http_proxy}) [Y/n]: "
-    ans = STDIN.gets.chop
-    if ans.downcase == "n" or ans.downcase == "no"
-      print "> http_proxy: "
-      new_proxy = STDIN.gets.chop
-    else
-      new_proxy = http_proxy
-    end
-
-    if yaml['http_proxy'] != new_proxy
-      # update proxy conf
-      str = ""  # contains updated contents of vars_file to write new one
-      open(vars_file, "r") {|f|
-        f.each_line {|l|
-          if l.include? "http_proxy:"
-            str += "http_proxy: #{new_proxy}\n"
-          else
-            str += l
-          end
+  if yaml['http_proxy'] == nil
+    if (http_proxy != "") or (http_proxy != yaml['http_proxy'])
+      puts "Check proxy configuration."
+      puts  "> 'http_proxy' is set to be '#{yaml['http_proxy']}'"
+      print "> or use default? (#{http_proxy}) [Y/n]: "
+      ans = STDIN.gets.chop
+      if ans.downcase == "n" or ans.downcase == "no"
+        print "> http_proxy: "
+        new_proxy = STDIN.gets.chop
+      else
+        new_proxy = http_proxy
+      end
+  
+      if yaml['http_proxy'] != new_proxy
+        # update proxy conf
+        str = ""  # contains updated contents of vars_file to write new one
+        open(vars_file, "r") {|f|
+          f.each_line {|l|
+            if l.include? "http_proxy:"
+              str += "http_proxy: \"#{new_proxy}\"\n"
+            else
+              str += l
+            end
+          }
         }
-      }
-      open(vars_file, "w+"){|f| f.write(str)}
-      puts "> update 'http_proxy' to '#{new_proxy}' in 'group_vars/all'."
-    else
-      puts "> proxy isn't changed."
+        open(vars_file, "w+"){|f| f.write(str)}
+        puts "> update 'http_proxy' to '#{new_proxy}' in 'group_vars/all'."
+      else
+        puts "> proxy isn't changed."
+      end
     end
   end
 end
@@ -98,9 +124,10 @@ end
 
 desc "Update remote_user, ansible_ssh_pass and ansible_sudo_pass."
 task :confirm_account do
+  target_params = ["remote_user", "ansible_ssh_pass", "ansible_sudo_pass"]
   vars_file = "group_vars/all"
   yaml = YAML.load_file(vars_file)
-  ["remote_user", "ansible_ssh_pass", "ansible_sudo_pass"].each do |account_info|
+  target_params.each do |account_info|
     cur_info = yaml[account_info]
     # Check if cur_info is described in the vars_file
     if cur_info == nil
@@ -132,12 +159,22 @@ end
 
 desc "Run ansible playbook"
 task :install do
-  sh "ansible-playbook -i hosts site.yml"
+  vars_file = "group_vars/all"
+  yaml = YAML.load_file(vars_file)
+  if yaml["http_proxy"] == nil or yaml["http_proxy"] == "" 
+    sh "ansible-playbook -i hosts site.yml"
+  else
+    sh "ansible-playbook -i hosts site_proxy.yml"
+  end
 end
 
 
 desc "Clean variables depend on user env"
 task :clean do
+  target_params = [
+    "remote_user", "ansible_ssh_pass", "ansible_sudo_pass", "http_proxy"
+  ]
+
   puts "Clean user specific info."
   # remove public key
   target = "./roles/common/templates/id_rsa.pub"
@@ -145,8 +182,8 @@ task :clean do
   puts "> remove #{target}."
 
   # remove ssh user account form vars file.
-  ["remote_user", "ansible_ssh_pass", "ansible_sudo_pass", "http_proxy"].each do |key|
-    update_var("group_vars/all", key, "")
+  target_params.each do |key|
+    update_var("group_vars/all", key, "", true)
     puts "> clear '#{key}' in 'group_vars/all'."
   end
 end

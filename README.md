@@ -21,9 +21,9 @@ This script also installs customized qemu for extending ivshmem to use hugepages
 ### 1. Recommended System Requirements
 
   - Ubuntu 16.04
-  - CPU: 8 cores
-  - Memory: 16GB
-  - NIC: 2 ports
+  - CPU: 4~ (cores)
+  - Memory: 8~ (GB)
+  - NIC: 2~ (ports)
 
 
 ### 2. Installation
@@ -54,15 +54,17 @@ copy content of it to
 
 #### 3.1. Understand roles
 
-There are several roles defined in hosts file.
+There are several roles defined in `hosts` file.
 Role is a kind of group of installation tasks.
 Each of tasks of the role is listed in "roles/[role_name]/tasks/main.yml".
 
+Target machine are specified as a list of IP address or hostname in `hosts`.
+Empty list means the role is not effective.
+For example, if you only use dpdk, empty the entries of pktgen and spp.
 
 ##### (1) common role
 
 Applied for all of roles as common tasks.
-If you run other tasks, common is run before them.
 
 ##### (2) dpdk role
 
@@ -86,7 +88,7 @@ Install kvm and libvirt tools.
 
 #### 3.2. Add a user
 
-For remote login to ansible-clients, you have to create an account and add
+For remote login to ansible-clients, create an account and add
 following account info in `group_vars/all`.
 You can also setup it by running rake command detailed in later.
 
@@ -94,7 +96,7 @@ You can also setup it by running rake command detailed in later.
   - ansible_ssh_pass: password for ssh login
   - ansible_sudo_pass: password for doing sudo
 
-If you don't have the account, add it as sudoer.
+If you don't have a account, add it as sudoer.
 
 ```
 $ sudo adduser dpdk
@@ -118,7 +120,7 @@ DPDK params are defined in group_vars/{dpdk spp pktgen}.
   - nr_hugepages: Number of hugepages.
   - dpdk_interfaces: List of names of network interface assign to DPDK.
 
-If you use other than 2048kB of hugepage size (typically 1GB), you have to
+If you use other than 2048kB of hugepage size (typically 1GB),
 define it as mount option described in "Using Hugepages with the DPDK" section
 in [Getting Started Guide](http://dpdk.org/doc/guides/linux_gsg/sys_reqs.html).
 
@@ -128,9 +130,28 @@ in [Getting Started Guide](http://dpdk.org/doc/guides/linux_gsg/sys_reqs.html).
 You can setup and install DPDK by running rake which is a `make` like build tool.
 
 Type simply `rake` to run default task for setup and install at once.
+At first time you run rake, it asks you some questions for configuration. 
 
 ```sh
-$ rake
+ugwort:dpdk-installer ogawa$ rake
+> input new remote_user.
+[type your account]
+> update 'remote_user' to 'dpdk1607' in 'group_vars/all'.
+> input new ansible_ssh_pass.
+[type your passwd]
+> update 'ansible_ssh_pass' to 'dpdk3388' in 'group_vars/all'.
+> input new ansible_sudo_pass.
+[type your passwd]
+> update 'ansible_sudo_pass' to 'dpdk3388' in 'group_vars/all'.
+SSH key configuration.
+> './roles/common/templates/id_rsa.pub' doesn't exist.
+> Please put your public key as './roles/common/templates/id_rsa.pub' for login spp VMs.
+> copy '/Users/ogawa/.ssh/id_rsa.pub' to './roles/common/templates/id_rsa.pub'? [y/N]
+[type y or n]
+Check proxy configuration.
+> 'http_proxy' is set to be ''
+> or use default? () [Y/n]: 
+[type y or n]
 ```
 
 To list all of tasks, run `rake -T`.
@@ -150,6 +171,7 @@ rake install             # Run ansible playbook
 
 If you need to remove account and proxy configuration from config files,
 run "clean" task.
+It is useful if you share the repo in public.
 
 ```sh
 $ rake clean
