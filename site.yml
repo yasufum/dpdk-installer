@@ -3,7 +3,7 @@
 
 - name: apply all base packages
   hosts: all
-  remote_user: "{{ user_account }}" 
+  remote_user: "{{ remote_user }}" 
   roles:
     - common
   environment:
@@ -12,7 +12,7 @@
 
 - name: install dpdk
   hosts: dpdk 
-  remote_user: "{{ user_account }}" 
+  remote_user: "{{ remote_user }}" 
   roles:
     - dpdk 
   environment:
@@ -21,7 +21,7 @@
 
 - name: install kvm 
   hosts: dpdk 
-  remote_user: "{{ user_account }}"
+  remote_user: "{{ remote_user }}"
   roles:
     - kvm
   environment:
@@ -39,7 +39,7 @@
 
 - name: install pktgen
   hosts: pktgen 
-  remote_user: "{{ user_account }}"
+  remote_user: "{{ remote_user }}"
   roles:
     - pktgen
   environment:
