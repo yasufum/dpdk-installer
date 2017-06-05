@@ -1,6 +1,17 @@
-## Install DPDK and pktgen with ansible
+## Install DPDK and pktgen, spp
 
-This program setup following tools with ansible.
+Install script for
+[DPDK](http://dpdk.org/browse/dpdk/) and
+[pktgen](http://dpdk.org/browse/apps/pktgen-dpdk/),
+[spp](http://dpdk.org/browse/apps/spp/) with ansible.
+Pktgen is a high-performance traffic generator and spp is a patch panel like 
+switching function for Inter-VM communication.
+
+Installed DPDK version is 16.07 which supports
+[IVSHMEM](http://dpdk.org/doc/guides-16.07/prog_guide/ivshmem_lib.html?highlight=ivshmem)
+for zero-copy transfer among host and gest VMs.
+
+This script also installs customized qemu for extending ivshmem to use hugepages.
 
 - DPDK 16.07
 - pktge-dpdk 3.0.16
@@ -35,11 +46,10 @@ In order to ssh-key login, you generate with `ssh-keygen` on the server and copy
 
 #### 2.1. Understand roles
 
-First of all, edit "hosts" to register IP addresses or hostname under each of roles.
-
-There are several roles in hosts file.
+There are several roles defined in hosts file.
 Role is a kind of group of installation tasks.
 Each of tasks of the role is listed in "roles/[role_name]/tasks/main.yml".
+
 
 ##### (1) common role
 
@@ -48,27 +58,38 @@ If you run other tasks, common is run before them.
 
 ##### (2) dpdk role
 
-Setup environment for running [dpdk](http://www.dpdk.org/).
+Setup environment for running [dpdk](http://www.dpdk.org/) and install.
 
-##### (3) spp role
+##### (3) pktgen role
 
-Setup environment for running [spp](http://www.dpdk.org/browse/apps/spp/) and qemu
-for dpdk apps on VMs. 
+Setup environment for [pktgen](http://www.dpdk.org/browse/apps/pktgen-dpdk/)
+and install.
+
+##### (4) spp role
+
+Setup environment for running [spp](http://www.dpdk.org/browse/apps/spp/)
+and install.
+It also install customized qemu. 
+
+##### (5) kvm role
+
+Install kvm and libvirt tools. 
 
 
-##### (4) pktgen role
+#### 2.2. Add a user
 
-Setup environment for [pktgen](http://www.dpdk.org/browse/apps/pktgen-dpdk/).
+For remote login to ansible-clients, you have to create an account as default
+user.
+Default user "dpdk1607" is defined as `remote_user` with empty password
+in `group_vars/all`.
+Password is empty because for security, so you need to decide it when you create
+your account.
+Then add it to `group_vars/all` or input directory when you run `rake`.
 
+[NOTE] 
+Add http_proxy in .bashrc after create user if you are in proxy environment.
 
-#### 2.2. Add an user
-
-On each of ansible-clients, you should create an account.
-Default user is "dpdk" as defined in hosts file and 
-you might edit username and password defined in hosts.
-Then make it as sudoer as following.
-
-[NOTE] Add http_proxy in .bashrc after create user if you are in proxy environment.
+Add the account as sudoer as following.
 
 ```
 $ sudo adduser dpdk
