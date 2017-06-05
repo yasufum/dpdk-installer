@@ -125,7 +125,6 @@ task :confirm_account do
 end
 
 
-desc "Dummy task used for debugging"
 task :dummy do
   puts "I'm dummy task!"
 end
@@ -139,10 +138,13 @@ end
 
 desc "Clean variables depend on user env"
 task :clean do
+  puts "Clean user specific info."
+  # remove public key
   target = "./roles/common/templates/id_rsa.pub"
   FileUtils.rm_f(target)
   puts "> remove #{target}."
 
+  # remove ssh user account form vars file.
   ["remote_user", "ansible_ssh_pass", "ansible_sudo_pass", "http_proxy"].each do |key|
     update_var("group_vars/all", key, "")
     puts "> clear '#{key}' in 'group_vars/all'."

@@ -78,19 +78,15 @@ Install kvm and libvirt tools.
 
 #### 2.2. Add a user
 
-For remote login to ansible-clients, you have to create an account as default
-user.
-Default user "dpdk1607" is defined as `remote_user` with empty password
-in `group_vars/all`.
-Password is empty because for security reason. 
-You need to decide it when you create
-your account.
-Then add it to `group_vars/all` or input directory when you run `rake`.
+For remote login to ansible-clients, you have to create an account and add
+following account info in `group_vars/all`.
+You can also setup it by running rake command detailed in later.
 
-[NOTE] 
-Add http_proxy in .bashrc after create user if you are in proxy environment.
+  - remote_user: your account name
+  - ansible_ssh_pass: password for ssh login
+  - ansible_sudo_pass: password for doing sudo
 
-Add the account as sudoer as following.
+If you don't have the account, add it as sudoer.
 
 ```
 $ sudo adduser dpdk
@@ -105,18 +101,55 @@ $ sudo userdel -r dpdk
 ```
 
 
-#### 2.3. Run ansible-playbook.
-```
-$ ansible-playbook -i hosts site.yml
-```
-or use rake for short.
-```
+#### 2.3. Rake
+
+You can setup and install DPDK by running rake which is a `make` like build tool.
+
+Type simply `rake` to run default task for setup and install at once.
+
+```sh
 $ rake
 ```
 
+To list all of tasks, run `rake -T`.
+The default task includes "confirm_*" and "install" tasks.
+You can run each of tasks explicitly by specifying task name.
+"install" task runs "ansible-playbook".
 
-#### (4) Run pktgen-dpdk.
-Login as dpdk, then move to pktgen-dpdk directory.
+```sh
+$ rake -T
+rake clean               # Clean variables depend on user env
+rake confirm_account     # Update remote_user, ansible_ssh_pass and ansible_sudo_pass
+rake confirm_http_proxy  # Check http_proxy setting
+rake confirm_sshkey      # Check if sshkey exists and copy from your $HOME/.ssh/id_rsa.pub
+rake default             # Run tasks for install
+rake install             # Run ansible playbook
+```
+
+If you need to remove account and proxy configuration from config files,
+run "clean" task.
+
+```sh
+$ rake clean
+```
+
+
+#### 2.4. Run ansible-playbook.
+
+You don't do this section if you use `rake` previous section.
+
+If you setup config and run ansible-playbook manually,
+run ansible-playbook with inventory file `hosts` and `site.yml`.
+
+```
+$ ansible-playbook -i hosts site.yml
+```
+
+
+#### 3. Using pktgen-dpdk
+
+pktgen is installed in $HOME/dpdk-home/pktgen-dpdk.
+Exec file is $HOME/pktgen-dpdk/app/app/x86_64-native-linuxapp-gcc/pktgen.
 
 ```
 $ ssh dpdk@localhost
@@ -124,32 +157,20 @@ Welcome to Ubuntu 16.04.4 LTS (GNU/Linux 4.2.0-35-generic x86_64)
 
  * Documentation:  https://help.ubuntu.com/
 Last login: Sun May  8 01:44:03 2016 from 10.0.2.2
-dpdk@localhost:~$ ls
-do_after_reboot.sh  dpdk  install.sh  netsniff-ng  pktgen-dpdk
 dpdk@localhost:~$ cd dpdk_home/pktgen-dpdk/
 ```
 
-Run pktgen located on $HOME/pktgen-dpdk/app/app/x86_64-native-linuxapp-gcc/pktgen.
 You can run it directory, but it better to use `doit` script.
-```
+Refer to [README](http://dpdk.org/browse/apps/pktgen-dpdk/tree/README.md)
+of pktgen for how to use and more details.
+
+```sh
 dpdk@localhost:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
 ```
 
-if you change options for pktgen, edit `doit` script. Please refer to pktgen-dpdk's [README](http://dpdk.org/browse/apps/pktgen-dpdk/tree/README.md) for details.
-```
-# doit
 
-dpdk_opts="-c 3  -n 2 --proc-type auto --log-level 7"
-#dpdk_opts="-l 18-26 -n 3 --proc-type auto --log-level 7 --socket-mem 256,256 --file-prefix pg"
-pktgen_opts="-T -P"
-#port_map="-m [19:20].0 -m [21:22].1 -m [23:24].2 -m [25:26].3"
-port_map="-m [0:1].0 -m [2:3].1"
-#port_map="-m [2-4].0 -m [5-7].1"
-#load_file="-f themes/black-yellow.theme"
-load_file="-f themes/white-black.theme"
-#black_list="-b 06:00.0 -b 06:00.1 -b 08:00.0 -b 08:00.1 -b 09:00.0 -b 09:00.1 -b 83:00.1"
-black_list=""
-```
+#### 4. Using spp
+
 
 ### Status
 This program is under construction.
