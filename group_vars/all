@@ -2,9 +2,11 @@
 # Variables are applicable to all host groups
 # all
 
-ansible_ssh_pass: dpdk3388
-ansible_sudo_pass: dpdk3388
+ansible_ssh_pass: 
+ansible_sudo_pass: 
+http_proxy: 
+
+# dein
 dein_home: "{{ ansible_env.HOME }}/dein"
 dein_repo: "https://github.com/Shougo/dein.vim.git"
 dein_dir: "{{ ansible_env.HOME }}/dein.vim"
-http_proxy: "http://proxy-bcp.ecl.ntt.co.jp:20066"
