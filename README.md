@@ -146,7 +146,7 @@ $ ansible-playbook -i hosts site.yml
 ```
 
 
-#### 3. Using pktgen-dpdk
+### 3. Using pktgen-dpdk
 
 pktgen is installed in $HOME/dpdk-home/pktgen-dpdk.
 Exec file is $HOME/pktgen-dpdk/app/app/x86_64-native-linuxapp-gcc/pktgen.
@@ -169,12 +169,14 @@ dpdk@localhost:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
 ```
 
 
-#### 4. Using spp
+### 4. Using SPP 
 
+SPP is installed in $HOME/dpdk-home/spp.
 
-### Status
-This program is under construction.
+Please refer to [README](http://dpdk.org/browse/apps/spp/tree/README)
+and [setup_guide](http://dpdk.org/browse/apps/spp/tree/docs/setup_guide.md)
+for details.
+
 
 ### License
-This program is released under the MIT license:
-- http://opensource.org/licenses/MIT
+This program is released under the BSD license.
