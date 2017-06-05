@@ -1,13 +1,18 @@
 ---
 # dpdk
 
-dpdk_ver: v16.07
+# Change params for your env 
+hugepage_size: 2048kB
 nr_hugepages: 4096
 dpdk_interfaces: "enp2s0f0 enp2s0f1"
-dpdk_target: x86_64-ivshmem-linuxapp-gcc
 
+# Use "x86_64-ivshmem-ivshmem-gcc" for ivshmem
+dpdk_target: x86_64-ivshmem-linuxapp-gcc
+#dpdk_target: x86_64-native-linuxapp-gcc
+
+
+# Do not edit
 dpdk_home: "{{ ansible_env.HOME }}/dpdk-home"
 dpdk_dir: "{{ dpdk_home }}/dpdk"
 dpdk_repo: "http://dpdk.org/git/dpdk"
-
-hugepage_size: 2048kB
+dpdk_ver: v16.07

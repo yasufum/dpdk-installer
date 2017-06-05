@@ -1,6 +1,6 @@
 ## Install DPDK and pktgen, spp
 
-Install script for
+Install scripts for
 [DPDK](http://dpdk.org/browse/dpdk/) and
 [pktgen](http://dpdk.org/browse/apps/pktgen-dpdk/),
 [spp](http://dpdk.org/browse/apps/spp/) with ansible.
@@ -8,8 +8,7 @@ Pktgen is a high-performance traffic generator and spp is a patch panel like
 switching function for Inter-VM communication.
 
 Installed DPDK version is 16.07 which supports
-[IVSHMEM](http://dpdk.org/doc/guides-16.07/prog_guide/ivshmem_lib.html?highlight=ivshmem)
-for zero-copy transfer among host and gest VMs.
+[IVSHMEM](http://dpdk.org/doc/guides-16.07/prog_guide/ivshmem_lib.html?highlight=ivshmem).
 
 This script also installs customized qemu for extending ivshmem to use hugepages.
 
@@ -19,7 +18,15 @@ This script also installs customized qemu for extending ivshmem to use hugepages
 - qemu-2.3.0 (customized for DPDK's ivshmem)
 
 
-### 1. Installation
+### 1. Recommended System Requirements
+
+  - Ubuntu 16.04
+  - CPU: 8 cores
+  - Memory: 16GB
+  - NIC: 2 ports
+
+
+### 2. Installation
 
 You have to install ansible before running ansible-playbook which is a
 instruction for building DPDK and other tools.
@@ -38,13 +45,14 @@ so you have to ssh client into ansible server in which ansible is installed.
 You also have to install sshd on ansible clients and to be able to ssh-key login
 from the server before install DPDK and other applications.
 
-In order to ssh-key login, you generate with `ssh-keygen` on the server and copy content of it to 
+In order to ssh-key login, you generate with `ssh-keygen` on the server and
+copy content of it to 
 `$HOME/.ssh/authorized_keys` on the clients.
 
 
-### 2. How to use
+### 3. How to use
 
-#### 2.1. Understand roles
+#### 3.1. Understand roles
 
 There are several roles defined in hosts file.
 Role is a kind of group of installation tasks.
@@ -76,7 +84,7 @@ It also install customized qemu.
 Install kvm and libvirt tools. 
 
 
-#### 2.2. Add a user
+#### 3.2. Add a user
 
 For remote login to ansible-clients, you have to create an account and add
 following account info in `group_vars/all`.
@@ -94,14 +102,28 @@ $ sudo adduser dpdk
 $ sudo gpasswd -a dpdk sudo
 ```
 
-Delete account by userdel if it's no need. You should add -r option to delete home directory.
+Delete account by userdel if it's no need. You should add -r option to delete
+home directory.
 
 ```
 $ sudo userdel -r dpdk
 ```
 
+#### 3.3. Configuration
 
-#### 2.3. Rake
+For DPDK, You might have to change params for your environment.
+DPDK params are defined in group_vars/{dpdk spp pktgen}. 
+
+  - hugepage_size: Size of each of hugepage.
+  - nr_hugepages: Number of hugepages.
+  - dpdk_interfaces: List of names of network interface assign to DPDK.
+
+If you use other than 2048kB of hugepage size (typically 1GB), you have to
+define it as mount option described in "Using Hugepages with the DPDK" section
+in [Getting Started Guide](http://dpdk.org/doc/guides/linux_gsg/sys_reqs.html).
+
+
+#### 3.4. Run rake
 
 You can setup and install DPDK by running rake which is a `make` like build tool.
 
@@ -134,7 +156,7 @@ $ rake clean
 ```
 
 
-#### 2.4. Run ansible-playbook.
+#### 3.5. (Optional) Run ansible-playbook.
 
 You don't do this section if you use `rake` previous section.
 
@@ -146,7 +168,7 @@ $ ansible-playbook -i hosts site.yml
 ```
 
 
-### 3. Using pktgen-dpdk
+### 4. Using pktgen-dpdk
 
 pktgen is installed in $HOME/dpdk-home/pktgen-dpdk.
 Exec file is $HOME/pktgen-dpdk/app/app/x86_64-native-linuxapp-gcc/pktgen.
@@ -169,7 +191,7 @@ dpdk@localhost:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
 ```
 
 
-### 4. Using SPP 
+### 5. Using SPP 
 
 SPP is installed in $HOME/dpdk-home/spp.
 
