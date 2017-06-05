@@ -58,7 +58,7 @@ There are several roles defined in `hosts` file.
 Role is a kind of group of installation tasks.
 Each of tasks of the role is listed in "roles/[role_name]/tasks/main.yml".
 
-Target machine are specified as a list of IP address or hostname in `hosts`.
+Target machines are specified as a list of IP address or hostname in `hosts`.
 Empty list means the role is not effective.
 For example, if you only use dpdk, empty the entries of pktgen and spp.
 
@@ -79,7 +79,7 @@ and install.
 
 Setup environment for running [spp](http://www.dpdk.org/browse/apps/spp/)
 and install.
-It also install customized qemu. 
+It also installs customized qemu. 
 
 ##### (5) kvm role
 
