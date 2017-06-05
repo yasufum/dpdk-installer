@@ -82,7 +82,8 @@ For remote login to ansible-clients, you have to create an account as default
 user.
 Default user "dpdk1607" is defined as `remote_user` with empty password
 in `group_vars/all`.
-Password is empty because for security, so you need to decide it when you create
+Password is empty because for security reason. 
+You need to decide it when you create
 your account.
 Then add it to `group_vars/all` or input directory when you run `rake`.
 

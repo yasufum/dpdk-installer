@@ -20,7 +20,7 @@ end
 # Default task
 desc "Run tasks for install"
 task :default => [
-  :confirm_passwd,
+  :confirm_account,
   :confirm_sshkey,
   :confirm_http_proxy,
   :install
@@ -96,33 +96,30 @@ task :confirm_http_proxy do
 end
 
 
-desc "Update ansible_ssh_pass and ansible_sudo_pass."
-task :confirm_passwd do
+desc "Update remote_user, ansible_ssh_pass and ansible_sudo_pass."
+task :confirm_account do
   vars_file = "group_vars/all"
   yaml = YAML.load_file(vars_file)
-  ["ansible_ssh_pass", "ansible_sudo_pass"].each do |passwd|
-    cur_passwd = yaml[passwd]
-    # Check if cur_passwd is described in the vars_file
-    puts "passwd: #{passwd}"
-    puts "cur_passwd: #{cur_passwd}"
-    puts yaml
-    if cur_passwd == nil
-      puts "> input new #{passwd}."
-      input_passwd = STDIN.gets.chop
+  ["remote_user", "ansible_ssh_pass", "ansible_sudo_pass"].each do |account_info|
+    cur_info = yaml[account_info]
+    # Check if cur_info is described in the vars_file
+    if cur_info == nil
+      puts "> input new #{account_info}."
+      input_info = STDIN.gets.chop
 
-      # Overwrite vars_file with new passwd
+      # Overwrite vars_file with new one 
       str = ""
       open(vars_file, "r") {|f|
         f.each_line {|l|
-          if l.include? passwd
-            str += "#{passwd}: #{input_passwd}\n"
+          if l.include? account_info
+            str += "#{account_info}: #{input_info}\n"
           else
             str += l
           end
         }
       }
       open(vars_file, "w+"){|f| f.write(str)}
-      puts "> update '#{passwd}' to '#{input_passwd}' in 'group_vars/all'."
+      puts "> update '#{account_info}' to '#{input_info}' in 'group_vars/all'."
     end
   end
 end
@@ -146,7 +143,7 @@ task :clean do
   FileUtils.rm_f(target)
   puts "> remove #{target}."
 
-  ["ansible_ssh_pass", "ansible_sudo_pass", "http_proxy"].each do |key|
+  ["remote_user", "ansible_ssh_pass", "ansible_sudo_pass", "http_proxy"].each do |key|
     update_var("group_vars/all", key, "")
     puts "> clear '#{key}' in 'group_vars/all'."
   end
