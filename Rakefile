@@ -60,7 +60,7 @@ task :confirm_sshkey do
   if not File.exists? target 
     puts "SSH key configuration."
     puts "> '#{target}' doesn't exist."
-    puts "> Please put your public key as '#{target}' for login spp VMs."
+    puts "> Please put your public key as '#{target}' for target machines."
 
     if File.exists? sshkey
       print "> copy '#{sshkey}' to '#{target}'? [y/N]"
