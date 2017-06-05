@@ -6,6 +6,8 @@ ansible_ssh_pass:
 ansible_sudo_pass: 
 http_proxy: 
 
+user_account: dpdk1607
+
 # dein
 dein_home: "{{ ansible_env.HOME }}/dein"
 dein_repo: "https://github.com/Shougo/dein.vim.git"

@@ -2,18 +2,21 @@
 
 This program setup following tools with ansible.
 
-- DPDK 16.07 (configurable in group_vars/dpdk)
-- pktge-dpdk 3.0.16 (configurable in group_vars/pktgen)
-- qemu-2.3.0 (specialized for dpdk's ivshmem)
+- DPDK 16.07
+- pktge-dpdk 3.0.16
+- spp 16.07
+- qemu-2.3.0 (customized for DPDK's ivshmem)
 
 
 ### 1. Installation
 
-You have to install ansible to run ansible-playbook which is a instruction for building DPDK and other tools.
+You have to install ansible before running ansible-playbook which is a
+instruction for building DPDK and other tools.
 
 #### (1) ansible
 
-Install ansible  >= 2.0 by following this [instruction](http://docs.ansible.com/ansible/intro_installation.html#installation).
+Install ansible  >= 2.0 by following this
+[instruction](http://docs.ansible.com/ansible/intro_installation.html#installation).
 I only tested version 2.0.0.2 and 2.0.1.0 but other versions might work.
 
 #### (2) ssh
@@ -21,8 +24,8 @@ I only tested version 2.0.0.2 and 2.0.1.0 but other versions might work.
 Ansible uses ssh to install tools on remote server,
 so you have to ssh client into ansible server in which ansible is installed.
 
-You also have to install sshd on ansible clients and to be able to ssh-key login from the server
-before install DPDK and other applications. 
+You also have to install sshd on ansible clients and to be able to ssh-key login
+from the server before install DPDK and other applications.
 
 In order to ssh-key login, you generate with `ssh-keygen` on the server and copy content of it to 
 `$HOME/.ssh/authorized_keys` on the clients.
@@ -49,7 +52,8 @@ Setup environment for running [dpdk](http://www.dpdk.org/).
 
 ##### (3) spp role
 
-Setup environment for running [spp](http://www.dpdk.org/browse/apps/spp/) and qemu for dpdk apps on VMs. 
+Setup environment for running [spp](http://www.dpdk.org/browse/apps/spp/) and qemu
+for dpdk apps on VMs. 
 
 
 ##### (4) pktgen role

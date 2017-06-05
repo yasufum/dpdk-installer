@@ -3,7 +3,7 @@
 
 - name: apply all base packages
   hosts: all
-  remote_user: dpdk 
+  remote_user: "{{ user_account }}" 
   roles:
     - common
   environment:
@@ -12,7 +12,7 @@
 
 - name: install dpdk
   hosts: dpdk 
-  remote_user: dpdk
+  remote_user: "{{ user_account }}" 
   roles:
     - dpdk 
   environment:
@@ -21,7 +21,7 @@
 
 - name: install kvm 
   hosts: dpdk 
-  remote_user: dpdk
+  remote_user: "{{ user_account }}"
   roles:
     - kvm
   environment:
@@ -30,7 +30,7 @@
 
 - name: install spp and qemu 
   hosts: spp
-  remote_user: dpdk
+  remote_user: "{{ user_account }}"
   roles:
     - spp
   environment:
@@ -39,7 +39,7 @@
 
 - name: install pktgen
   hosts: pktgen 
-  remote_user: dpdk
+  remote_user: "{{ user_account }}"
   roles:
     - pktgen
   environment:
