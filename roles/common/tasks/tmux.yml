@@ -1,12 +1,4 @@
 ---
-- name: install ruby 
-  become: yes
-  apt: name=ruby state=present
-
-- name: install nmon
-  become: yes
-  apt: name=nmon state=present
-
 - name: install tmux
   become: yes
   apt: name=tmux state=present

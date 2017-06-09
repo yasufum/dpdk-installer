@@ -1,4 +1,8 @@
 ---
+- name: install vim
+  become: yes
+  apt: name=vim state=present
+
 - name: get dein
   git: repo={{ dein_repo }}
        dest={{ dein_dir }}

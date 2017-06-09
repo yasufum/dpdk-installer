@@ -1,0 +1,4 @@
+---
+- name: install ruby 
+  become: yes
+  apt: name=ruby state=present
