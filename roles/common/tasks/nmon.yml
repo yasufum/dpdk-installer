@@ -1,0 +1,4 @@
+---
+- name: install nmon
+  become: yes
+  apt: name=nmon state=present

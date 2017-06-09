@@ -66,6 +66,43 @@ For example, if you only use dpdk, empty the entries of pktgen and spp.
 
 Applied for all of roles as common tasks.
 
+This role installs following applications as defined in YAML files under
+"roles/common/tasks/".
+All of entries are listed in "roles/common/tasks/main.yml" and comment out
+entries if you don't need to install from it.
+
+- base.yml
+  - git
+  - curl
+  - wget
+
+- vim.yml
+  - vim + .vimrc
+  - dein (vim plugin manager)
+
+- emacs.yml
+  - emacs
+
+- tmux.yml
+  - tmux + .tmux.conf
+
+- nmon.yml
+  - nmon (sophisticated resource monitor)
+
+- ruby.yml
+  - ruby
+
+- rbenv.yml
+  - rbenv
+
+- netsniff-ng.yml
+  - netsniff-ng and required packages
+
+Configuration files which are also installed on target machines with the application 
+are included in "roles/common/templates.
+Change the configuration before run ansible if you need to.
+
+
 ##### (2) dpdk role
 
 Setup environment for running [dpdk](http://www.dpdk.org/) and install.
