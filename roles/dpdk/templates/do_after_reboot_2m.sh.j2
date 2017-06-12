@@ -1,11 +1,12 @@
 #!/bin/sh
 
-HUGEPAGES={{ nr_hugepages }}
-
-echo "Setup port for dpdk."
-
-sudo mount -t hugetlbfs nodev /mnt/huge
-sudo sh -c "echo $HUGEPAGES > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages"
+# Setting hugepages is defined in /etc/default/grub as default and loaded
+# while booting.
+# Uncomment following and run this script if you change default setting.
+#HUGEPAGES={{ nr_hugepages }}
+#echo "Setup port for dpdk."
+#sudo mount -t hugetlbfs nodev /mnt/huge
+#sudo sh -c "echo $HUGEPAGES > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages"
 
 # modprobe
 echo sudo modprobe uio_pci_generic 

@@ -30,8 +30,15 @@
 - name: install dpdk
   command: make install T={{ dpdk_target }} chdir={{ dpdk_dir }}
 
-- name: put do_after_reboot.sh
-  template: src=templates/do_after_reboot.sh.j2
+- name: put do_after_reboot.sh 2m
+  when: hugepage_size == "2M"
+  template: src=templates/do_after_reboot_2m.sh.j2
+            dest={{ dpdk_home }}/do_after_reboot.sh
+            mode=775
+
+- name: put do_after_reboot.sh 1g
+  when: hugepage_size == "1G"
+  template: src=templates/do_after_reboot_1g.sh.j2
             dest={{ dpdk_home }}/do_after_reboot.sh
             mode=775
 

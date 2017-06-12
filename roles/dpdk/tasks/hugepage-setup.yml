@@ -1,8 +1,44 @@
 ---
-- name: set hugepages size 2MB
+
+# [TODO] remove after confirming updated version is working correctly
+#- name: set hugepages size 2MB
+#  when: hugepage_size == "2M"
+#  become: yes
+#  command: sh -c "echo {{ nr_hugepages }} > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages"
+
+# [TODO] remove after confirming updated version is working correctly
+#- name: fstab
+#  replace:
+#    dest=/etc/fstab
+#    regexp='nodev /mnt/huge hugetlbfs *$'
+#    replace='nodev /mnt/huge hugetlbfs defaults 0 0'
+
+- name: clean grub hugepage opt
+  become: yes
+  replace:
+    dest=/etc/default/grub
+    regexp='(hugepages=\d+|default_hugepagesz=1G hugepagesz=1G |hugepagesz=2M )'
+    replace=''
+
+- name: set grub hugepage 2MB
   when: hugepage_size == "2M"
   become: yes
-  command: sh -c "echo {{ nr_hugepages }} > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages"
+  replace:
+    dest=/etc/default/grub
+    regexp='^GRUB_CMDLINE_LINUX="(?!hugepages=)'
+    replace='GRUB_CMDLINE_LINUX="hugepages={{ nr_hugepages }}'
+
+- name: set grub hugepage 1GB
+  when: hugepage_size == "1G"
+  become: yes
+  replace:
+    dest=/etc/default/grub
+    regexp='^GRUB_CMDLINE_LINUX="(?!default_hugepagesz=)'
+    replace='GRUB_CMDLINE_LINUX="default_hugepagesz=1G hugepagesz=1G hugepages={{ nr_hugepages }}'
+
+- name: update grub
+  become: yes
+  shell: update-grub
 
 - name: mkdir -p /mnt/huge
   become: yes
