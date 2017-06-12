@@ -2,6 +2,7 @@
 # Variables are applicable to all host groups
 # all
 
+# Edit params
 remote_user: 
 ansible_ssh_pass: 
 ansible_sudo_pass: 

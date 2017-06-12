@@ -1,12 +1,13 @@
 ---
 # pktgen
 
-# Change params for your env 
-nr_hugepages: 4096
+# Edit params
+#nr_hugepages: 4096
 
 # Use "x86_64-ivshmem-ivshmem-gcc" for ivshmem
 dpdk_target: x86_64-ivshmem-linuxapp-gcc
 #dpdk_target: x86_64-native-linuxapp-gcc
+
 
 # Do not edit
 dpdk_repo: "http://dpdk.org/git/dpdk"

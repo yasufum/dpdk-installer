@@ -49,6 +49,10 @@ In order to ssh-key login, you generate with `ssh-keygen` on the server and
 copy content of it to 
 `$HOME/.ssh/authorized_keys` on the clients.
 
+#### (3) rake
+
+Install rake for running setup script, or you can setup it manually.
+
 
 ### 3. How to use
 
@@ -168,6 +172,8 @@ DPDK params are defined in group_vars/{dpdk spp pktgen}.
   - hugepage_size: Size of each of hugepage.
   - nr_hugepages: Number of hugepages.
   - dpdk_interfaces: List of names of network interface assign to DPDK.
+  - dpdk_target: Set "x86_64-ivshmem-ivshmem-gcc" for using ivshmem, or
+                 "x86_64-native-linuxapp-gcc".
 
 If you use other than 2048kB of hugepage size (typically 1GB),
 define it as mount option described in "Using Hugepages with the DPDK" section
