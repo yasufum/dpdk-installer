@@ -143,9 +143,9 @@ task :confirm_http_proxy do
   # Check if http_proxy same as your env is described in the vars_file
   if yaml['http_proxy'] == nil
     if (http_proxy != "") or (http_proxy != yaml['http_proxy'])
-      puts "Check proxy configuration."
-      puts  "> 'http_proxy' is set to be '#{yaml['http_proxy']}'"
-      print "> or use default? (#{http_proxy}) [Y/n]: "
+      puts "Check proxy (Type enter with no input if you are not in proxy env)."
+      puts  "> 'http_proxy' is set as '#{yaml['http_proxy']}'."
+      print "> Use proxy env ? (#{http_proxy}) [Y/n]: "
       ans = STDIN.gets.chop
       if ans.downcase == "n" or ans.downcase == "no"
         print "> http_proxy: "
