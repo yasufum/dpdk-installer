@@ -116,13 +116,17 @@ Setup environment for running [dpdk](http://www.dpdk.org/) and install.
 Setup environment for [pktgen](http://www.dpdk.org/browse/apps/pktgen-dpdk/)
 and install.
 
+Require DPDK is installed.
+
 ##### (4) spp role
 
 Setup environment for running [spp](http://www.dpdk.org/browse/apps/spp/)
 and install.
 It also installs customized qemu. 
 
-##### (5) kvm role
+Require DPDK is installed.
+
+##### (5) (Optional) kvm role
 
 Install kvm and libvirt tools. 
 
@@ -175,15 +179,17 @@ DPDK params are defined in group_vars/{dpdk spp pktgen}.
   - dpdk_target: Set "x86_64-ivshmem-ivshmem-gcc" for using ivshmem, or
                  "x86_64-native-linuxapp-gcc".
 
-If you use other than 2048kB of hugepage size (typically 1GB),
-define it as mount option described in "Using Hugepages with the DPDK" section
-in [Getting Started Guide](http://dpdk.org/doc/guides/linux_gsg/sys_reqs.html).
+This script supports 2MB or 1GB of hugepage size.
+Please refer "Using Hugepages with the DPDK" section
+in [Getting Started Guide](http://dpdk.org/doc/guides/linux_gsg/sys_reqs.html)
+for detals of hugepages.
 
 This configuration to be effective from DPDK is installed, but cleared by
 shutting down.
 Run `$HOME/dpdk-home/do_after_reboot.sh` on the client for config.
 It also setups modprobe and assignment of interfaces.
-Template of this script is included as
+
+Template of `do_after_reboot.sh` is included as
 `roles/dpdk/templates/do_after_reboot.sh.j2`,
 so edit it if you need to.
 
@@ -211,9 +217,9 @@ SSH key configuration.
 > Please put your public key as './roles/common/templates/id_rsa.pub' for login spp VMs.
 > copy '/Users/ogawa/.ssh/id_rsa.pub' to './roles/common/templates/id_rsa.pub'? [y/N]
 [type y or n]
-Check proxy configuration.
-> 'http_proxy' is set to be ''
-> or use default? () [Y/n]: 
+Check proxy (Type enter with no input if you are not in proxy env).
+> 'http_proxy' is set as ''.
+> Use proxy env ? () [Y/n]: 
 [type y or n]
 ```
 
