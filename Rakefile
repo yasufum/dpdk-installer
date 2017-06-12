@@ -41,6 +41,26 @@ def update_var(vars_file, key, val, clean_flg=false)
 end
 
 
+# Check host is setup
+# Return false if hosts is not configured.
+def is_hosts_configured()
+  ary = []
+  hosts_file = "hosts"
+  open(hosts_file, "r") {|f|
+    f.each_line {|l|
+      if not (l =~ /^(\[|#|\n)/) # match lines doesn't start from "[", "#" or "\n"
+        ary << l
+      end
+    }
+  }
+  if ary.size == 0
+    return false
+  else
+    return true
+  end
+end
+
+
 # Clean hosts
 # Remove other than string starting "[", "#" or "\n"
 def clean_hosts()
@@ -48,7 +68,7 @@ def clean_hosts()
   hosts_file = "hosts"
   open(hosts_file, "r") {|f|
     f.each_line {|l|
-      if l =~ /^(\[|#|\n)/ # match "[", "#" or "\n"
+      if l =~ /^(\[|#|\n)/ # match lines starting from "[", "#" or "\n"
         str += l
       end
     }
@@ -62,18 +82,23 @@ end
 #     - memsize: Memory size as string or integer
 #     - unit: Unit of memsize (k, m or g) 
 def pretty_memsize(memsize, unit=nil)
-  if unit == nil
+  un = nil
+  case unit
+  when nil
     un = 1
-  elsif unit == "k"
+  when "k"
     un = 1_000
-  elsif unit == "m"
+  when "m"
     un = 1_000_000
-  elsif unit == "g"
+  when "g"
     un = 1_000_000_000
+  else
+    raise "Error! Invalid unit '#{unit}'"
   end
-  res = memsize.to_i * un
 
+  res = memsize.to_i * un
   len = res.to_s.size 
+
   if len < 4 
     return res.to_s + " B"
   elsif len < 7
@@ -97,13 +122,26 @@ end
 # Default task
 desc "Run tasks for install"
 task :default => [
+  :check_hosts,
   :confirm_account,
   :confirm_sshkey,
   :confirm_http_proxy,
   :confirm_dpdk,
   :install
 ] do
-  puts "done" 
+  puts "Done" 
+end
+
+
+desc "Configure params"
+task :config => [
+  :check_hosts,
+  :confirm_account,
+  :confirm_sshkey,
+  :confirm_http_proxy,
+  :confirm_dpdk,
+] do
+  puts "Done"
 end
 
 
@@ -209,61 +247,92 @@ end
 desc "Setup DPDK params (hugepages and network interfaces)"
 task :confirm_dpdk do
   vars_file = "group_vars/dpdk"
+  yaml = YAML.load_file(vars_file)
 
-  puts "Input params for DPDK"
-  puts "> hugepage_size (must be 2m(2M) or 1g(1G)):"
-  ans = ""
-  while not (ans == "2M" or ans == "1G")
-    ans = STDIN.gets.chop.upcase
-    if not (ans == "2M" or ans == "1G")
-      puts "> Error! Invalid parameter."
-      puts "> hugepage_size (must be 2M or 1G):"
+  target_params = [
+    "hugepage_size",
+    "nr_hugepages",
+    "dpdk_interfaces",
+    "dpdk_target"
+  ]
+
+  target_params.each do |param|
+    if yaml[param] == nil
+      puts "Input params for DPDK"
+      break
     end
   end
-  hp_size = ans
-  update_var(vars_file, "hugepage_size", hp_size, false)
-  #puts "hugepage_size: #{hp_size}"
 
-  puts "> nr_hugepages:"
-  ans = STDIN.gets.chop
-  nr_hp = ans
-  if hp_size == "2M"
-    total_hpmem = 2_000_000 * nr_hp.to_i
-  elsif hp_size == "1G"
-    total_hpmem = 1_000_000_000 * nr_hp.to_i
-  end
-  total_hpmem = pretty_memsize(total_hpmem)
-  puts "> total hugepages mem: #{total_hpmem}"
-  update_var(vars_file, "nr_hugepages", nr_hp, false)
-
-  puts "> dpdk_interfaces (separate by space if two or more):"
-  delim = " "
-  ans = STDIN.gets.chop
-  nw_ifs = ans.split(delim).join(delim)
-  #puts "nw interfaces: #{nw_ifs}"
-  update_var(vars_file, "dpdk_interfaces", nw_ifs, false)
-
-  puts "> dpdk_target (must be '(i)vshmem' for SPP or '(n)ative'):"
-  ans = ""
-  while not (ans == "ivshmem" or ans == "native")
-    ans = STDIN.gets.chop
-    if ans == "i"
-      ans = "ivshmem"
-    elsif ans == "n"
-      ans = "native"
+  hp_size = yaml["hugepage_size"]
+  target_params.each do |param|
+    case param
+    when "hugepage_size"
+      if yaml["hugepage_size"] == nil
+        puts "> hugepage_size (must be 2m(2M) or 1g(1G)):"
+        ans = ""
+        while not (ans == "2M" or ans == "1G")
+          ans = STDIN.gets.chop.upcase
+          if not (ans == "2M" or ans == "1G")
+            puts "> Error! Invalid parameter."
+            puts "> hugepage_size (must be 2M or 1G):"
+          end
+        end
+        hp_size = ans
+        update_var(vars_file, "hugepage_size", hp_size, false)
+        #puts "hugepage_size: #{hp_size}"
+      end
+  
+    when "nr_hugepages"
+      if yaml["nr_hugepages"] == nil
+        puts "> nr_hugepages:"
+        ans = STDIN.gets.chop
+        nr_hp = ans
+        if hp_size == "2M"
+          total_hpmem = 2_000_000 * nr_hp.to_i
+        elsif hp_size == "1G"
+          total_hpmem = 1_000_000_000 * nr_hp.to_i
+        end
+        total_hpmem = pretty_memsize(total_hpmem)
+        puts "> total hugepages mem: #{total_hpmem}"
+        update_var(vars_file, "nr_hugepages", nr_hp, false)
+      end
+  
+    when "dpdk_interfaces"
+      if yaml["dpdk_interfaces"] == nil
+        puts "> dpdk_interfaces (separate by space if two or more):"
+        delim = " "
+        ans = STDIN.gets.chop
+        nw_ifs = ans.split(delim).join(delim)
+        #puts "nw interfaces: #{nw_ifs}"
+        update_var(vars_file, "dpdk_interfaces", nw_ifs, false)
+      end
+  
+    when "dpdk_target"
+      if yaml["dpdk_target"] == nil
+        puts "> dpdk_target (must be '(i)vshmem' for SPP or '(n)ative'):"
+        ans = ""
+        while not (ans == "ivshmem" or ans == "native")
+          ans = STDIN.gets.chop
+          if ans == "i"
+            ans = "ivshmem"
+          elsif ans == "n"
+            ans = "native"
+          end
+          if not (ans == "ivshmem" or ans == "native")
+            puts "> Error! Invalid parameter."
+            puts "> dpdk_target (must be 'ivshmem' for SPP or 'native'):"
+          end
+        end
+        if ans == "ivshmem"
+          dpdk_tgt = "x86_64-ivshmem-linuxapp-gcc"
+        else
+          dpdk_tgt = "x86_64-native-linuxapp-gcc"
+        end
+        #puts "dpdk_target: #{dpdk_tgt}"
+        update_var(vars_file, "dpdk_target", dpdk_tgt, false)
+      end
     end
-    if not (ans == "ivshmem" or ans == "native")
-      puts "> Error! Invalid parameter."
-      puts "> dpdk_target (must be 'ivshmem' for SPP or 'native'):"
-    end
   end
-  if ans == "ivshmem"
-    dpdk_tgt = "x86_64-ivshmem-linuxapp-gcc"
-  else
-    dpdk_tgt = "x86_64-native-linuxapp-gcc"
-  end
-  #puts "dpdk_target: #{dpdk_tgt}"
-  update_var(vars_file, "dpdk_target", dpdk_tgt, false)
 end
 
 
@@ -294,7 +363,7 @@ task :clean_vars do
   vars_file = "group_vars/all"
   target_params.each do |key|
     update_var(vars_file, key, "", true)
-    puts "> clear '#{key}' in '#{vars_file}'."
+    puts "> clean '#{key}' in '#{vars_file}'."
   end
 
   # "group_vars/dpdk"
@@ -305,8 +374,38 @@ task :clean_vars do
   vars_file = "group_vars/dpdk"
   target_params.each do |key|
     update_var(vars_file, key, "", true)
-    puts "> clear '#{key}' in '#{vars_file}'."
+    puts "> clean '#{key}' in '#{vars_file}'."
   end
+end
+
+
+desc "Check hosts file is configured"
+task :check_hosts do
+  if not is_hosts_configured()
+    raise "Error! You must setup 'hosts' first."
+  end
+end
+
+
+desc "Save config"
+task :save_conf do
+  dst_dir = "tmp/config"
+  # mkdir dst and child dir
+  sh "mkdir -p #{dst_dir}/group_vars"
+
+  sh "cp hosts #{dst_dir}/"
+  sh "cp group_vars/all #{dst_dir}/group_vars/"
+  sh "cp group_vars/dpdk #{dst_dir}/group_vars/"
+end
+
+
+desc "Restore config"
+task :restore_conf do
+  dst_dir = "tmp/config"
+
+  sh "cp #{dst_dir}/hosts hosts"
+  sh "cp #{dst_dir}/group_vars/all group_vars/all"
+  sh "cp #{dst_dir}/group_vars/dpdk group_vars/dpdk"
 end
 
 

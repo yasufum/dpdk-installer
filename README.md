@@ -146,16 +146,16 @@ You can also setup this params by running rake command as detailed in later.
 Create an account and add it as sudoer.
 
 ```
-$ sudo adduser dpdk
+$ sudo adduser dpdk1607
 
-$ sudo gpasswd -a dpdk sudo
+$ sudo gpasswd -a dpdk1607 sudo
 ```
 
 Delete account by userdel if it's no need. You should add -r option to delete
 home directory.
 
 ```
-$ sudo userdel -r dpdk
+$ sudo userdel -r dpdk1607
 ```
 
 
@@ -202,7 +202,7 @@ Type simply `rake` to run default task for setup and install at once.
 At first time you run rake, it asks you some questions for configuration. 
 
 ```sh
-ugwort:dpdk-installer ogawa$ rake
+$ rake
 > input new remote_user.
 [type your account]
 > update 'remote_user' to 'dpdk1607' in 'group_vars/all'.
@@ -268,12 +268,12 @@ pktgen is installed in $HOME/dpdk-home/pktgen-dpdk.
 Exec file is $HOME/pktgen-dpdk/app/app/x86_64-native-linuxapp-gcc/pktgen.
 
 ```
-$ ssh dpdk@localhost
+$ ssh dpdk1607@remote
 Welcome to Ubuntu 16.04.4 LTS (GNU/Linux 4.2.0-35-generic x86_64)
 
  * Documentation:  https://help.ubuntu.com/
 Last login: Sun May  8 01:44:03 2016 from 10.0.2.2
-dpdk@localhost:~$ cd dpdk_home/pktgen-dpdk/
+dpdk1607@remote:~$ cd dpdk_home/pktgen-dpdk/
 ```
 
 You can run it directory, but it better to use `doit` script.
@@ -281,7 +281,7 @@ Refer to [README](http://dpdk.org/browse/apps/pktgen-dpdk/tree/README.md)
 of pktgen for how to use and more details.
 
 ```sh
-dpdk@localhost:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
+dpdk1607@remote:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
 ```
 
 
