@@ -125,15 +125,17 @@ Install kvm and libvirt tools.
 
 #### 3.2. Add a user
 
-For remote login to ansible-clients, create an account and add
-following account info in `group_vars/all`.
-You can also setup it by running rake command detailed in later.
+For remote login to ansible-clients, create an account as following steps
+and add following account info in `group_vars/all`.
 
   - remote_user: your account name
   - ansible_ssh_pass: password for ssh login
   - ansible_sudo_pass: password for doing sudo
+  - http_proxy: proxy for ansible-client.
 
-If you don't have a account, add it as sudoer.
+You can also setup this params by running rake command as detailed in later.
+
+Create an account and add it as sudoer.
 
 ```
 $ sudo adduser dpdk
@@ -148,7 +150,17 @@ home directory.
 $ sudo userdel -r dpdk
 ```
 
-#### 3.3. Configuration
+
+#### 3.3. (Optional) Using Proxy
+
+If you are in proxy environment, set http_proxy while running rake or define
+it directly in `group_vars/all` and use `site_proxy.yml` instead of `site.yml`
+at running ansible playbook.
+Rake script selects which of them by checking your proxy environment, so you
+don't need to specify it manually if you use rake.
+
+
+#### 3.4. Configuration for DPDK
 
 For DPDK, You might have to change params for your environment.
 DPDK params are defined in group_vars/{dpdk spp pktgen}. 
@@ -161,8 +173,16 @@ If you use other than 2048kB of hugepage size (typically 1GB),
 define it as mount option described in "Using Hugepages with the DPDK" section
 in [Getting Started Guide](http://dpdk.org/doc/guides/linux_gsg/sys_reqs.html).
 
+This configuration to be effective from DPDK is installed, but cleared by
+shutting down.
+Run `$HOME/dpdk-home/do_after_reboot.sh` on the client for config.
+It also setups modprobe and assignment of interfaces.
+Template of this script is included as
+`roles/dpdk/templates/do_after_reboot.sh.j2`,
+so edit it if you need to.
 
-#### 3.4. Run rake
+
+#### 3.5. Run rake
 
 You can setup and install DPDK by running rake which is a `make` like build tool.
 
@@ -215,7 +235,7 @@ $ rake clean
 ```
 
 
-#### 3.5. (Optional) Run ansible-playbook.
+#### 3.6. (Optional) Run ansible-playbook.
 
 You don't do this section if you use `rake` previous section.
 
@@ -227,7 +247,10 @@ $ ansible-playbook -i hosts site.yml
 ```
 
 
-### 4. Using pktgen-dpdk
+### 4. DPDK
+
+
+### 5. Using pktgen-dpdk
 
 pktgen is installed in $HOME/dpdk-home/pktgen-dpdk.
 Exec file is $HOME/pktgen-dpdk/app/app/x86_64-native-linuxapp-gcc/pktgen.
@@ -250,7 +273,7 @@ dpdk@localhost:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
 ```
 
 
-### 5. Using SPP 
+### 6. Using SPP 
 
 SPP is installed in $HOME/dpdk-home/spp.
 
