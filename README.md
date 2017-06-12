@@ -215,7 +215,7 @@ $ rake
 SSH key configuration.
 > './roles/common/templates/id_rsa.pub' doesn't exist.
 > Please put your public key as './roles/common/templates/id_rsa.pub' for login spp VMs.
-> copy '/Users/ogawa/.ssh/id_rsa.pub' to './roles/common/templates/id_rsa.pub'? [y/N]
+> copy '/home/local-user/.ssh/id_rsa.pub' to './roles/common/templates/id_rsa.pub'? [y/N]
 [type y or n]
 Check proxy (Type enter with no input if you are not in proxy env).
 > 'http_proxy' is set as ''.
@@ -230,12 +230,20 @@ You can run each of tasks explicitly by specifying task name.
 
 ```sh
 $ rake -T
-rake clean               # Clean variables depend on user env
+rake check_hosts         # Check hosts file is configured
+rake clean               # Clean variables and files depend on user env
+rake clean_hosts         # Clean hosts file
+rake clean_vars          # Clean variables
+rake config              # Configure params
 rake confirm_account     # Update remote_user, ansible_ssh_pass and ansible_sudo_pass
+rake confirm_dpdk        # Setup DPDK params (hugepages and network interfaces)
 rake confirm_http_proxy  # Check http_proxy setting
 rake confirm_sshkey      # Check if sshkey exists and copy from your $HOME/.ssh/id_rsa.pub
 rake default             # Run tasks for install
 rake install             # Run ansible playbook
+rake remove_sshkey       # Remove sshkey file
+rake restore_conf        # Restore config
+rake save_conf           # Save config
 ```
 
 If you need to remove account and proxy configuration from config files,
