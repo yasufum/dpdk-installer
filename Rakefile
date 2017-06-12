@@ -41,12 +41,66 @@ def update_var(vars_file, key, val, clean_flg=false)
 end
 
 
+# Clean hosts
+# Remove other than string starting "[", "#" or "\n"
+def clean_hosts()
+  str = ""
+  hosts_file = "hosts"
+  open(hosts_file, "r") {|f|
+    f.each_line {|l|
+      if l =~ /^(\[|#|\n)/ # match "[", "#" or "\n"
+        str += l
+      end
+    }
+  }
+  open(hosts_file, "w+") {|f| f.write(str)}
+end
+
+
+# Return pretty formatted memsize
+#   params
+#     - memsize: Memory size as string or integer
+#     - unit: Unit of memsize (k, m or g) 
+def pretty_memsize(memsize, unit=nil)
+  if unit == nil
+    un = 1
+  elsif unit == "k"
+    un = 1_000
+  elsif unit == "m"
+    un = 1_000_000
+  elsif unit == "g"
+    un = 1_000_000_000
+  end
+  res = memsize.to_i * un
+
+  len = res.to_s.size 
+  if len < 4 
+    return res.to_s + " B"
+  elsif len < 7
+    return (res/1_000).to_i.to_s + " kB"
+  elsif len < 10
+    return (res/1_000_000).to_i.to_s + " MB"
+  elsif len < 13
+    return (res/1_000_000_000).to_i.to_s + " GB"
+  elsif len < 16
+    return (res/1_000_000_000_000).to_i.to_s + " TB"
+  elsif len < 19
+    return (res/1_000_000_000_000_000).to_i.to_s + " PB"
+  elsif len < 22
+    return (res/1_000_000_000_000_000_000).to_i.to_s + " EB"
+  else
+    return (res/1_000_000_000_000_000_000_000).to_i.to_s  + " ZB"
+  end
+end
+
+
 # Default task
 desc "Run tasks for install"
 task :default => [
   :confirm_account,
   :confirm_sshkey,
   :confirm_http_proxy,
+  :confirm_dpdk,
   :install
 ] do
   puts "done" 
@@ -152,6 +206,67 @@ task :confirm_account do
 end
 
 
+desc "Setup DPDK params (hugepages and network interfaces)"
+task :confirm_dpdk do
+  vars_file = "group_vars/dpdk"
+
+  puts "Input params for DPDK"
+  puts "> hugepage_size (must be 2m(2M) or 1g(1G)):"
+  ans = ""
+  while not (ans == "2M" or ans == "1G")
+    ans = STDIN.gets.chop.upcase
+    if not (ans == "2M" or ans == "1G")
+      puts "> Error! Invalid parameter."
+      puts "> hugepage_size (must be 2M or 1G):"
+    end
+  end
+  hp_size = ans
+  update_var(vars_file, "hugepage_size", hp_size, false)
+  #puts "hugepage_size: #{hp_size}"
+
+  puts "> nr_hugepages:"
+  ans = STDIN.gets.chop
+  nr_hp = ans
+  if hp_size == "2M"
+    total_hpmem = 2_000_000 * nr_hp.to_i
+  elsif hp_size == "1G"
+    total_hpmem = 1_000_000_000 * nr_hp.to_i
+  end
+  total_hpmem = pretty_memsize(total_hpmem)
+  puts "> total hugepages mem: #{total_hpmem}"
+  update_var(vars_file, "nr_hugepages", nr_hp, false)
+
+  puts "> dpdk_interfaces (separate by space if two or more):"
+  delim = " "
+  ans = STDIN.gets.chop
+  nw_ifs = ans.split(delim).join(delim)
+  #puts "nw interfaces: #{nw_ifs}"
+  update_var(vars_file, "dpdk_interfaces", nw_ifs, false)
+
+  puts "> dpdk_target (must be '(i)vshmem' for SPP or '(n)ative'):"
+  ans = ""
+  while not (ans == "ivshmem" or ans == "native")
+    ans = STDIN.gets.chop
+    if ans == "i"
+      ans = "ivshmem"
+    elsif ans == "n"
+      ans = "native"
+    end
+    if not (ans == "ivshmem" or ans == "native")
+      puts "> Error! Invalid parameter."
+      puts "> dpdk_target (must be 'ivshmem' for SPP or 'native'):"
+    end
+  end
+  if ans == "ivshmem"
+    dpdk_tgt = "x86_64-ivshmem-linuxapp-gcc"
+  else
+    dpdk_tgt = "x86_64-native-linuxapp-gcc"
+  end
+  #puts "dpdk_target: #{dpdk_tgt}"
+  update_var(vars_file, "dpdk_target", dpdk_tgt, false)
+end
+
+
 task :dummy do
   puts "I'm dummy task!"
 end
@@ -169,21 +284,54 @@ task :install do
 end
 
 
-desc "Clean variables depend on user env"
-task :clean do
+desc "Clean variables"
+task :clean_vars do
+  # "group_vars/all"
   target_params = [
     "remote_user", "ansible_ssh_pass", "ansible_sudo_pass", "http_proxy"
   ]
+  # remove ssh user account form vars file.
+  vars_file = "group_vars/all"
+  target_params.each do |key|
+    update_var(vars_file, key, "", true)
+    puts "> clear '#{key}' in '#{vars_file}'."
+  end
 
-  puts "Clean user specific info."
-  # remove public key
+  # "group_vars/dpdk"
+  target_params = [
+    "hugepage_size", "nr_hugepages", "dpdk_interfaces", "dpdk_target"
+  ]
+  # remove ssh user account form vars file.
+  vars_file = "group_vars/dpdk"
+  target_params.each do |key|
+    update_var(vars_file, key, "", true)
+    puts "> clear '#{key}' in '#{vars_file}'."
+  end
+end
+
+
+desc "Clean hosts file"
+task :clean_hosts do
+  # clean hosts file
+  clean_hosts()
+  puts "> clean hosts"
+end
+
+
+desc "Remove sshkey file"
+task :remove_sshkey do
+  # remove public key from templates
   target = "./roles/common/templates/id_rsa.pub"
   FileUtils.rm_f(target)
   puts "> remove #{target}."
+end
 
-  # remove ssh user account form vars file.
-  target_params.each do |key|
-    update_var("group_vars/all", key, "", true)
-    puts "> clear '#{key}' in 'group_vars/all'."
-  end
+
+desc "Clean variables and files depend on user env"
+task :clean => [
+  :clean_vars,
+  :clean_hosts,
+  :remove_sshkey
+] do
+  sh "rm -f *.retry"
 end

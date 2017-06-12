@@ -1,14 +1,15 @@
 ---
 # dpdk
 
-# Change params for your env 
-hugepage_size: 2048kB
-nr_hugepages: 4096
-dpdk_interfaces: "enp2s0f0 enp2s0f1"
+# Edit params
+# hugepage_size must be 2M or 1G
+hugepage_size: 
+nr_hugepages: 
+dpdk_interfaces: 
 
 # Use "x86_64-ivshmem-ivshmem-gcc" for ivshmem
-dpdk_target: x86_64-ivshmem-linuxapp-gcc
-#dpdk_target: x86_64-native-linuxapp-gcc
+# or "x86_64-native-linuxapp-gcc"
+dpdk_target: 
 
 
 # Do not edit

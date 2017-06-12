@@ -1,8 +1,8 @@
 ---
 # spp
 
-# Change params for your env 
-nr_hugepages: 4096
+# Edit params
+#nr_hugepages: 4096
 
 # Do not edit
 dpdk_home: "{{ ansible_env.HOME }}/dpdk-home"
