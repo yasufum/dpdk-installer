@@ -1,4 +1,25 @@
-## Install DPDK and pktgen, spp
+# Install DPDK and pktgen, spp
+
+## Table of contents
+- [What is this](#what-is-this)
+- [Recommended System Requirements](#recommended-system-requirements)
+- [Installation](#installation)
+  1. [ansible](#ansible)
+  1. [ssh](#ssh)
+  1. [rake](#rake)
+- [How to use](#how-to-use)
+  - [Understand roles](#understand-roles)
+  - [Add user](#add-user)
+  - [(Optional) Using Proxy](#optional-using-proxy)
+  - [Configuration for DPDK](#configuration-for-dpdk)
+  - [Run rake](#run-rake)
+  - [(Optional) Run ansible-playbook](#optional-run-ansible-playbook)
+- [Using DPDK](#using-dpdk)
+- [Using pktgen-dpdk](#using-pktgen-dpdk)
+- [Using SPP](#using-spp)
+- [License](#license)
+
+## What is this ?
 
 Install scripts for
 [DPDK](http://dpdk.org/browse/dpdk/) and
@@ -18,7 +39,7 @@ This script also installs customized qemu for extending ivshmem to use hugepages
 - qemu-2.3.0 (customized for DPDK's ivshmem)
 
 
-### 1. Recommended System Requirements
+## Recommended System Requirements
 
   - Ubuntu 16.04
   - CPU: 4~ (cores)
@@ -26,18 +47,18 @@ This script also installs customized qemu for extending ivshmem to use hugepages
   - NIC: 2~ (ports)
 
 
-### 2. Installation
+## Installation
 
 You have to install ansible before running ansible-playbook which is a
 instruction for building DPDK and other tools.
 
-#### (1) ansible
+### (1) ansible
 
 Install ansible  >= 2.0 by following this
 [instruction](http://docs.ansible.com/ansible/intro_installation.html#installation).
 I only tested version 2.0.0.2 and 2.0.1.0 but other versions might work.
 
-#### (2) ssh
+### (2) ssh
 
 Ansible uses ssh to install tools on remote server,
 so you have to ssh client into ansible server in which ansible is installed.
@@ -49,14 +70,14 @@ In order to ssh-key login, you generate with `ssh-keygen` on the server and
 copy content of it to 
 `$HOME/.ssh/authorized_keys` on the clients.
 
-#### (3) rake
+### (3) rake
 
 Install rake for running setup script, or you can setup it manually.
 
 
-### 3. How to use
+## How to use
 
-#### 3.1. Understand roles
+### Understand roles
 
 There are several roles defined in `hosts` file.
 Role is a kind of group of installation tasks.
@@ -66,7 +87,7 @@ Target machines are specified as a list of IP address or hostname in `hosts`.
 Empty list means the role is not effective.
 For example, if you only use dpdk, empty the entries of pktgen and spp.
 
-##### (1) common role
+#### (1) common role
 
 Applied for all of roles as common tasks.
 
@@ -107,18 +128,18 @@ are included in "roles/common/templates.
 Change the configuration before run ansible if you need to.
 
 
-##### (2) dpdk role
+#### (2) dpdk role
 
 Setup environment for running [dpdk](http://www.dpdk.org/) and install.
 
-##### (3) pktgen role
+#### (3) pktgen role
 
 Setup environment for [pktgen](http://www.dpdk.org/browse/apps/pktgen-dpdk/)
 and install.
 
 Require DPDK is installed.
 
-##### (4) spp role
+#### (4) spp role
 
 Setup environment for running [spp](http://www.dpdk.org/browse/apps/spp/)
 and install.
@@ -126,12 +147,12 @@ It also installs customized qemu.
 
 Require DPDK is installed.
 
-##### (5) (Optional) kvm role
+#### (5) (Optional) kvm role
 
 Install kvm and libvirt tools. 
 
 
-#### 3.2. Add a user
+### Add user
 
 For remote login to ansible-clients, create an account as following steps
 and add following account info in `group_vars/all`.
@@ -159,7 +180,7 @@ $ sudo userdel -r dpdk1607
 ```
 
 
-#### 3.3. (Optional) Using Proxy
+### (Optional) Using Proxy
 
 If you are in proxy environment, set http_proxy while running rake or define
 it directly in `group_vars/all` and use `site_proxy.yml` instead of `site.yml`
@@ -168,7 +189,7 @@ Rake script selects which of them by checking your proxy environment, so you
 don't need to specify it manually if you use rake.
 
 
-#### 3.4. Configuration for DPDK
+### Configuration for DPDK
 
 For DPDK, You might have to change params for your environment.
 DPDK params are defined in group_vars/{dpdk spp pktgen}. 
@@ -194,7 +215,7 @@ Template of `do_after_reboot.sh` is included as
 so edit it if you need to.
 
 
-#### 3.5. Run rake
+### Run rake
 
 You can setup and install DPDK by running rake which is a `make` like build tool.
 
@@ -255,7 +276,7 @@ $ rake clean
 ```
 
 
-#### 3.6. (Optional) Run ansible-playbook.
+### (Optional) Run ansible-playbook
 
 You don't do this section if you use `rake` previous section.
 
@@ -267,10 +288,12 @@ $ ansible-playbook -i hosts site.yml
 ```
 
 
-### 4. DPDK
+## Using DPDK
+
+Refer to the [DPDK Documentation](#http://dpdk.org/doc/guides-16.07/).
 
 
-### 5. Using pktgen-dpdk
+## Using pktgen-dpdk
 
 pktgen is installed in $HOME/dpdk-home/pktgen-dpdk.
 Exec file is $HOME/pktgen-dpdk/app/app/x86_64-native-linuxapp-gcc/pktgen.
@@ -293,7 +316,7 @@ dpdk1607@remote:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
 ```
 
 
-### 6. Using SPP 
+## Using SPP 
 
 SPP is installed in $HOME/dpdk-home/spp.
 
@@ -302,5 +325,5 @@ and [setup_guide](http://dpdk.org/browse/apps/spp/tree/docs/setup_guide.md)
 for details.
 
 
-### License
+## License
 This program is released under the BSD license.
