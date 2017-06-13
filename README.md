@@ -4,10 +4,11 @@
 - [What is this](#what-is-this)
 - [Recommended System Requirements](#recommended-system-requirements)
 - [Installation](#installation)
-  1. [ansible](#ansible)
-  1. [ssh](#ssh)
-  1. [rake](#rake)
-- [How to use](#how-to-use)
+  - [(1) ansible](#1-ansible)
+  - [(2) ssh](#2-ssh)
+  - [(3) rake](#3-rake)
+- [Usage and settings](#usage-and-settings)
+  - [How to use](#how-to-use)
   - [Understand roles](#understand-roles)
   - [Add user](#add-user)
   - [(Optional) Using Proxy](#optional-using-proxy)
@@ -19,7 +20,7 @@
 - [Using SPP](#using-spp)
 - [License](#license)
 
-## What is this ?
+## What is this
 
 Install scripts for
 [DPDK](http://dpdk.org/browse/dpdk/) and
@@ -75,7 +76,18 @@ copy content of it to
 Install rake for running setup script, or you can setup it manually.
 
 
-## How to use
+## Usage and settings
+
+### How to use
+
+First of all, setup roles defined in `hosts` and run `rake` to start installation.
+Refer to following sections for roles and details of settings.
+
+```sh
+$ rake
+...
+```
+
 
 ### Understand roles
 
