@@ -3,45 +3,45 @@
 
 - name: apply all base packages
   hosts: all
-  remote_user: "{{ remote_user }}" 
+  remote_user: {{ remote_user }}
   roles:
     - common
   environment:
-    http_proxy: "{{ http_proxy }}"
-    https_proxy: "{{ http_proxy }}"
+    http_proxy: {{ http_proxy }}
+    https_proxy: {{ http_proxy }}
 
 - name: install dpdk
   hosts: dpdk 
-  remote_user: "{{ remote_user }}" 
+  remote_user: {{ remote_user }}
   roles:
     - dpdk 
   environment:
-    http_proxy: "{{ http_proxy }}"
-    https_proxy: "{{ http_proxy }}"
+    http_proxy: {{ http_proxy }}
+    https_proxy: {{ http_proxy }}
 
 - name: install kvm 
   hosts: dpdk 
-  remote_user: "{{ remote_user }}"
+  remote_user: {{ remote_user }}
   roles:
     - kvm
   environment:
-    http_proxy: "{{ http_proxy }}"
-    https_proxy: "{{ http_proxy }}"
+    http_proxy: {{ http_proxy }}
+    https_proxy: {{ http_proxy }}
 
 - name: install spp and qemu 
   hosts: spp
-  remote_user: "{{ remote_user }}"
+  remote_user: {{ remote_user }}
   roles:
     - spp
   environment:
-    http_proxy: "{{ http_proxy }}"
-    https_proxy: "{{ http_proxy }}"
+    http_proxy: {{ http_proxy }}
+    https_proxy: {{ http_proxy }}
 
 - name: install pktgen
   hosts: pktgen 
-  remote_user: "{{ remote_user }}"
+  remote_user: {{ remote_user }}
   roles:
     - pktgen
   environment:
-    http_proxy: "{{ http_proxy }}"
-    https_proxy: "{{ http_proxy }}"
+    http_proxy: {{ http_proxy }}
+    https_proxy: {{ http_proxy }}

@@ -25,7 +25,7 @@
 Install scripts for
 [DPDK](http://dpdk.org/browse/dpdk/) and
 [pktgen](http://dpdk.org/browse/apps/pktgen-dpdk/),
-[spp](http://dpdk.org/browse/apps/spp/) with ansible.
+[SPP](http://dpdk.org/browse/apps/spp/) with ansible.
 Pktgen is a high-performance traffic generator and spp is a patch panel like 
 switching function for Inter-VM communication.
 
@@ -34,6 +34,7 @@ Installed DPDK version is 16.07 which supports
 
 This script also installs customized qemu for extending ivshmem to use hugepages.
 
+Supported versions:
 - DPDK 16.07
 - pktge-dpdk 3.0.16
 - spp 16.07
@@ -70,6 +71,13 @@ from the server before install DPDK and other applications.
 In order to ssh-key login, you generate with `ssh-keygen` on the server and
 copy content of it to 
 `$HOME/.ssh/authorized_keys` on the clients.
+
+[NOTE] You can skip it if you have a public key "$HOME/.ssh/id_rsa.pub" and use `rake`.
+If you don't have the key, generate it as following.
+
+```sh
+$ ssh-keygen -t rsa
+```
 
 ### (3) rake
 
@@ -193,6 +201,8 @@ $ sudo userdel -r dpdk1607
 
 
 ### (Optional) Using Proxy
+
+[NOTE] You can skip it if you use `rake`.
 
 If you are in proxy environment, set http_proxy while running rake or define
 it directly in `group_vars/all` and use `site_proxy.yml` instead of `site.yml`

@@ -3,30 +3,30 @@
 
 - name: apply all base packages
   hosts: all
-  remote_user: "{{ remote_user }}" 
+  remote_user: {{ remote_user }}
   roles:
     - common
 
 - name: install dpdk
   hosts: dpdk 
-  remote_user: "{{ remote_user }}" 
+  remote_user: {{ remote_user }}
   roles:
     - dpdk 
 
 - name: install kvm 
   hosts: dpdk 
-  remote_user: "{{ remote_user }}"
+  remote_user: {{ remote_user }}
   roles:
     - kvm
 
 - name: install spp and qemu 
   hosts: spp
-  remote_user: dpdk
+  remote_user: {{ remote_user }}
   roles:
     - spp
 
 - name: install pktgen
   hosts: pktgen 
-  remote_user: "{{ remote_user }}"
+  remote_user: {{ remote_user }}
   roles:
     - pktgen
