@@ -2,14 +2,15 @@
 # spp
 
 # Edit params
-#nr_hugepages: 4096
+# Use "x86_64-ivshmem-ivshmem-gcc" for ivshmem
+# or "x86_64-native-linuxapp-gcc"
+dpdk_target: 
+
 
 # Do not edit
 dpdk_home: "{{ ansible_env.HOME }}/dpdk-home"
 dpdk_dir: "{{ dpdk_home }}/dpdk"
 dpdk_ver: v16.07
-# target must be ivshmem for spp
-dpdk_target: x86_64-ivshmem-linuxapp-gcc
 
 spp_repo: "http://dpdk.org/git/apps/spp"
 spp_dir: "{{ dpdk_home }}/spp"
