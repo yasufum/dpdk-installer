@@ -302,7 +302,7 @@ $ ansible-playbook -i hosts site.yml
 
 ## Using DPDK
 
-Refer to the [DPDK Documentation](#http://dpdk.org/doc/guides-16.07/).
+Refer to the [DPDK Documentation](http://dpdk.org/doc/guides-16.07/).
 
 
 ## Using pktgen-dpdk
