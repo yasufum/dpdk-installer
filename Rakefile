@@ -246,25 +246,38 @@ end
 
 desc "Setup DPDK params (hugepages and network interfaces)"
 task :confirm_dpdk do
+  # There are three vars_files including params related to DPDK.
+  #   1. group_vars/dpdk
+  #   2. group_vars/pktgen
+  #   3. group_vars/spp
+  # In this task, setup all of files by asking user some questions and update
+  # vars_files. 
+  # Skip updating if vars_files are already setup.
+  #
+  # [NOTE] It asks only for dpdk and not others because all of vars are included
+  # in dpdk's var file. It's needed to be asked for other files if they include
+  # vars not included dpdk.
+  
+  # 1. Update group_vars/dpdk 
   vars_file = "group_vars/dpdk"
   yaml = YAML.load_file(vars_file)
 
-  target_params = [
-    "hugepage_size",
-    "nr_hugepages",
-    "dpdk_interfaces",
-    "dpdk_target"
-  ]
+  target_params = {
+    "hugepage_size" => nil,
+    "nr_hugepages" => nil,
+    "dpdk_interfaces" => nil,
+    "dpdk_target" => nil
+  }
 
-  target_params.each do |param|
+  # Check if all params are filled for confirm vars_file is already setup
+  target_params.each do |param, val|
     if yaml[param] == nil
       puts "Input params for DPDK"
       break
     end
   end
 
-  hp_size = yaml["hugepage_size"]
-  target_params.each do |param|
+  target_params.each do |param, val|
     case param
     when "hugepage_size"
       if yaml["hugepage_size"] == nil
@@ -274,37 +287,51 @@ task :confirm_dpdk do
           ans = STDIN.gets.chop.upcase
           if not (ans == "2M" or ans == "1G")
             puts "> Error! Invalid parameter."
-            puts "> hugepage_size (must be 2M or 1G):"
+            puts "> hugepage_size (must be 2m(2M) or 1g(1G)):"
           end
         end
         hp_size = ans
         update_var(vars_file, "hugepage_size", hp_size, false)
+        target_params[param] = hp_size
         #puts "hugepage_size: #{hp_size}"
+      else
+        target_params[param] = yaml[param]
       end
   
+    # [NOTE] "hugepage_size" must be decided before "nr_hugepages" because it's
+    # refered in this section.
     when "nr_hugepages"
       if yaml["nr_hugepages"] == nil
         puts "> nr_hugepages:"
         ans = STDIN.gets.chop
         nr_hp = ans
+        hp_size = target_params["hugepage_size"]
         if hp_size == "2M"
           total_hpmem = 2_000_000 * nr_hp.to_i
         elsif hp_size == "1G"
           total_hpmem = 1_000_000_000 * nr_hp.to_i
+        else
+          raise "Error! Invalid hugepage_size: #{hp_size}"
         end
         total_hpmem = pretty_memsize(total_hpmem)
         puts "> total hugepages mem: #{total_hpmem}"
         update_var(vars_file, "nr_hugepages", nr_hp, false)
+        target_params[param] = nr_hp
+      else
+        target_params[param] = yaml[param]
       end
   
     when "dpdk_interfaces"
       if yaml["dpdk_interfaces"] == nil
         puts "> dpdk_interfaces (separate by space if two or more):"
-        delim = " "
+        delim = " "  # input is separated with white spaces
         ans = STDIN.gets.chop
-        nw_ifs = ans.split(delim).join(delim)
+        nw_ifs = ans.split(delim).join(delim) # formatting by removing nouse chars
         #puts "nw interfaces: #{nw_ifs}"
         update_var(vars_file, "dpdk_interfaces", nw_ifs, false)
+        target_params[param] = nw_ifs
+      else
+        target_params[param] = yaml[param]
       end
   
     when "dpdk_target"
@@ -330,9 +357,28 @@ task :confirm_dpdk do
         end
         #puts "dpdk_target: #{dpdk_tgt}"
         update_var(vars_file, "dpdk_target", dpdk_tgt, false)
+        target_params[param] = dpdk_tgt
+      else
+        target_params[param] = yaml[param]
       end
     end
   end
+
+  # 2. Update group_vars/pktgen
+  update_var(
+    "group_vars/pktgen",
+    "dpdk_target",
+    target_params["dpdk_target"],
+    false
+  )
+
+  # 3. Update group_vars/spp
+  update_var(
+    "group_vars/spp",
+    "dpdk_target",
+    target_params["dpdk_target"],
+    false
+  )
 end
 
 
@@ -366,9 +412,12 @@ task :clean_vars do
     puts "> clean '#{key}' in '#{vars_file}'."
   end
 
-  # "group_vars/dpdk"
+  # 1. "group_vars/dpdk"
   target_params = [
-    "hugepage_size", "nr_hugepages", "dpdk_interfaces", "dpdk_target"
+    "hugepage_size",
+    "nr_hugepages",
+    "dpdk_interfaces",
+    "dpdk_target"
   ]
   # remove ssh user account form vars file.
   vars_file = "group_vars/dpdk"
@@ -376,6 +425,18 @@ task :clean_vars do
     update_var(vars_file, key, "", true)
     puts "> clean '#{key}' in '#{vars_file}'."
   end
+
+  # 2. "group_vars/pktgen"
+  key = "dpdk_target"
+  vars_file = "group_vars/pktgen"
+  update_var(vars_file, key, "", true)
+  puts "> clean '#{key}' in '#{vars_file}'."
+
+  # 3. "group_vars/spp"
+  key = "dpdk_target"
+  vars_file = "group_vars/spp"
+  update_var(vars_file, key, "", true)
+  puts "> clean '#{key}' in '#{vars_file}'."
 end
 
 
@@ -394,8 +455,7 @@ task :save_conf do
   sh "mkdir -p #{dst_dir}/group_vars"
 
   sh "cp hosts #{dst_dir}/"
-  sh "cp group_vars/all #{dst_dir}/group_vars/"
-  sh "cp group_vars/dpdk #{dst_dir}/group_vars/"
+  sh "cp group_vars/* #{dst_dir}/group_vars/"
 end
 
 
@@ -404,8 +464,7 @@ task :restore_conf do
   dst_dir = "tmp/config"
 
   sh "cp #{dst_dir}/hosts hosts"
-  sh "cp #{dst_dir}/group_vars/all group_vars/all"
-  sh "cp #{dst_dir}/group_vars/dpdk group_vars/dpdk"
+  sh "cp #{dst_dir}/group_vars/* group_vars/"
 end
 
 

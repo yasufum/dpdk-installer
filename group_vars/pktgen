@@ -2,11 +2,9 @@
 # pktgen
 
 # Edit params
-#nr_hugepages: 4096
-
 # Use "x86_64-ivshmem-ivshmem-gcc" for ivshmem
-dpdk_target: x86_64-ivshmem-linuxapp-gcc
-#dpdk_target: x86_64-native-linuxapp-gcc
+# or "x86_64-native-linuxapp-gcc"
+dpdk_target: 
 
 
 # Do not edit
