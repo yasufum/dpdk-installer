@@ -1,9 +1,9 @@
-# Installer for DPDK and pktgen, spp
+# DPDK(+pktgen and spp)インストーラ
 
-## Table of contents
-- [What is this](#what-is-this)
-- [Recommended System Requirements](#recommended-system-requirements)
-- [Installation](#installation)
+## 目次
+- [概要](#概要)
+- [推奨スペック](#推奨スペック)
+- [インストール](#インストール)
   - [(1) ansible](#1-ansible)
   - [(2) ssh](#2-ssh)
   - [(3) rake](#3-rake)
@@ -20,50 +20,56 @@
 - [Using SPP](#using-spp)
 - [License](#license)
 
-## What is this
+## 概要
 
-Install scripts for
-[DPDK](http://dpdk.org/browse/dpdk/) and
-[pktgen](http://dpdk.org/browse/apps/pktgen-dpdk/),
-[SPP](http://dpdk.org/browse/apps/spp/) with ansible.
-Pktgen is a high-performance traffic generator and spp is a patch panel like 
-switching function for Inter-VM communication.
+これは
+[DPDK](http://dpdk.org/browse/dpdk/)と
+[pktgen](http://dpdk.org/browse/apps/pktgen-dpdk/)、
+[SPP](http://dpdk.org/browse/apps/spp/)
+をインストールするためのAnsibleスクリプトです。
 
-Installed DPDK version is 16.07 which supports
+pktgenは高性能なトラフィックジェネレータ、
+そしてSPPは仮想マシン(VM)同士をパッチパネルのように接続するためのアプリケーションです。
+
+インストールされるDPDKのバージョンは16.07で、これは
 [IVSHMEM](http://dpdk.org/doc/guides-16.07/prog_guide/ivshmem_lib.html?highlight=ivshmem).
+をサポートしています。
+またこのスクリプトは特別なパッチをあてたqemuをインストールします。
+これはDPDKで必要とされるhugepagesを使用するために、qemuの拡張を行います。
 
-This script also installs customized qemu for extending ivshmem to use hugepages.
-
-Supported versions:
+動作対象バージョン:
 - DPDK 16.07
 - pktge-dpdk 3.0.16
 - spp 16.07
-- qemu-2.3.0 (customized for DPDK's ivshmem)
+- qemu-2.3.0 (ivshmemのためのパッチをあてたもの)
 
 
-## Recommended System Requirements
+## 推奨スペック
 
   - Ubuntu 16.04
-  - CPU: 4~ (cores)
-  - Memory: 8~ (GB)
-  - NIC: 2~ (ports)
+  - CPU: 4~ (コア)
+  - メモリ: 8~ (GB)
+  - NIC: 2~ (ポート)
 
 
-## Installation
+## インストール
 
-You have to install ansible before running ansible-playbook which is a
-instruction for building DPDK and other tools.
+Ansibleスクリプトである`ansible-playbook`を実行するために、
+まずansible自体をインストールする必要があります。
+`ansible-playbook`はDPDKおよびその他のアプリケーションをインストールするための
+一連の作業を定義するものです。
 
 ### (1) ansible
 
-Install ansible  >= 2.0 by following this
 [instruction](http://docs.ansible.com/ansible/intro_installation.html#installation).
-I only tested version 2.0.0.2 and 2.0.1.0 but other versions might work.
+にしたがってAnsible(>= 2.0)をインストールします。
+バージョン2.0.0.2と2.0.1.0しか検証していませんが、
+おそらくその他のものも正常に動作するはずです。
 
 ### (2) ssh
 
-Ansible uses ssh to install tools on remote server,
-so you have to ssh client into ansible server in which ansible is installed.
+ansibleはリモートマシンでのインストール作業を実行するためにsshを利用します。
+したがってansibleを実行するマシンにはsshクライアントがインストールされている必要があります。
 
 You also have to install sshd on ansible clients and to be able to ssh-key login
 from the server before install DPDK and other applications.
