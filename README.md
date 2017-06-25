@@ -20,6 +20,8 @@
 - [Using SPP](#using-spp)
 - [License](#license)
 
+Japanese version of this manual is [docs/jp/README](docs/jp/README).
+
 ## What is this
 
 Install scripts for
@@ -32,7 +34,8 @@ switching function for Inter-VM communication.
 Installed DPDK version is 16.07 which supports
 [IVSHMEM](http://dpdk.org/doc/guides-16.07/prog_guide/ivshmem_lib.html?highlight=ivshmem).
 
-This script also installs customized qemu for extending ivshmem to use hugepages.
+This script also installs customized [qemu](http://www.qemu.org/) for extending ivshmem
+to use hugepages.
 
 Supported versions:
 - DPDK 16.07
@@ -144,13 +147,15 @@ entries if you don't need to install from it.
   - netsniff-ng and required packages
 
 Configuration files which are also installed on target machines with the application 
-are included in "roles/common/templates.
+are included in "roles/common/templates".
+"j2" files are templates of Jinja2 format and it is exchanged to other format
+after variables expantion.
 Change the configuration before run ansible if you need to.
 
 
 #### (2) dpdk role
 
-Setup environment for running [dpdk](http://www.dpdk.org/) and install.
+Setup environment for running [DPDK](http://www.dpdk.org/) and install.
 
 #### (3) pktgen role
 
@@ -163,7 +168,7 @@ Require DPDK is installed.
 
 Setup environment for running [spp](http://www.dpdk.org/browse/apps/spp/)
 and install.
-It also installs customized qemu. 
+It also installs customized qemu for using DPDK on VMs. 
 
 Require DPDK is installed.
 
@@ -207,14 +212,14 @@ $ sudo userdel -r dpdk1607
 If you are in proxy environment, set http_proxy while running rake or define
 it directly in `group_vars/all` and use `site_proxy.yml` instead of `site.yml`
 at running ansible playbook.
-Rake script selects which of them by checking your proxy environment, so you
-don't need to specify it manually if you use rake.
+Rake script asks you to use proxy by checking your proxy environment.
 
 
 ### Configuration for DPDK
 
 For DPDK, You might have to change params for your environment.
-DPDK params are defined in group_vars/{dpdk spp pktgen}. 
+DPDK params are defined in `group_vars/dpdk`.
+It is same as pktgen and SPP. 
 
   - hugepage_size: Size of each of hugepage.
   - nr_hugepages: Number of hugepages.
@@ -269,7 +274,7 @@ Check proxy (Type enter with no input if you are not in proxy env).
 To list all of tasks, run `rake -T`.
 The default task includes "confirm_*" and "install" tasks.
 You can run each of tasks explicitly by specifying task name.
-"install" task runs "ansible-playbook".
+`rake install` task runs "ansible-playbook".
 
 ```sh
 $ rake -T
@@ -290,7 +295,7 @@ rake save_conf           # Save config
 ```
 
 If you need to remove account and proxy configuration from config files,
-run "clean" task.
+run `rake clean` task.
 It is useful if you share the repo in public.
 
 ```sh
@@ -300,10 +305,12 @@ $ rake clean
 
 ### (Optional) Run ansible-playbook
 
-You don't do this section if you use `rake` previous section.
+[NOTE] You don't need do this section if you use `rake`.
 
-If you setup config and run ansible-playbook manually,
+You setup config and run ansible-playbook manually,
 run ansible-playbook with inventory file `hosts` and `site.yml`.
+You use `site_proxy.yml` instead of `site.yml` if you are in proxy
+environment.
 
 ```
 $ ansible-playbook -i hosts site.yml
@@ -311,6 +318,8 @@ $ ansible-playbook -i hosts site.yml
 
 
 ## Using DPDK
+
+DPDK is installed in $HOME/dpdk-home/dpdk.
 
 Refer to the [DPDK Documentation](http://dpdk.org/doc/guides-16.07/).
 
