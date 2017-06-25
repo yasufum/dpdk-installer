@@ -7,18 +7,19 @@
   - [(1) ansible](#1-ansible)
   - [(2) ssh](#2-ssh)
   - [(3) rake](#3-rake)
-- [Usage and settings](#usage-and-settings)
-  - [How to use](#how-to-use)
-  - [Understand roles](#understand-roles)
-  - [Add user](#add-user)
-  - [(Optional) Using Proxy](#optional-using-proxy)
-  - [Configuration for DPDK](#configuration-for-dpdk)
-  - [Run rake](#run-rake)
-  - [(Optional) Run ansible-playbook](#optional-run-ansible-playbook)
-- [Using DPDK](#using-dpdk)
-- [Using pktgen-dpdk](#using-pktgen-dpdk)
-- [Using SPP](#using-spp)
-- [License](#license)
+- [使い方と設定方法](#使い方と設定方法)
+  - [使い方](#使い方)
+  - [ロールについて](#ロールについて)
+  - [ユーザーの追加](#ユーザーの追加)
+  - [(オプション)プロキシの設定](#オプション-プロキシの設定)
+  - [DPDKの設定](#dpdkの設定)
+  - [rakeコマンド](#rakeコマンド)
+  - [(オプション)ansible-playbook](#オプション-ansible-playbook)
+- [DPDKの使い方](#dpdkの使い方)
+- [pktgen-dpdkの使い方](#pktgen-dpdkの使い方)
+- [SPPの使い方](#sppの使い方)
+- [ライセンス](#ライセンス)
+
 
 ## 概要
 
@@ -34,7 +35,8 @@ pktgenは高性能なトラフィックジェネレータ、
 インストールされるDPDKのバージョンは16.07で、これは
 [IVSHMEM](http://dpdk.org/doc/guides-16.07/prog_guide/ivshmem_lib.html?highlight=ivshmem).
 をサポートしています。
-またこのスクリプトは特別なパッチをあてたqemuをインストールします。
+またこのスクリプトは特別なパッチをあてた
+[qemu](http://www.qemu.org/)をインストールします。
 これはDPDKで必要とされるhugepagesを使用するために、qemuの拡張を行います。
 
 動作対象バージョン:
@@ -71,31 +73,31 @@ Ansibleスクリプトである`ansible-playbook`を実行するために、
 ansibleはリモートマシンでのインストール作業を実行するためにsshを利用します。
 したがってansibleを実行するマシンにはsshクライアントがインストールされている必要があります。
 
-You also have to install sshd on ansible clients and to be able to ssh-key login
-from the server before install DPDK and other applications.
+またリモートマシンにはsshdがインストールされている必要があります。
+パスワード無しでリモートマシンへログインするためにはssh-keyを配置する必要があります。
 
-In order to ssh-key login, you generate with `ssh-keygen` on the server and
-copy content of it to 
-`$HOME/.ssh/authorized_keys` on the clients.
-
-[NOTE] You can skip it if you have a public key "$HOME/.ssh/id_rsa.pub" and use `rake`.
-If you don't have the key, generate it as following.
+ssh-keyを生成するには`ssh-keygen`コマンドを実行します。
+そして生成されたファイル"$HOME/.ssh/id_rsa.pub"の内容をクライアントマシンの
+`$HOME/.ssh/authorized_keys`に書き加えます。
 
 ```sh
 $ ssh-keygen -t rsa
 ```
 
+[NOTE] ssh-keyに関する設定は`rake`コマンドから行うことができます。
+
 ### (3) rake
 
-Install rake for running setup script, or you can setup it manually.
+ansibleの設定を簡単に実行するには、`rake`コマンドをインストールします。
 
 
-## Usage and settings
+## 使い方と設定方法
 
-### How to use
+### 使い方
 
-First of all, setup roles defined in `hosts` and run `rake` to start installation.
-Refer to following sections for roles and details of settings.
+はじめに`hosts`ファイルを編集してロールの定義を行います。
+そのあと`rake`コマンドを実行してインストールを行います。
+ロールおよび設定方法の詳細は次章を参照してください。
 
 ```sh
 $ rake
@@ -103,24 +105,27 @@ $ rake
 ```
 
 
-### Understand roles
+### ロールについて
 
-There are several roles defined in `hosts` file.
-Role is a kind of group of installation tasks.
-Each of tasks of the role is listed in "roles/[role_name]/tasks/main.yml".
+`hosts`ファイルに各種のロールが定義されます。
+ロールはインストールの手順をまとめたグループです。
+それぞれのロールの手順は"roles/[role_name]/tasks/main.yml"に記述されています。
 
-Target machines are specified as a list of IP address or hostname in `hosts`.
-Empty list means the role is not effective.
-For example, if you only use dpdk, empty the entries of pktgen and spp.
+`hosts`ファイルでは、ロールごとにターゲットマシンのIPアドレスもしくは
+ホスト名を記述します。
+もしロールから対象を外すにはコメント行にすればエントリが無効になり
+インストールは実行されません。
+例えばdpdkだけをインストールしたい場合には、pktgenとsppのエントリを無効にします。
 
 #### (1) common role
 
-Applied for all of roles as common tasks.
+commonロールは特別なロールであり、全てのロールに適用される共通的な処理が
+定義されています。
 
-This role installs following applications as defined in YAML files under
-"roles/common/tasks/".
-All of entries are listed in "roles/common/tasks/main.yml" and comment out
-entries if you don't need to install from it.
+commonロールにて実行されるインストール作業は"roles/common/tasks/"配下の
+YAMLファイルに記述されます。
+全てのYAMLファイルの一覧は"roles/common/tasks/main.yml"に記述されており、
+これをコメントアウトすれば不要なインストール作業を無効にすることができます。
 
 - base.yml
   - git
@@ -149,48 +154,53 @@ entries if you don't need to install from it.
 - netsniff-ng.yml
   - netsniff-ng and required packages
 
-Configuration files which are also installed on target machines with the application 
-are included in "roles/common/templates.
-Change the configuration before run ansible if you need to.
+インストールの際に必要となる設定ファイルなどは"roles/common/templates"に
+置かれています。
+拡張子"j2"のファイルはJinja2と呼ばれる形式のテンプレートファイルであり、
+ansible-playbookにて変数の置き換えなどを行ったあと別の形式に変換されます。
+そのほかの形式のファイルは置換は行わず単にコピーされるだけです。
+もし設定ファイルの内容を変更したい場合は、インストール前に編集を行ってください。
 
 
 #### (2) dpdk role
 
-Setup environment for running [dpdk](http://www.dpdk.org/) and install.
+[DPDK](http://www.dpdk.org/)をインストールし動作に必要な環境設定を行います。
 
 #### (3) pktgen role
 
-Setup environment for [pktgen](http://www.dpdk.org/browse/apps/pktgen-dpdk/)
-and install.
+[pktgen](http://www.dpdk.org/browse/apps/pktgen-dpdk/)をインストールし
+動作に必要な環境設定を行います。
 
-Require DPDK is installed.
+DPDKもインストールする必要があります。
 
 #### (4) spp role
 
-Setup environment for running [spp](http://www.dpdk.org/browse/apps/spp/)
-and install.
-It also installs customized qemu. 
+[spp](http://www.dpdk.org/browse/apps/spp/)をインストールし
+動作に必要な環境設定を行います。
+またVM上でDPDKを使用するためにカスタマイズされた[QEMU](http://www.qemu.org/)
+もインストールします。
 
-Require DPDK is installed.
+DPDKもインストールする必要があります。
 
-#### (5) (Optional) kvm role
+#### (5) (オプション)kvm role
 
-Install kvm and libvirt tools. 
+kvmおよびlibvirtツールをインストールします。
 
 
-### Add user
+### ユーザーの追加
 
-For remote login to ansible-clients, create an account as following steps
-and add following account info in `group_vars/all`.
+リモートのansibleクライアントへログインするために、ユーザーアカウントを用意します。
+そしてそのアカウント情報を`group_vars/all`に記述します。
 
-  - remote_user: your account name
-  - ansible_ssh_pass: password for ssh login
-  - ansible_sudo_pass: password for doing sudo
-  - http_proxy: proxy for ansible-client.
+  - remote_user: アカウント名
+  - ansible_ssh_pass: ssh用ログインパスワード
+  - ansible_sudo_pass: sudoパスワード
+  - http_proxy: HTTPプロキシ設定
 
-You can also setup this params by running rake command as detailed in later.
+これらのパラメータを直接編集する代わりに、
+rakeコマンドを使用することで設定することもできます。
 
-Create an account and add it as sudoer.
+ユーザーアカウントを作成し、sudoを可能にするには以下のように行います。
 
 ```
 $ sudo adduser dpdk1607
@@ -198,57 +208,62 @@ $ sudo adduser dpdk1607
 $ sudo gpasswd -a dpdk1607 sudo
 ```
 
-Delete account by userdel if it's no need. You should add -r option to delete
-home directory.
+またユーザーアカウントを削除するには、userdelコマンドを使います。
+`-r`オプションを付けるとホームディレクトリの削除も同時に実行されます。
 
 ```
 $ sudo userdel -r dpdk1607
 ```
 
 
-### (Optional) Using Proxy
+### (オプション)プロキシの設定
 
-[NOTE] You can skip it if you use `rake`.
+[NOTE] rakeコマンドを使用する場合はこの設定をスキップできます。
 
-If you are in proxy environment, set http_proxy while running rake or define
-it directly in `group_vars/all` and use `site_proxy.yml` instead of `site.yml`
-at running ansible playbook.
-Rake script selects which of them by checking your proxy environment, so you
-don't need to specify it manually if you use rake.
+もしあなたがプロキシ環境下にいるなら、インストールを行う前に
+`group_vars/all`を編集してHTTPプロキシの設定を行います。
+またこの場合、`site.yml`ではなく`site_proxy.yml`を使用します。
 
-
-### Configuration for DPDK
-
-For DPDK, You might have to change params for your environment.
-DPDK params are defined in group_vars/{dpdk spp pktgen}. 
-
-  - hugepage_size: Size of each of hugepage.
-  - nr_hugepages: Number of hugepages.
-  - dpdk_interfaces: List of names of network interface assign to DPDK.
-  - dpdk_target: Set "x86_64-ivshmem-ivshmem-gcc" for using ivshmem, or
-                 "x86_64-native-linuxapp-gcc".
-
-This script supports 2MB or 1GB of hugepage size.
-Please refer "Using Hugepages with the DPDK" section
-in [Getting Started Guide](http://dpdk.org/doc/guides/linux_gsg/sys_reqs.html)
-for detals of hugepages.
-
-This configuration to be effective from DPDK is installed, but cleared by
-shutting down.
-Run `$HOME/dpdk-home/do_after_reboot.sh` on the client for config.
-It also setups modprobe and assignment of interfaces.
-
-Template of `do_after_reboot.sh` is included as
-`roles/dpdk/templates/do_after_reboot.sh.j2`,
-so edit it if you need to.
+rakeコマンドではあなたの環境変数をチェックし、もしプロキシ設定が見つかれば
+それを使うかどうかを選択できます。
 
 
-### Run rake
+### DPDKの設定
 
-You can setup and install DPDK by running rake which is a `make` like build tool.
+DPDKを使用するために、いくつかのパラメータを変更する必要があります。
+DPDKに関する設定は`group_vars/dpdk`に記述されています。
+pktgenとSPPも同様です。 
 
-Type simply `rake` to run default task for setup and install at once.
-At first time you run rake, it asks you some questions for configuration. 
+  - hugepage_size: hugepageのサイズ
+  - nr_hugepages: hugepageの数
+  - dpdk_interfaces: DPDKに割り当てるネットワークインターフェース一覧
+  - dpdk_target: DPDKのターゲット(もしivshmemを使用する場合は、
+                 そうで無い場合は"x86_64-native-linuxapp-gcc")
+                 
+このツールでは2MBおよび1GBのhugepageサイズをサポートしています。
+hugepageの設定の詳細については、
+[Getting Started Guide](http://dpdk.org/doc/guides/linux_gsg/sys_reqs.html)
+にある"Using Hugepages with the DPDK"の章を参照してください。
+
+DPDKに関するこれらの設定はインストール後に有効になっていますが、
+再起動した場合はクリアされるものもあります。
+クライアントマシンでこれを再び有効にするには
+`$HOME/dpdk-home/do_after_reboot.sh`を実行します。
+これによりmodprobeやネットワークインターフェースの割り当てなども行います。
+
+`do_after_reboot.sh`のテンプレートは
+`roles/dpdk/templates/do_after_reboot.sh.j2`です。
+他に再起動後に有効にしたいものがある場合はここに登録してください。
+
+
+### rakeコマンド
+
+rakeコマンドはmakeコマンドのようなビルドツールの一種であり、
+インストールおよびパラメータ設定を自動で行ってくれます。
+
+起動は単純に"rake"と入力するだけです。
+もし初めて`rake`を実行する場合、パラメータ設定のためにいくつかの質問を行います。
+すでに設定済みのパラメータについては質問はスキップされます。
 
 ```sh
 $ rake
@@ -272,10 +287,11 @@ Check proxy (Type enter with no input if you are not in proxy env).
 [type y or n]
 ```
 
-To list all of tasks, run `rake -T`.
-The default task includes "confirm_*" and "install" tasks.
-You can run each of tasks explicitly by specifying task name.
-"install" task runs "ansible-playbook".
+`rake`では様々なタスクが定義されています。
+タスクの一覧を表示するには`rake -T`を実行してください。
+単に"rake"と入力するとインストールのための全てのタスクが実行されますが、
+タスク名を指定することでひとつひとつのタスクを順に実行することもできます。
+`rake install`タスクが`ansible-playbook`を実行するタスクです。
 
 ```sh
 $ rake -T
@@ -295,36 +311,43 @@ rake restore_conf        # Restore config
 rake save_conf           # Save config
 ```
 
-If you need to remove account and proxy configuration from config files,
-run "clean" task.
-It is useful if you share the repo in public.
+もしすでに設定されているアカウント情報やプロキシの設定を消去したい場合には
+`rake clean`を実行してください。
+このタスクはパブリックなリポジトリに公開する場合などに有用です。
 
 ```sh
 $ rake clean
 ```
 
 
-### (Optional) Run ansible-playbook
+### (オプション)ansible-playbook
 
-You don't do this section if you use `rake` previous section.
+[NOTE] もし`rake`コマンドを使用する場合はこの章はスキップしてください。
 
-If you setup config and run ansible-playbook manually,
-run ansible-playbook with inventory file `hosts` and `site.yml`.
+ansible-playbookコマンドを実行してインストールを行います。
+インストール実行の前に設定ファイルである`hosts`と`site.yml`を編集します。
+ansible-playbookコマンドは次の様に実行します。
+もしあなたがプロキシ環境下にいるなら、`site.yml`の代わりに
+`site_proxy.yml`を用います。
+
 
 ```
 $ ansible-playbook -i hosts site.yml
 ```
 
 
-## Using DPDK
+## DPDKの使い方
 
-Refer to the [DPDK Documentation](http://dpdk.org/doc/guides-16.07/).
+DPDKは$HOME/dpdk-home/dpdkにインストールされます。
+
+使用方法の詳細については[DPDK Documentation](http://dpdk.org/doc/guides-16.07/)
+を参照してください。
 
 
-## Using pktgen-dpdk
+## pktgen-dpdkの使い方
 
-pktgen is installed in $HOME/dpdk-home/pktgen-dpdk.
-Exec file is $HOME/pktgen-dpdk/app/app/x86_64-native-linuxapp-gcc/pktgen.
+pktgenは$HOME/dpdk-home/pktgen-dpdkにインストールされます。
+実行ファイルは$HOME/pktgen-dpdk/app/app/x86_64-native-linuxapp-gcc/pktgenです。
 
 ```
 $ ssh dpdk1607@remote
@@ -335,23 +358,24 @@ Last login: Sun May  8 01:44:03 2016 from 10.0.2.2
 dpdk1607@remote:~$ cd dpdk_home/pktgen-dpdk/
 ```
 
-You can run it directory, but it better to use `doit` script.
-Refer to [README](http://dpdk.org/browse/apps/pktgen-dpdk/tree/README.md)
-of pktgen for how to use and more details.
+実行ファイルを直接することも出来ますが、`doit`スクリプトを実行するのが簡単です。
+使用方法の詳細については
+[README](http://dpdk.org/browse/apps/pktgen-dpdk/tree/README.md)
+を参照してください。
 
 ```sh
 dpdk1607@remote:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
 ```
 
 
-## Using SPP 
+## SPPの使い方
 
-SPP is installed in $HOME/dpdk-home/spp.
+SPPは$HOME/dpdk-home/sppにインストールされます。
 
-Please refer to [README](http://dpdk.org/browse/apps/spp/tree/README)
-and [setup_guide](http://dpdk.org/browse/apps/spp/tree/docs/setup_guide.md)
-for details.
+使用方法の詳細については、[README](http://dpdk.org/browse/apps/spp/tree/README)
+および[setup_guide](http://dpdk.org/browse/apps/spp/tree/docs/setup_guide.md)
+を参照してください。
 
 
-## License
-This program is released under the BSD license.
+## ライセンス
+[BSD](https://opensource.org/licenses/bsd-license.php)

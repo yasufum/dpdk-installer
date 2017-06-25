@@ -1,3 +1,4 @@
+.*.swp
 tmp/*
 site*.retry
 roles/common/templates/id_rsa.pub
