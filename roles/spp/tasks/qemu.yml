@@ -21,8 +21,11 @@
   git: repo={{ qemu_repo }}
        dest={{ qemu_tmpdir }}
 
+- name: remove if qemu already exists
+  command: rm -rf {{ qemu_dir }}
+
 - name: move qemu
-  command: mv {{ qemu_tmpdir }}/{{ qemu_ver }} {{ qemu_dir }}
+  command: mv -f {{ qemu_tmpdir }}/{{ qemu_ver }} {{ qemu_dir }}
 
 - name: remove qemu_tmpdir
   command: rm -rf {{ qemu_tmpdir }}

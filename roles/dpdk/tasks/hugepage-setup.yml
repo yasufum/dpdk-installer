@@ -1,18 +1,5 @@
 ---
 
-# [TODO] remove after confirming updated version is working correctly
-#- name: set hugepages size 2MB
-#  when: hugepage_size == "2M"
-#  become: yes
-#  command: sh -c "echo {{ nr_hugepages }} > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages"
-
-# [TODO] remove after confirming updated version is working correctly
-#- name: fstab
-#  replace:
-#    dest=/etc/fstab
-#    regexp='nodev /mnt/huge hugetlbfs *$'
-#    replace='nodev /mnt/huge hugetlbfs defaults 0 0'
-
 - name: clean grub hugepage opt
   become: yes
   replace:
