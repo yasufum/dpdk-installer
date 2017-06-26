@@ -11,10 +11,12 @@
   - [使い方](#使い方)
   - [ロールについて](#ロールについて)
   - [ユーザーの追加](#ユーザーの追加)
-  - [(オプション)プロキシの設定](#オプション-プロキシの設定)
+  - [(オプション)プロキシの設定](#オプションプロキシの設定)
   - [DPDKの設定](#dpdkの設定)
+    - [hugepageサイズの設定](#hugepageサイズの設定)
+    - [再起動後のDPDKの設定有効化](#再起動後のDPDKの設定有効化)
   - [rakeコマンド](#rakeコマンド)
-  - [(オプション)ansible-playbook](#オプション-ansible-playbook)
+  - [(オプション)ansible-playbook](#オプションansible-playbook)
 - [DPDKの使い方](#dpdkの使い方)
 - [pktgen-dpdkの使い方](#pktgen-dpdkの使い方)
 - [SPPの使い方](#sppの使い方)
@@ -241,9 +243,55 @@ pktgenとSPPも同様です。
                  そうで無い場合は"x86_64-native-linuxapp-gcc")
                  
 このツールでは2MBおよび1GBのhugepageサイズをサポートしています。
+
 hugepageの設定の詳細については、
 [Getting Started Guide](http://dpdk.org/doc/guides/linux_gsg/sys_reqs.html)
 にある"Using Hugepages with the DPDK"の章を参照してください。
+
+[NOTE] 1GBはシステムで使用できない場合があるため、2MBを設定する方が良いかもしれません。
+hugepageの設定はサイズに応じて以下の様に参照できます。
+1GBのhugepageを作成したのにもかかわらず参照できない場合、
+あなたのシステムではデフォルトで1GBのhugepageをサポートしていません。
+
+```sh
+# 2MB
+cat /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+
+# 1GB
+cat /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
+```
+
+#### hugepageサイズの設定
+
+hugepageサイズは"/etc/defaults/grub"の`GRUB_CMDLINE_LINUX`にて定義されており、
+システムの起動時に有効になります。
+編集を誤るとOSが正常に起動しない場合がありますので、
+hugepageサイズを変更する場合は注意してください。
+
+以下の例は8GBのhugepageを確保する例です。
+
+2MBページの場合hugepageの数のみを記述します。
+
+```
+# 2MB x 4096pages
+GRUB_CMDLINE_LINUX="hugepages=4096"
+```
+
+一方1GBの場合はhugepageのサイズと数の両方を記述します。
+
+```
+# 1GB x 8pages
+GRUB_CMDLINE_LINUX="default_hugepagesz=1G hugepagesz=1G hugepages=8"
+```
+
+編集を終えた後に`update-grab`を実行して設定を有効にしてください。
+
+```sh
+$ sudo update-grub
+Generating grub configuration file ...
+```
+
+#### 再起動後のDPDKの設定有効化
 
 DPDKに関するこれらの設定はインストール後に有効になっていますが、
 再起動した場合はクリアされるものもあります。

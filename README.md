@@ -13,6 +13,8 @@
   - [Add user](#add-user)
   - [(Optional) Using Proxy](#optional-using-proxy)
   - [Configuration for DPDK](#configuration-for-dpdk)
+    - [Configure hugepage size](#configure-hugepage-size)
+    - [Activate DPDK configuration after reboot](#activate-dpdk-configuration-after-reboot)
   - [Run rake](#run-rake)
   - [(Optional) Run ansible-playbook](#optional-run-ansible-playbook)
 - [Using DPDK](#using-dpdk)
@@ -228,9 +230,57 @@ It is same as pktgen and SPP.
                  "x86_64-native-linuxapp-gcc".
 
 This script supports 2MB or 1GB of hugepage size.
+
 Please refer "Using Hugepages with the DPDK" section
 in [Getting Started Guide](http://dpdk.org/doc/guides/linux_gsg/sys_reqs.html)
 for detals of hugepages.
+
+[NOTE] You had better to choose 2MB because you might not able to use
+1GB in deufalt.
+If you cannot find nr_hugepages for 1GB, system is not supporting 1GB hugepge
+in default.
+
+```sh
+# 2MB
+cat /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+
+# 1GB
+cat /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
+```
+
+If you change hugepage size, re-run this script or edit config file
+manually.
+
+#### Configure hugepage size
+
+Hugepage size is defined with `GRUB_CMDLINE_LINUX` in "/etc/defaults/grub"
+to be effective while booting system.
+Please be careful to edit it because it might cause an error booting OS.
+
+This is examples for 8GB of hugepages of 2MB or 1GB.
+
+For 2MB, you simply define the number of hugepages.
+
+```
+# 2MB x 4096pages
+GRUB_CMDLINE_LINUX="hugepages=4096"
+```
+
+Or define size and number of hugepages for 1GB.
+
+```
+# 1GB x 8pages
+GRUB_CMDLINE_LINUX="default_hugepagesz=1G hugepagesz=1G hugepages=8"
+```
+
+You have to run `update-grab` to update grub config.
+
+```sh
+$ sudo update-grub
+Generating grub configuration file ...
+```
+
+#### Activate DPDK configuration after reboot
 
 This configuration to be effective from DPDK is installed, but cleared by
 shutting down.
