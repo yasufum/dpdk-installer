@@ -59,39 +59,40 @@ end
 # Ask using default value or new one.
 desc "Check http_proxy setting"
 task :confirm_http_proxy do
-  http_proxy = ENV["http_proxy"]
   vars_file = "group_vars/all"
   yaml = YAML.load_file(vars_file)
-  # Check if http_proxy same as your env is described in the vars_file
-  if yaml['http_proxy'] == nil
-    if (http_proxy != "") or (http_proxy != yaml['http_proxy'])
-      puts "Check proxy (Type enter with no input if you are not in proxy env)."
-      puts  "> 'http_proxy' is set as '#{yaml['http_proxy']}'."
-      print "> Use proxy env ? (#{http_proxy}) [Y/n]: "
-      ans = STDIN.gets.chop
-      if ans.downcase == "n" or ans.downcase == "no"
-        print "> http_proxy: "
-        new_proxy = STDIN.gets.chop
-      else
-        new_proxy = http_proxy
-      end
-  
-      if yaml['http_proxy'] != new_proxy
-        # update proxy conf
-        str = ""  # contains updated contents of vars_file to write new one
-        open(vars_file, "r") {|f|
-          f.each_line {|l|
-            if l.include? "http_proxy:"
-              str += "http_proxy: \"#{new_proxy}\"\n"
-            else
-              str += l
-            end
+  ["http_proxy", "https_proxy"].each do |proxy|
+    # Check if http_proxy same as your env is described in the vars_file
+    if yaml[proxy] == nil
+      if (ENV[proxy] != "") or (ENV[proxy] != yaml[proxy])
+        puts "Check proxy (Type enter with no input if you are not in proxy env)."
+        puts  "> '#{proxy}' is set as '#{yaml[proxy]}'."
+        print "> Use proxy env ? (#{ENV[proxy]}) [Y/n]: "
+        ans = STDIN.gets.chop
+        if ans.downcase == "n" or ans.downcase == "no"
+          print "> #{proxy}: "
+          new_proxy = STDIN.gets.chop
+        else
+          new_proxy = ENV[proxy]
+        end
+
+        if yaml[proxy] != new_proxy
+          # update proxy conf
+          str = ""  # contains updated contents of vars_file to write new one
+          open(vars_file, "r") {|f|
+            f.each_line {|l|
+              if l.include? "#{proxy}:"
+                str += "#{proxy}: \"#{new_proxy}\"\n"
+              else
+                str += l
+              end
+            }
           }
-        }
-        open(vars_file, "w+"){|f| f.write(str)}
-        puts "> update 'http_proxy' to '#{new_proxy}' in 'group_vars/all'."
-      else
-        puts "> proxy isn't changed."
+          open(vars_file, "w+"){|f| f.write(str)}
+          puts "> update #{proxy} to '#{new_proxy}' in 'group_vars/all'."
+        else
+          puts "> proxy isn't changed."
+        end
       end
     end
   end
@@ -290,7 +291,8 @@ task :clean_vars do
     "remote_user",
     "ansible_ssh_pass",
     "ansible_sudo_pass",
-    "http_proxy"
+    "http_proxy",
+    "https_proxy"
   ]
   # remove ssh user account form vars file.
   vars_file = "group_vars/all"

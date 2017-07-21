@@ -7,6 +7,8 @@ remote_user:
 ansible_ssh_pass: 
 ansible_sudo_pass: 
 http_proxy: 
+https_proxy: 
+
 
 
 # Do not edit
