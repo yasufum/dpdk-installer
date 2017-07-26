@@ -33,17 +33,16 @@ Install scripts for
 Pktgen is a high-performance traffic generator and spp is a patch panel like 
 switching function for Inter-VM communication.
 
-Installed DPDK version is 16.07 which supports
-[IVSHMEM](http://dpdk.org/doc/guides-16.07/prog_guide/ivshmem_lib.html?highlight=ivshmem).
+Installed DPDK version is 17.05 which supports
+[IVSHMEM](http://dpdk.org/doc/guides-17.05/prog_guide/ivshmem_lib.html?highlight=ivshmem).
 
 This script also installs customized [qemu](http://www.qemu.org/) for extending ivshmem
 to use hugepages.
 
 Supported versions:
-- DPDK 16.07
-- pktge-dpdk 3.0.16
-- spp 16.07
-- qemu-2.3.0 (customized for DPDK's ivshmem)
+- DPDK 17.05
+- pktge-dpdk 3.3.7
+- spp 17.05
 
 
 ## Recommended System Requirements
@@ -63,7 +62,7 @@ instruction for building DPDK and other tools.
 
 Install ansible  >= 2.0 by following this
 [instruction](http://docs.ansible.com/ansible/intro_installation.html#installation).
-I only tested version 2.0.0.2 and 2.0.1.0 but other versions might work.
+I only tested version 2.3.1 but other versions might work.
 
 ### (2) ssh
 
@@ -194,16 +193,16 @@ You can also setup this params by running rake command as detailed in later.
 Create an account and add it as sudoer.
 
 ```
-$ sudo adduser dpdk1607
+$ sudo adduser dpdk1705
 
-$ sudo gpasswd -a dpdk1607 sudo
+$ sudo gpasswd -a dpdk1705 sudo
 ```
 
 Delete account by userdel if it's no need. You should add -r option to delete
 home directory.
 
 ```
-$ sudo userdel -r dpdk1607
+$ sudo userdel -r dpdk1705
 ```
 
 
@@ -303,7 +302,7 @@ At first time you run rake, it asks you some questions for configuration.
 $ rake
 > input new remote_user.
 [type your account]
-> update 'remote_user' to 'dpdk1607' in 'group_vars/all'.
+> update 'remote_user' to 'dpdk1705' in 'group_vars/all'.
 > input new ansible_ssh_pass.
 [type your passwd]
 > update 'ansible_ssh_pass' to 'dpdk3388' in 'group_vars/all'.
@@ -371,7 +370,7 @@ $ ansible-playbook -i hosts site.yml
 
 DPDK is installed in $HOME/dpdk-home/dpdk.
 
-Refer to the [DPDK Documentation](http://dpdk.org/doc/guides-16.07/).
+Refer to the [DPDK Documentation](http://dpdk.org/doc/guides-17.05/).
 
 
 ## Using pktgen-dpdk
@@ -380,12 +379,12 @@ pktgen is installed in $HOME/dpdk-home/pktgen-dpdk.
 Exec file is $HOME/pktgen-dpdk/app/app/x86_64-native-linuxapp-gcc/pktgen.
 
 ```
-$ ssh dpdk1607@remote
+$ ssh dpdk1705@remote
 Welcome to Ubuntu 16.04.4 LTS (GNU/Linux 4.2.0-35-generic x86_64)
 
  * Documentation:  https://help.ubuntu.com/
 Last login: Sun May  8 01:44:03 2016 from 10.0.2.2
-dpdk1607@remote:~$ cd dpdk_home/pktgen-dpdk/
+dpdk1705@remote:~$ cd dpdk_home/pktgen-dpdk/
 ```
 
 You can run it directory, but it better to use `doit` script.
@@ -393,7 +392,7 @@ Refer to [README](http://dpdk.org/browse/apps/pktgen-dpdk/tree/README.md)
 of pktgen for how to use and more details.
 
 ```sh
-dpdk1607@remote:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
+dpdk1705@remote:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
 ```
 
 
