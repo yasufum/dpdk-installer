@@ -1,3 +1,2 @@
 ---
-- include: qemu.yml
 - include: spp.yml

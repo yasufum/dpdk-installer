@@ -131,27 +131,19 @@ end
 
 desc "Setup DPDK params (hugepages and network interfaces)"
 task :confirm_dpdk do
-  # There are three vars_files including params related to DPDK.
-  #   1. group_vars/dpdk
-  #   2. group_vars/pktgen
-  #   3. group_vars/spp
-  # In this task, setup all of files by asking user some questions and update
-  # vars_files. 
-  # Skip updating if vars_files are already setup.
+  # In this task, setup "group_vars/dpdk" by asking user some questions.
   #
   # [NOTE] It asks only for dpdk and not others because all of vars are included
   # in dpdk's var file. It's needed to be asked for other files if they include
   # vars not included dpdk.
   
-  # 1. Update group_vars/dpdk 
   vars_file = "group_vars/dpdk"
   yaml = YAML.load_file(vars_file)
 
   target_params = {
     "hugepage_size" => nil,
     "nr_hugepages" => nil,
-    "dpdk_interfaces" => nil,
-    "dpdk_target" => nil
+    "dpdk_interfaces" => nil
   }
 
   # Check if all params are filled for confirm vars_file is already setup
@@ -219,51 +211,8 @@ task :confirm_dpdk do
         target_params[param] = yaml[param]
       end
   
-    when "dpdk_target"
-      if yaml["dpdk_target"] == nil
-        puts "> dpdk_target (use '(i)vshmem' for SPP or '(n)ative'):"
-        ans = ""
-        while not (ans == "ivshmem" or ans == "native")
-          ans = STDIN.gets.chop
-          if ans == "i"
-            ans = "ivshmem"
-          elsif ans == "n"
-            ans = "native"
-          end
-          if not (ans == "ivshmem" or ans == "native")
-            puts "> Error! Invalid parameter."
-            puts "> dpdk_target (use 'ivshmem' for SPP or 'native'):"
-          end
-        end
-        if ans == "ivshmem"
-          dpdk_tgt = "x86_64-ivshmem-linuxapp-gcc"
-        else
-          dpdk_tgt = "x86_64-native-linuxapp-gcc"
-        end
-        #puts "dpdk_target: #{dpdk_tgt}"
-        update_var(vars_file, "dpdk_target", dpdk_tgt, false)
-        target_params[param] = dpdk_tgt
-      else
-        target_params[param] = yaml[param]
-      end
     end
   end
-
-  # 2. Update group_vars/pktgen
-  update_var(
-    "group_vars/pktgen",
-    "dpdk_target",
-    target_params["dpdk_target"],
-    false
-  )
-
-  # 3. Update group_vars/spp
-  update_var(
-    "group_vars/spp",
-    "dpdk_target",
-    target_params["dpdk_target"],
-    false
-  )
 end
 
 
@@ -305,8 +254,7 @@ task :clean_vars do
   target_params = [
     "hugepage_size",
     "nr_hugepages",
-    "dpdk_interfaces",
-    "dpdk_target"
+    "dpdk_interfaces"
   ]
   # remove ssh user account form vars file.
   vars_file = "group_vars/dpdk"
@@ -314,18 +262,6 @@ task :clean_vars do
     update_var(vars_file, key, "", true)
     puts "> clean '#{key}' in '#{vars_file}'."
   end
-
-  # 2. "group_vars/pktgen"
-  key = "dpdk_target"
-  vars_file = "group_vars/pktgen"
-  update_var(vars_file, key, "", true)
-  puts "> clean '#{key}' in '#{vars_file}'."
-
-  # 3. "group_vars/spp"
-  key = "dpdk_target"
-  vars_file = "group_vars/spp"
-  update_var(vars_file, key, "", true)
-  puts "> clean '#{key}' in '#{vars_file}'."
 end
 
 

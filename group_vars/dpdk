@@ -7,13 +7,9 @@ hugepage_size:
 nr_hugepages: 
 dpdk_interfaces: 
 
-# Use "x86_64-ivshmem-ivshmem-gcc" for ivshmem
-# or "x86_64-native-linuxapp-gcc"
-dpdk_target: 
-
-
 # Do not edit
 dpdk_home: "{{ ansible_env.HOME }}/dpdk-home"
 dpdk_dir: "{{ dpdk_home }}/dpdk"
 dpdk_repo: "http://dpdk.org/git/dpdk"
-dpdk_ver: v16.07
+dpdk_ver: "v17.05"
+dpdk_target: "x86_64-native-linuxapp-gcc"
