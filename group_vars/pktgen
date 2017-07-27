@@ -1,18 +1,13 @@
 ---
 # pktgen
 
-# Edit params
-# Use "x86_64-ivshmem-ivshmem-gcc" for ivshmem
-# or "x86_64-native-linuxapp-gcc"
-dpdk_target: 
-
-
 # Do not edit
 dpdk_repo: "http://dpdk.org/git/dpdk"
 dpdk_home: "{{ ansible_env.HOME }}/dpdk-home"
 dpdk_dir: "{{ dpdk_home }}/dpdk"
-dpdk_ver: v16.07
+dpdk_ver: "v17.05"
+dpdk_target: "x86_64-native-linuxapp-gcc"
 
-pktgen_ver: pktgen-3.0.14
+pktgen_ver: "pktgen-3.3.4"
 pktgen_repo: "http://dpdk.org/git/apps/pktgen-dpdk"
 pktgen_dir: "{{ dpdk_home }}/pktgen-dpdk"

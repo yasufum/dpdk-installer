@@ -15,7 +15,7 @@ echo sudo modprobe vfio-pci
 sudo modprobe vfio-pci
 
 # setup vars for nic bind.
-script=${RTE_SDK}/tools/dpdk-devbind.py
+script=${RTE_SDK}/usertools/dpdk-devbind.py
 opt="--bind=uio_pci_generic"
 
 for eth in {{ dpdk_interfaces }}

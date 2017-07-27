@@ -34,18 +34,17 @@
 pktgenは高性能なトラフィックジェネレータ、
 そしてSPPは仮想マシン(VM)同士をパッチパネルのように接続するためのアプリケーションです。
 
-インストールされるDPDKのバージョンは16.07で、これは
-[IVSHMEM](http://dpdk.org/doc/guides-16.07/prog_guide/ivshmem_lib.html?highlight=ivshmem).
+インストールされるDPDKのバージョンは17.05で、これは
+[IVSHMEM](http://dpdk.org/doc/guides-17.05/prog_guide/ivshmem_lib.html?highlight=ivshmem).
 をサポートしています。
 またこのスクリプトは特別なパッチをあてた
 [qemu](http://www.qemu.org/)をインストールします。
 これはDPDKで必要とされるhugepagesを使用するために、qemuの拡張を行います。
 
 動作対象バージョン:
-- DPDK 16.07
-- pktge-dpdk 3.0.16
-- spp 16.07
-- qemu-2.3.0 (ivshmemのためのパッチをあてたもの)
+- DPDK 17.05
+- pktge-dpdk 3.3.7
+- spp 17.05
 
 
 ## 推奨スペック
@@ -67,7 +66,7 @@ Ansibleスクリプトである`ansible-playbook`を実行するために、
 
 [instruction](http://docs.ansible.com/ansible/intro_installation.html#installation).
 にしたがってAnsible(>= 2.0)をインストールします。
-バージョン2.0.0.2と2.0.1.0しか検証していませんが、
+バージョン2.3.1しか検証していませんが、
 おそらくその他のものも正常に動作するはずです。
 
 ### (2) ssh
@@ -205,16 +204,16 @@ rakeコマンドを使用することで設定することもできます。
 ユーザーアカウントを作成し、sudoを可能にするには以下のように行います。
 
 ```
-$ sudo adduser dpdk1607
+$ sudo adduser dpdk1705
 
-$ sudo gpasswd -a dpdk1607 sudo
+$ sudo gpasswd -a dpdk1705 sudo
 ```
 
 またユーザーアカウントを削除するには、userdelコマンドを使います。
 `-r`オプションを付けるとホームディレクトリの削除も同時に実行されます。
 
 ```
-$ sudo userdel -r dpdk1607
+$ sudo userdel -r dpdk1705
 ```
 
 
@@ -317,7 +316,7 @@ rakeコマンドはmakeコマンドのようなビルドツールの一種であ
 $ rake
 > input new remote_user.
 [type your account]
-> update 'remote_user' to 'dpdk1607' in 'group_vars/all'.
+> update 'remote_user' to 'dpdk1705' in 'group_vars/all'.
 > input new ansible_ssh_pass.
 [type your passwd]
 > update 'ansible_ssh_pass' to 'dpdk3388' in 'group_vars/all'.
@@ -388,7 +387,7 @@ $ ansible-playbook -i hosts site.yml
 
 DPDKは$HOME/dpdk-home/dpdkにインストールされます。
 
-使用方法の詳細については[DPDK Documentation](http://dpdk.org/doc/guides-16.07/)
+使用方法の詳細については[DPDK Documentation](http://dpdk.org/doc/guides-17.05/)
 を参照してください。
 
 
@@ -398,12 +397,12 @@ pktgenは$HOME/dpdk-home/pktgen-dpdkにインストールされます。
 実行ファイルは$HOME/pktgen-dpdk/app/app/x86_64-native-linuxapp-gcc/pktgenです。
 
 ```
-$ ssh dpdk1607@remote
+$ ssh dpdk1705@remote
 Welcome to Ubuntu 16.04.4 LTS (GNU/Linux 4.2.0-35-generic x86_64)
 
  * Documentation:  https://help.ubuntu.com/
 Last login: Sun May  8 01:44:03 2016 from 10.0.2.2
-dpdk1607@remote:~$ cd dpdk_home/pktgen-dpdk/
+dpdk1705@remote:~$ cd dpdk_home/pktgen-dpdk/
 ```
 
 実行ファイルを直接することも出来ますが、`doit`スクリプトを実行するのが簡単です。
@@ -412,7 +411,7 @@ dpdk1607@remote:~$ cd dpdk_home/pktgen-dpdk/
 を参照してください。
 
 ```sh
-dpdk1607@remote:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
+dpdk1705@remote:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
 ```
 
 

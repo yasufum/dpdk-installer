@@ -9,8 +9,6 @@ ansible_sudo_pass:
 http_proxy: 
 https_proxy: 
 
-
-
 # Do not edit
 # dein
 dein_home: "{{ ansible_env.HOME }}/dein"
