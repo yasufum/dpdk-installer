@@ -319,10 +319,10 @@ $ rake
 > update 'remote_user' to 'dpdk1705' in 'group_vars/all'.
 > input new ansible_ssh_pass.
 [type your passwd]
-> update 'ansible_ssh_pass' to 'dpdk3388' in 'group_vars/all'.
+> update 'ansible_ssh_pass' to 'your_passwd' in 'group_vars/all'.
 > input new ansible_sudo_pass.
 [type your passwd]
-> update 'ansible_sudo_pass' to 'dpdk3388' in 'group_vars/all'.
+> update 'ansible_sudo_pass' to 'your_passwd' in 'group_vars/all'.
 SSH key configuration.
 > './roles/common/templates/id_rsa.pub' doesn't exist.
 > Please put your public key as './roles/common/templates/id_rsa.pub' for login spp VMs.
