@@ -34,13 +34,6 @@
 pktgenは高性能なトラフィックジェネレータ、
 そしてSPPは仮想マシン(VM)同士をパッチパネルのように接続するためのアプリケーションです。
 
-インストールされるDPDKのバージョンは17.08で、これは
-[IVSHMEM](http://dpdk.org/doc/guides-17.08/prog_guide/ivshmem_lib.html?highlight=ivshmem).
-をサポートしています。
-またこのスクリプトは特別なパッチをあてた
-[qemu](http://www.qemu.org/)をインストールします。
-これはDPDKで必要とされるhugepagesを使用するために、qemuの拡張を行います。
-
 動作対象バージョン:
 - DPDK 17.08
 - pktge-dpdk 3.3.7
@@ -178,9 +171,6 @@ DPDKもインストールする必要があります。
 
 [spp](http://www.dpdk.org/browse/apps/spp/)をインストールし
 動作に必要な環境設定を行います。
-またVM上でDPDKを使用するためにカスタマイズされた[QEMU](http://www.qemu.org/)
-もインストールします。
-
 DPDKもインストールする必要があります。
 
 #### (5) (オプション)kvm role
@@ -238,8 +228,7 @@ pktgenとSPPも同様です。
   - hugepage_size: hugepageのサイズ
   - nr_hugepages: hugepageの数
   - dpdk_interfaces: DPDKに割り当てるネットワークインターフェース一覧
-  - dpdk_target: DPDKのターゲット(もしivshmemを使用する場合は、
-                 そうで無い場合は"x86_64-native-linuxapp-gcc")
+  - dpdk_target: DPDKのターゲット("x86_64-native-linuxapp-gcc")
                  
 このツールでは2MBおよび1GBのhugepageサイズをサポートしています。
 

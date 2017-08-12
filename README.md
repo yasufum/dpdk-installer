@@ -33,12 +33,6 @@ Install scripts for
 Pktgen is a high-performance traffic generator and spp is a patch panel like 
 switching function for Inter-VM communication.
 
-Installed DPDK version is 17.08 which supports
-[IVSHMEM](http://dpdk.org/doc/guides-17.08/prog_guide/ivshmem_lib.html?highlight=ivshmem).
-
-This script also installs customized [qemu](http://www.qemu.org/) for extending ivshmem
-to use hugepages.
-
 Supported versions:
 - DPDK 17.08
 - pktge-dpdk 3.3.7
@@ -169,7 +163,6 @@ Require DPDK is installed.
 
 Setup environment for running [spp](http://www.dpdk.org/browse/apps/spp/)
 and install.
-It also installs customized qemu for using DPDK on VMs. 
 
 Require DPDK is installed.
 
@@ -225,8 +218,8 @@ It is same as pktgen and SPP.
   - hugepage_size: Size of each of hugepage.
   - nr_hugepages: Number of hugepages.
   - dpdk_interfaces: List of names of network interface assign to DPDK.
-  - dpdk_target: Set "x86_64-ivshmem-ivshmem-gcc" for using ivshmem, or
-                 "x86_64-native-linuxapp-gcc".
+  - dpdk_target: Set "x86_64-native-linuxapp-gcc".
+                 
 
 This script supports 2MB or 1GB of hugepage size.
 
