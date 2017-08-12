@@ -4,7 +4,7 @@
 # Do not edit
 dpdk_home: "{{ ansible_env.HOME }}/dpdk-home"
 dpdk_dir: "{{ dpdk_home }}/dpdk"
-dpdk_ver: "v17.05"
+dpdk_ver: "v17.08"
 dpdk_target: "x86_64-native-linuxapp-gcc"
 
 spp_repo: "http://dpdk.org/git/apps/spp"
