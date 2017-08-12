@@ -35,7 +35,7 @@ switching function for Inter-VM communication.
 
 Supported versions:
 - DPDK 17.08
-- pktge-dpdk 3.3.7
+- pktgen-dpdk 3.3.9
 - spp 17.08
 
 

@@ -10,6 +10,10 @@
   become: yes
   apt: pkg=build-essential update_cache=no state=present
 
+- name: install libnuma-dev
+  become: yes
+  apt: pkg=libnuma-dev update_cache=no state=present
+
 - name: put install_linux_headers.sh
   copy: src=templates/install_linux_headers.sh
         dest={{ dpdk_home }}
