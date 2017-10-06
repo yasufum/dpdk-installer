@@ -2,7 +2,7 @@
 - name: get spp
   git: repo={{ spp_repo }}
        dest={{ spp_dir }}
-       version={{ spp_ver }}
+       #version={{ spp_ver }}
 
 - name: make spp
   command: make RTE_SDK={{ dpdk_dir }} RTE_TARGET={{ dpdk_target }} chdir={{ spp_dir }}
