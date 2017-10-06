@@ -8,25 +8,25 @@
     - common
 
 - name: install dpdk
-  hosts: dpdk 
+  hosts: dpdk
   remote_user: "{{ remote_user }}"
   roles:
-    - dpdk 
+    - dpdk
 
-- name: install kvm 
-  hosts: dpdk 
+- name: install kvm
+  hosts: dpdk
   remote_user: "{{ remote_user }}"
   roles:
     - kvm
 
-- name: install spp and qemu 
+- name: install spp and qemu
   hosts: spp
   remote_user: "{{ remote_user }}"
   roles:
     - spp
 
 - name: install pktgen
-  hosts: pktgen 
+  hosts: pktgen
   remote_user: "{{ remote_user }}"
   roles:
     - pktgen

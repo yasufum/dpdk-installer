@@ -13,7 +13,7 @@ task :default => [
   :confirm_dpdk,
   :install
 ] do
-  puts "Done" 
+  puts "Done"
 end
 
 
@@ -33,7 +33,7 @@ desc "Check if sshkey exists and copy from your $HOME/.ssh/id_rsa.pub"
 task :confirm_sshkey do
   target = "./roles/common/templates/id_rsa.pub"
   sshkey = "#{ENV['HOME']}/.ssh/id_rsa.pub"
-  if not File.exists? target 
+  if not File.exists? target
     puts "SSH key configuration."
     puts "> '#{target}' doesn't exist."
     puts "> Please put your public key as '#{target}' for target machines."
@@ -111,7 +111,7 @@ task :confirm_account do
       puts "> input new #{account_info}."
       input_info = STDIN.gets.chop
 
-      # Overwrite vars_file with new one 
+      # Overwrite vars_file with new one
       str = ""
       open(vars_file, "r") {|f|
         f.each_line {|l|
@@ -136,7 +136,7 @@ task :confirm_dpdk do
   # [NOTE] It asks only for dpdk and not others because all of vars are included
   # in dpdk's var file. It's needed to be asked for other files if they include
   # vars not included dpdk.
-  
+
   vars_file = "group_vars/dpdk"
   yaml = YAML.load_file(vars_file)
 
@@ -174,7 +174,7 @@ task :confirm_dpdk do
       else
         target_params[param] = yaml[param]
       end
-  
+
     # [NOTE] "hugepage_size" must be decided before "nr_hugepages" because it's
     # refered in this section.
     when "nr_hugepages"
@@ -197,7 +197,7 @@ task :confirm_dpdk do
       else
         target_params[param] = yaml[param]
       end
-  
+
     when "dpdk_interfaces"
       if yaml["dpdk_interfaces"] == nil
         puts "> dpdk_interfaces (separate by space if two or more):"
@@ -210,7 +210,7 @@ task :confirm_dpdk do
       else
         target_params[param] = yaml[param]
       end
-  
+
     end
   end
 end
@@ -225,7 +225,7 @@ desc "Run ansible playbook"
 task :install do
   vars_file = "group_vars/all"
   yaml = YAML.load_file(vars_file)
-  if yaml["http_proxy"] == nil or yaml["http_proxy"] == "" 
+  if yaml["http_proxy"] == nil or yaml["http_proxy"] == ""
     sh "ansible-playbook -i hosts site.yml"
   else
     sh "ansible-playbook -i hosts site_proxy.yml"
