@@ -11,5 +11,5 @@ dpdk_interfaces:
 dpdk_home: "{{ ansible_env.HOME }}/dpdk-home"
 dpdk_dir: "{{ dpdk_home }}/dpdk"
 dpdk_repo: "http://dpdk.org/git/dpdk"
-dpdk_ver: "v17.08"
+dpdk_ver: "v17.11"
 dpdk_target: "x86_64-native-linuxapp-gcc"
