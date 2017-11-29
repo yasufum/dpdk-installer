@@ -5,9 +5,9 @@
 dpdk_repo: "http://dpdk.org/git/dpdk"
 dpdk_home: "{{ ansible_env.HOME }}/dpdk-home"
 dpdk_dir: "{{ dpdk_home }}/dpdk"
-dpdk_ver: "v17.08"
+dpdk_ver: "v17.11"
 dpdk_target: "x86_64-native-linuxapp-gcc"
 
-pktgen_ver: "pktgen-3.3.9"
+pktgen_ver: "pktgen-3.4.5"
 pktgen_repo: "http://dpdk.org/git/apps/pktgen-dpdk"
 pktgen_dir: "{{ dpdk_home }}/pktgen-dpdk"

@@ -30,13 +30,13 @@ Install scripts for
 [DPDK](http://dpdk.org/browse/dpdk/) and
 [pktgen](http://dpdk.org/browse/apps/pktgen-dpdk/),
 [SPP](http://dpdk.org/browse/apps/spp/) with ansible.
-Pktgen is a high-performance traffic generator and spp is a patch panel like 
+Pktgen is a high-performance traffic generator and spp is a patch panel like
 switching function for Inter-VM communication.
 
 Supported versions:
-- DPDK 17.08
-- pktgen-dpdk 3.3.9
-- spp 17.08
+- DPDK 17.11
+- pktgen-dpdk 3.4.5
+- spp latest
 
 
 ## Recommended System Requirements
@@ -67,7 +67,7 @@ You also have to install sshd on ansible clients and to be able to ssh-key login
 from the server before install DPDK and other applications.
 
 In order to ssh-key login, you generate with `ssh-keygen` on the server and
-copy content of it to 
+copy content of it to
 `$HOME/.ssh/authorized_keys` on the clients.
 
 [NOTE] You can skip it if you have a public key "$HOME/.ssh/id_rsa.pub" and use `rake`.
@@ -141,7 +141,7 @@ entries if you don't need to install from it.
 - netsniff-ng.yml
   - netsniff-ng and required packages
 
-Configuration files which are also installed on target machines with the application 
+Configuration files which are also installed on target machines with the application
 are included in "roles/common/templates".
 "j2" files are templates of Jinja2 format and it is exchanged to other format
 after variables expantion.
@@ -168,7 +168,7 @@ Require DPDK is installed.
 
 #### (5) (Optional) kvm role
 
-Install kvm and libvirt tools. 
+Install kvm and libvirt tools.
 
 
 ### Add user
@@ -186,16 +186,16 @@ You can also setup this params by running rake command as detailed in later.
 Create an account and add it as sudoer.
 
 ```
-$ sudo adduser dpdk1708
+$ sudo adduser dpdk1711
 
-$ sudo gpasswd -a dpdk1708 sudo
+$ sudo gpasswd -a dpdk1711 sudo
 ```
 
 Delete account by userdel if it's no need. You should add -r option to delete
 home directory.
 
 ```
-$ sudo userdel -r dpdk1708
+$ sudo userdel -r dpdk1711
 ```
 
 
@@ -213,7 +213,7 @@ Rake script asks you to use proxy by checking your proxy environment.
 
 For DPDK, You might have to change params for your environment.
 DPDK params are defined in `group_vars/dpdk`.
-It is same as pktgen and SPP. 
+It is same as pktgen and SPP.
 
   - hugepage_size: Size of each of hugepage.
   - nr_hugepages: Number of hugepages.
@@ -289,13 +289,13 @@ so edit it if you need to.
 You can setup and install DPDK by running rake which is a `make` like build tool.
 
 Type simply `rake` to run default task for setup and install at once.
-At first time you run rake, it asks you some questions for configuration. 
+At first time you run rake, it asks you some questions for configuration.
 
 ```sh
 $ rake
 > input new remote_user.
 [type your account]
-> update 'remote_user' to 'dpdk1708' in 'group_vars/all'.
+> update 'remote_user' to 'dpdk1711' in 'group_vars/all'.
 > input new ansible_ssh_pass.
 [type your passwd]
 > update 'ansible_ssh_pass' to 'your_passwd' in 'group_vars/all'.
@@ -363,7 +363,7 @@ $ ansible-playbook -i hosts site.yml
 
 DPDK is installed in $HOME/dpdk-home/dpdk.
 
-Refer to the [DPDK Documentation](http://dpdk.org/doc/guides-17.08/).
+Refer to the [DPDK Documentation](http://dpdk.org/doc/guides-17.11/).
 
 
 ## Using pktgen-dpdk
@@ -372,12 +372,12 @@ pktgen is installed in $HOME/dpdk-home/pktgen-dpdk.
 Exec file is $HOME/pktgen-dpdk/app/app/x86_64-native-linuxapp-gcc/pktgen.
 
 ```
-$ ssh dpdk1708@remote
+$ ssh dpdk1711@remote
 Welcome to Ubuntu 16.04.4 LTS (GNU/Linux 4.2.0-35-generic x86_64)
 
  * Documentation:  https://help.ubuntu.com/
 Last login: Sun May  8 01:44:03 2016 from 10.0.2.2
-dpdk1708@remote:~$ cd dpdk_home/pktgen-dpdk/
+dpdk1711@remote:~$ cd dpdk_home/pktgen-dpdk/
 ```
 
 You can run it directory, but it better to use `doit` script.
@@ -385,11 +385,11 @@ Refer to [README](http://dpdk.org/browse/apps/pktgen-dpdk/tree/README.md)
 of pktgen for how to use and more details.
 
 ```sh
-dpdk1708@remote:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
+dpdk1711@remote:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
 ```
 
 
-## Using SPP 
+## Using SPP
 
 SPP is installed in $HOME/dpdk-home/spp.
 
