@@ -61,7 +61,8 @@ I only tested version 2.3.1 but other versions might work.
 ### (2) ssh
 
 Ansible uses ssh to install tools on remote server,
-so you have to ssh client into ansible server in which ansible is installed.
+so you have to ssh client and sshpass into ansible server in which ansible is
+installed. sshpass is required to login to remote with password.
 
 You also have to install sshd on ansible clients and to be able to ssh-key login
 from the server before install DPDK and other applications.
