@@ -6,3 +6,4 @@
     - git
     - curl
     - wget
+    - pkg-config
