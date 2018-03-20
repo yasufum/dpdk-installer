@@ -34,9 +34,9 @@ Pktgen is a high-performance traffic generator and spp is a patch panel like
 switching function for Inter-VM communication.
 
 Supported versions:
-- DPDK 17.11
-- pktgen-dpdk 3.4.5
-- spp latest
+- DPDK 18.02
+- pktgen-dpdk 3.4.9
+- spp 18.02
 
 
 ## Recommended System Requirements
@@ -187,16 +187,16 @@ You can also setup this params by running rake command as detailed in later.
 Create an account and add it as sudoer.
 
 ```
-$ sudo adduser dpdk1711
+$ sudo adduser dpdk1802
 
-$ sudo gpasswd -a dpdk1711 sudo
+$ sudo gpasswd -a dpdk1802 sudo
 ```
 
 Delete account by userdel if it's no need. You should add -r option to delete
 home directory.
 
 ```
-$ sudo userdel -r dpdk1711
+$ sudo userdel -r dpdk1802
 ```
 
 
@@ -296,7 +296,7 @@ At first time you run rake, it asks you some questions for configuration.
 $ rake
 > input new remote_user.
 [type your account]
-> update 'remote_user' to 'dpdk1711' in 'group_vars/all'.
+> update 'remote_user' to 'dpdk1802' in 'group_vars/all'.
 > input new ansible_ssh_pass.
 [type your passwd]
 > update 'ansible_ssh_pass' to 'your_passwd' in 'group_vars/all'.
@@ -364,7 +364,7 @@ $ ansible-playbook -i hosts site.yml
 
 DPDK is installed in $HOME/dpdk-home/dpdk.
 
-Refer to the [DPDK Documentation](http://dpdk.org/doc/guides-17.11/).
+Refer to the [DPDK Documentation](http://dpdk.org/doc/guides-18.02/).
 
 
 ## Using pktgen-dpdk
@@ -373,12 +373,12 @@ pktgen is installed in $HOME/dpdk-home/pktgen-dpdk.
 Exec file is $HOME/pktgen-dpdk/app/app/x86_64-native-linuxapp-gcc/pktgen.
 
 ```
-$ ssh dpdk1711@remote
+$ ssh dpdk1802@remote
 Welcome to Ubuntu 16.04.4 LTS (GNU/Linux 4.2.0-35-generic x86_64)
 
  * Documentation:  https://help.ubuntu.com/
 Last login: Sun May  8 01:44:03 2016 from 10.0.2.2
-dpdk1711@remote:~$ cd dpdk_home/pktgen-dpdk/
+dpdk1802@remote:~$ cd dpdk_home/pktgen-dpdk/
 ```
 
 You can run it directory, but it better to use `doit` script.
@@ -386,7 +386,7 @@ Refer to [README](http://dpdk.org/browse/apps/pktgen-dpdk/tree/README.md)
 of pktgen for how to use and more details.
 
 ```sh
-dpdk1711@remote:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
+dpdk1802@remote:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
 ```
 
 
