@@ -35,9 +35,9 @@ pktgenは高性能なトラフィックジェネレータ、
 そしてSPPは仮想マシン(VM)同士をパッチパネルのように接続するためのアプリケーションです。
 
 動作対象バージョン:
-- DPDK 17.11
-- pktgen-dpdk 3.4.5
-- spp 17.11
+- DPDK 18.02
+- pktgen-dpdk 3.4.9
+- spp 18.02
 
 
 ## 推奨スペック
@@ -194,16 +194,16 @@ rakeコマンドを使用することで設定することもできます。
 ユーザーアカウントを作成し、sudoを可能にするには以下のように行います。
 
 ```
-$ sudo adduser dpdk1711
+$ sudo adduser dpdk1802
 
-$ sudo gpasswd -a dpdk1711 sudo
+$ sudo gpasswd -a dpdk1802 sudo
 ```
 
 またユーザーアカウントを削除するには、userdelコマンドを使います。
 `-r`オプションを付けるとホームディレクトリの削除も同時に実行されます。
 
 ```
-$ sudo userdel -r dpdk1711
+$ sudo userdel -r dpdk1802
 ```
 
 
@@ -305,7 +305,7 @@ rakeコマンドはmakeコマンドのようなビルドツールの一種であ
 $ rake
 > input new remote_user.
 [type your account]
-> update 'remote_user' to 'dpdk1711' in 'group_vars/all'.
+> update 'remote_user' to 'dpdk1802' in 'group_vars/all'.
 > input new ansible_ssh_pass.
 [type your passwd]
 > update 'ansible_ssh_pass' to 'your_passwd' in 'group_vars/all'.
@@ -319,7 +319,7 @@ SSH key configuration.
 [type y or n]
 Check proxy (Type enter with no input if you are not in proxy env).
 > 'http_proxy' is set as ''.
-> Use proxy env ? () [Y/n]: 
+> Use proxy env ? () [Y/n]:
 [type y or n]
 ```
 
@@ -376,7 +376,7 @@ $ ansible-playbook -i hosts site.yml
 
 DPDKは$HOME/dpdk-home/dpdkにインストールされます。
 
-使用方法の詳細については[DPDK Documentation](http://dpdk.org/doc/guides-17.11/)
+使用方法の詳細については[DPDK Documentation](http://dpdk.org/doc/guides-18.02/)
 を参照してください。
 
 
@@ -386,12 +386,12 @@ pktgenは$HOME/dpdk-home/pktgen-dpdkにインストールされます。
 実行ファイルは$HOME/pktgen-dpdk/app/app/x86_64-native-linuxapp-gcc/pktgenです。
 
 ```
-$ ssh dpdk1711@remote
+$ ssh dpdk1802@remote
 Welcome to Ubuntu 16.04.4 LTS (GNU/Linux 4.2.0-35-generic x86_64)
 
  * Documentation:  https://help.ubuntu.com/
 Last login: Sun May  8 01:44:03 2016 from 10.0.2.2
-dpdk1711@remote:~$ cd dpdk_home/pktgen-dpdk/
+dpdk1802@remote:~$ cd dpdk_home/pktgen-dpdk/
 ```
 
 実行ファイルを直接することも出来ますが、`doit`スクリプトを実行するのが簡単です。
@@ -400,7 +400,7 @@ dpdk1711@remote:~$ cd dpdk_home/pktgen-dpdk/
 を参照してください。
 
 ```sh
-dpdk1711@remote:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
+dpdk1802@remote:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
 ```
 
 
