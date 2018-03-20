@@ -7,9 +7,10 @@ hugepage_size:
 nr_hugepages: 
 dpdk_interfaces: 
 
-# Do not edit
-dpdk_home: "{{ ansible_env.HOME }}/dpdk-home"
-dpdk_dir: "{{ dpdk_home }}/dpdk"
-dpdk_repo: "http://dpdk.org/git/dpdk"
-dpdk_ver: "v17.11"
-dpdk_target: "x86_64-native-linuxapp-gcc"
+# Do not edit understanding risk
+# dpdk
+dpdk_ver: "{{ dpdk_default_ver }}"
+dpdk_target: "{{ dpdk_default_target }}"
+dpdk_repo: "{{ dpdk_default_repo }}"
+dpdk_home: "{{ dpdk_default_home }}"
+dpdk_dir: "{{ dpdk_default_dir }}"

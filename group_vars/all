@@ -9,7 +9,14 @@ ansible_sudo_pass:
 http_proxy: 
 https_proxy: 
 
-# Do not edit
+# Do not edit without understanding risk
+# dpdk
+dpdk_default_ver: "v18.02"
+dpdk_default_target: "x86_64-native-linuxapp-gcc"
+dpdk_default_repo: "http://dpdk.org/git/dpdk"
+dpdk_default_home: "{{ ansible_env.HOME }}/dpdk-home"
+dpdk_default_dir: "{{ dpdk_default_home }}/dpdk"
+
 # dein
 dein_home: "{{ ansible_env.HOME }}/dein"
 dein_repo: "https://github.com/Shougo/dein.vim.git"
