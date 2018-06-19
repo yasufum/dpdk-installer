@@ -298,6 +298,12 @@ class DpdkInstaller(object):
         else:
             print("Error: invalid target '%s'" % target)
 
+    def do_config_install(self):
+        if self.check_hosts() is not True:
+            exit()
+        self.setup_config('all')
+        self.install()
+
     def clean(self, target='all'):
         if target == 'account':
             self.clean_account()
@@ -327,10 +333,34 @@ def arg_parser():
             "This script runs ansible scripts in which installation of",
             "application is defined."))
 
+    # Add subparsers as positinal arguments and its help message.
     subparsers = parser.add_subparsers(help="%s %s %s" % (
         "You should define user specific configurations with 'config' option",
         "beforea running ansible scripts.",
         "This config is reset to be default as 'clean'."))
+
+    # add config option
+    parser_config = subparsers.add_parser(
+        'config',
+        help="setup all of configs, or for given category")
+    parser_config.add_argument(
+        'config_target',
+        type=str,
+        default='all',
+        nargs='?',
+        choices=['all', 'account', 'sshkey', 'proxy', 'dpdk'],
+        help="'config all' for all of configs, or others for each of categories")
+
+    # add install option
+    parser_install = subparsers.add_parser(
+        'install',
+        help='run ansible scripts')
+    parser_install.add_argument(
+        'install_all',  # install does not take opt, but needed from main()
+        type=str,
+        nargs='?',
+        choices=['install_all'],
+        help='run ansible scripts')
 
     parser_clean = subparsers.add_parser(
         'clean',
@@ -343,47 +373,26 @@ def arg_parser():
         choices=['all', 'account', 'sshkey', 'proxy', 'dpdk', 'hosts'],
         help="'clean all' for all of configs, or others for each of categories")
 
-    parser_config = subparsers.add_parser(
-        'config',
-        help="setup all of configs, or for given category")
-    parser_config.add_argument(
-        'config_target',
-        type=str,
-        default='all',
-        nargs='?',
-        choices=['all', 'account', 'sshkey', 'proxy', 'dpdk'],
-        help="'config all' for all of configs, or others for each of categories")
-
-    parser_install = subparsers.add_parser(
-        'install',
-        help='run ansible scripts')
-    parser_install.add_argument(
-        'install_target',
-        type=str,
-        default='all',
-        nargs='?',
-        help='run ansible scripts')
-
     parser_save = subparsers.add_parser(
-        'save',
+        'save',  # install does not take opt, but needed from main()
         usage='make.py save [-h]',
         help='save configurations')
     parser_save.add_argument(
-        'save_target',
+        'save_all',
         type=str,
-        default='all',
         nargs='?',
+        choices=['save_all'],
         help='save configurations')
 
     parser_restore = subparsers.add_parser(
-        'restore',
+        'restore',  # restore does not take option, but needed from main()
         usage='make.py restore [-h]',
         help='restore configurations')
     parser_restore.add_argument(
-        'restore_target',
+        'restore_all',
         type=str,
-        default='all',
         nargs='?',
+        choices=['restore_all'],
         help='restore configurations')
     return parser
 
@@ -401,9 +410,11 @@ def main():
         di.setup_config(args.config_target)
     elif hasattr(args, 'install_target'):
         di.install()
-    elif hasattr(args, 'save_target'):
+    elif hasattr(args, 'install_all'):
+        di.do_config_install()
+    elif hasattr(args, 'save_all'):
         di.save_conf()
-    elif hasattr(args, 'restore_target'):
+    elif hasattr(args, 'restore_all'):
         di.restore_conf()
     else:
         parser.print_help()
