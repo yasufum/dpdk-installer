@@ -15,11 +15,8 @@
   - [Configuration for DPDK](#configuration-for-dpdk)
     - [Configure hugepage size](#configure-hugepage-size)
     - [Activate DPDK configuration after reboot](#activate-dpdk-configuration-after-reboot)
-  - [Run rake](#run-rake)
+  - [Run make.py](#run-makepy)
   - [(Optional) Run ansible-playbook](#optional-run-ansible-playbook)
-- [Using DPDK](#using-dpdk)
-- [Using pktgen-dpdk](#using-pktgen-dpdk)
-- [Using SPP](#using-spp)
 - [License](#license)
 
 Japanese version of this manual is [docs/jp/README](docs/jp/README).
@@ -285,70 +282,91 @@ Template of `do_after_reboot.sh` is included as
 so edit it if you need to.
 
 
-### Run rake
+### Run make.py
 
-You can setup and install DPDK by running rake which is a `make` like build tool.
+You can setup configurations and install DPDK, pktgen and SPP  by running
+`make.py` install script.
 
-Type simply `rake` to run default task for setup and install at once.
+Type simply `python make.py all` to run default task for setup and install at once.
 At first time you run rake, it asks you some questions for configuration.
 
 ```sh
-$ rake
-> input new remote_user.
+$ python make.py all
+> input new remote_user
 [type your account]
-> update 'remote_user' to 'dpdk1802' in 'group_vars/all'.
-> input new ansible_ssh_pass.
+> update 'remote_user' to 'dpdk1802' in 'group_vars/all'
+> input new ansible_ssh_pass
 [type your passwd]
-> update 'ansible_ssh_pass' to 'your_passwd' in 'group_vars/all'.
-> input new ansible_sudo_pass.
+> update 'ansible_ssh_pass' to 'your_passwd' in 'group_vars/all'
+> input new ansible_sudo_pass
 [type your passwd]
-> update 'ansible_sudo_pass' to 'your_passwd' in 'group_vars/all'.
-SSH key configuration.
-> './roles/common/templates/id_rsa.pub' doesn't exist.
-> Please put your public key as './roles/common/templates/id_rsa.pub' for login spp VMs.
+> update 'ansible_sudo_pass' to 'your_passwd' in 'group_vars/all'
+SSH key configuration
+> './roles/common/templates/id_rsa.pub' doesn't exist
+> Please put your public key as './roles/common/templates/id_rsa.pub' for login spp VMs
 > copy '/home/local-user/.ssh/id_rsa.pub' to './roles/common/templates/id_rsa.pub'? [y/N]
 [type y or n]
-Check proxy (Type enter with no input if you are not in proxy env).
-> 'http_proxy' is set as ''.
+Check proxy (Type enter with no input if you are not in proxy env)
+> 'http_proxy' is set as ''
 > Use proxy env ? () [Y/n]: 
 [type y or n]
 ```
 
-To list all of tasks, run `rake -T`.
-The default task includes "confirm_*" and "install" tasks.
-You can run each of tasks explicitly by specifying task name.
-`rake install` task runs "ansible-playbook".
+`all` task consists of configuration phase and installation phase.
+In addition, each of configuration and installation phases consists
+of subtasks.
+All of tasks and subtasks are referred from `-h` option.
+
+Here is an example of showing tasks.
 
 ```sh
-$ rake -T
-rake check_hosts         # Check hosts file is configured
-rake clean               # Clean variables and files depend on user env
-rake clean_hosts         # Clean hosts file
-rake clean_vars          # Clean variables
-rake config              # Configure params
-rake confirm_account     # Update remote_user, ansible_ssh_pass and ansible_sudo_pass
-rake confirm_dpdk        # Setup DPDK params (hugepages and network interfaces)
-rake confirm_http_proxy  # Check http_proxy setting
-rake confirm_sshkey      # Check if sshkey exists and copy from your $HOME/.ssh/id_rsa.pub
-rake default             # Run tasks for install
-rake install             # Run ansible playbook
-rake remove_sshkey       # Remove sshkey file
-rake restore_conf        # Restore config
-rake save_conf           # Save config
+$ python make.py -h
+usage: make.py [-h] {config,install,clean,save,restore} ...
+
+DPDK application installer for SPP and pktgen. This script runs ansible
+scripts in which installation of application is defined.
+
+positional arguments:
+  {config,install,clean,save,restore}
+                        You should define user specific configurations with
+                        'config' option beforea running ansible scripts. This
+                        config is reset to be default as 'clean'.
+    config              setup all of configs, or for given category
+    install             run ansible scripts
+    clean               reset all of configs, or for given category
+    save                save configurations
+    restore             restore configurations
+
+optional arguments:
+  -h, --help            show this help message and exit
 ```
 
-If you need to remove account and proxy configuration from config files,
-run `rake clean` task.
-It is useful if you share the repo in public.
+Subtasks are referred with `-h` for each of tasks.
+You find that `config` task consists of four subtasks,
+`account`, `sshkey`, `proxy` and `dpdk`.
+`all` subtask runs all of subtasks and it is the same as `make.py config`.
 
 ```sh
-$ rake clean
+$ python make.py config -h
+usage: make.py config [-h] [{all,account,sshkey,proxy,dpdk}]
+
+positional arguments:
+  {all,account,sshkey,proxy,dpdk}
+                        'config all' for all of configs, or others for each of
+                        categories
+
+optional arguments:
+  -h, --help            show this help message and exit
 ```
 
+If you need to reset your configurations, run `make.py clean`.
+As similar to configure, you can clean all of configurations or choose which of
+configuration is cleaned.
+For instance, you can clean for only http proxy configuration with
+`make.py clean proxy`.
 
-### (Optional) Run ansible-playbook
 
-[NOTE] You don't need do this section if you use `rake`.
+### (Optional) Run ansible directly
 
 You setup config and run ansible-playbook manually,
 run ansible-playbook with inventory file `hosts` and `site.yml`.
@@ -358,46 +376,6 @@ environment.
 ```
 $ ansible-playbook -i hosts site.yml
 ```
-
-
-## Using DPDK
-
-DPDK is installed in $HOME/dpdk-home/dpdk.
-
-Refer to the [DPDK Documentation](http://dpdk.org/doc/guides-18.02/).
-
-
-## Using pktgen-dpdk
-
-pktgen is installed in $HOME/dpdk-home/pktgen-dpdk.
-Exec file is $HOME/pktgen-dpdk/app/app/x86_64-native-linuxapp-gcc/pktgen.
-
-```
-$ ssh dpdk1802@remote
-Welcome to Ubuntu 16.04.4 LTS (GNU/Linux 4.2.0-35-generic x86_64)
-
- * Documentation:  https://help.ubuntu.com/
-Last login: Sun May  8 01:44:03 2016 from 10.0.2.2
-dpdk1802@remote:~$ cd dpdk_home/pktgen-dpdk/
-```
-
-You can run it directory, but it better to use `doit` script.
-Refer to [README](http://dpdk.org/browse/apps/pktgen-dpdk/tree/README.md)
-of pktgen for how to use and more details.
-
-```sh
-dpdk1802@remote:~/dpdk_home/pktgen-dpdk$ sudo -E ./doit
-```
-
-
-## Using SPP
-
-SPP is installed in $HOME/dpdk-home/spp.
-
-Please refer to [README](http://dpdk.org/browse/apps/spp/tree/README)
-and [setup_guide](http://dpdk.org/browse/apps/spp/tree/docs/setup_guide.md)
-for details.
-
 
 ## License
 This program is released under the BSD license.
