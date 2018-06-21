@@ -2,13 +2,6 @@
 # pktgen
 
 # Do not edit understanding risk
-# dpdk
-dpdk_ver: "{{ dpdk_default_ver }}"
-dpdk_target: "{{ dpdk_default_target }}"
-dpdk_repo: "{{ dpdk_default_repo }}"
-dpdk_home: "{{ dpdk_default_home }}"
-dpdk_dir: "{{ dpdk_default_dir }}"
-
 pktgen_ver: "pktgen-3.4.9"
 pktgen_repo: "http://dpdk.org/git/apps/pktgen-dpdk"
 pktgen_dir: "{{ dpdk_home }}/pktgen-dpdk"

@@ -118,7 +118,7 @@ class DpdkInstaller(object):
         other files if they include vars not included dpdk.
         """
 
-        vars_file = 'group_vars/dpdk'
+        vars_file = 'group_vars/all'
         yobj = yaml.load(open(vars_file))
 
         target_params = {
@@ -227,13 +227,13 @@ class DpdkInstaller(object):
             print("> clean '%s' in '%s'" % (key, vars_file))
 
     def clean_dpdk(self):
-        # group_vars/dpdk
+        # group_vars/all
         target_params = [
             "hugepage_size",
             "nr_hugepages",
             "dpdk_interfaces"]
 
-        vars_file = "group_vars/dpdk"
+        vars_file = "group_vars/all"
         for key in target_params:
             make_utils.update_var(vars_file, key, "", True)
             print("> clean '%s' in '%s'" % (key, vars_file))

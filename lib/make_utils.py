@@ -71,7 +71,7 @@ def clean_hosts():
     """Clean hosts file"""
 
     contents = ""
-    attrs = ['common', 'dpdk', 'pktgen', 'spp', 'kvm']
+    attrs = ['common', 'pktgen', 'spp', 'kvm']
     sample_ipaddr = '127.0.0.1'
     hosts_file = "hosts"
     f = open(hosts_file)

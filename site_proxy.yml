@@ -10,15 +10,6 @@
     http_proxy: "{{ http_proxy }}"
     https_proxy: "{{ https_proxy }}"
 
-- name: install dpdk
-  hosts: dpdk 
-  remote_user: "{{ remote_user }}"
-  roles:
-    - dpdk 
-  environment:
-    http_proxy: "{{ http_proxy }}"
-    https_proxy: "{{ https_proxy }}"
-
 - name: install kvm 
   hosts: dpdk 
   remote_user: "{{ remote_user }}"

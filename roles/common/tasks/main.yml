@@ -1,5 +1,7 @@
 ---
 - include: base.yml
+- include: hugepage-setup.yml
+- include: dpdk.yml
 - include: vim.yml
 - include: nmon.yml
 - include: tmux.yml
