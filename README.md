@@ -6,7 +6,6 @@
 - [Installation](#installation)
   - [(1) ansible](#1-ansible)
   - [(2) ssh](#2-ssh)
-  - [(3) rake](#3-rake)
 - [Usage and settings](#usage-and-settings)
   - [How to use](#how-to-use)
   - [Understand roles](#understand-roles)
@@ -64,31 +63,24 @@ installed. sshpass is required to login to remote with password.
 You also have to install sshd on ansible clients and to be able to ssh-key login
 from the server before install DPDK and other applications.
 
-In order to ssh-key login, you generate with `ssh-keygen` on the server and
+In order to ssh-key login, you generate public key with `ssh-keygen` on the server and
 copy content of it to
 `$HOME/.ssh/authorized_keys` on the clients.
-
-[NOTE] You can skip it if you have a public key "$HOME/.ssh/id_rsa.pub" and use `rake`.
-If you don't have the key, generate it as following.
 
 ```sh
 $ ssh-keygen -t rsa
 ```
-
-### (3) rake
-
-Install rake for running setup script, or you can setup it manually.
 
 
 ## Usage and settings
 
 ### How to use
 
-First of all, setup roles defined in `hosts` and run `rake` to start installation.
+First of all, setup roles defined in `hosts` and run `make.py` to start installation.
 Refer to following sections for roles and details of settings.
 
 ```sh
-$ rake
+$ python make.py all
 ...
 ```
 
@@ -112,32 +104,16 @@ This role installs following applications as defined in YAML files under
 All of entries are listed in "roles/common/tasks/main.yml" and comment out
 entries if you don't need to install from it.
 
-- base.yml
-  - git
-  - curl
-  - wget
+- base.yml (git, curl, wget)
+- hugepage-setup.yml
+- dpdk.yml
 
-- vim.yml
-  - vim + .vimrc
-  - dein (vim plugin manager)
+Optional
 
-- emacs.yml
-  - emacs
-
-- tmux.yml
-  - tmux + .tmux.conf
-
+- vim.yml (vim + .vimrc, dein)
+- tmux.yml (tmux + .tmux.conf)
 - nmon.yml
-  - nmon (sophisticated resource monitor)
-
-- ruby.yml
-  - ruby
-
-- rbenv.yml
-  - rbenv
-
-- netsniff-ng.yml
-  - netsniff-ng and required packages
+- kvm.yml (kvm and libvirt tools)
 
 Configuration files which are also installed on target machines with the application
 are included in "roles/common/templates".
@@ -145,28 +121,15 @@ are included in "roles/common/templates".
 after variables expantion.
 Change the configuration before run ansible if you need to.
 
-
-#### (2) dpdk role
-
-Setup environment for running [DPDK](http://www.dpdk.org/) and install.
-
-#### (3) pktgen role
+#### (2) pktgen role
 
 Setup environment for [pktgen](http://www.dpdk.org/browse/apps/pktgen-dpdk/)
 and install.
 
-Require DPDK is installed.
-
-#### (4) spp role
+#### (3) spp role
 
 Setup environment for running [spp](http://www.dpdk.org/browse/apps/spp/)
 and install.
-
-Require DPDK is installed.
-
-#### (5) (Optional) kvm role
-
-Install kvm and libvirt tools.
 
 
 ### Add user
@@ -184,16 +147,16 @@ You can also setup this params by running rake command as detailed in later.
 Create an account and add it as sudoer.
 
 ```
-$ sudo adduser dpdk1802
+$ sudo adduser dpdk1805
 
-$ sudo gpasswd -a dpdk1802 sudo
+$ sudo gpasswd -a dpdk1805 sudo
 ```
 
 Delete account by userdel if it's no need. You should add -r option to delete
 home directory.
 
 ```
-$ sudo userdel -r dpdk1802
+$ sudo userdel -r dpdk1805
 ```
 
 
