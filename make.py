@@ -4,10 +4,15 @@
 import argparse
 from lib import make_utils
 import os
+import re
 import shutil
 import subprocess
 import yaml
 
+default_dpdk_target= 'x86_64-native-linuxapp-gcc'
+default_dpdk_ver = 'v18.02'
+default_pktgen_ver = 'pktgen-3.4.9'
+default_spp_ver = ''
 
 class DpdkInstaller(object):
     """Run DPDK install tasks"""
@@ -22,17 +27,22 @@ class DpdkInstaller(object):
         sshkey = '%s/.ssh/id_rsa.pub' % os.getenv('HOME')
 
         if not os.path.exists(target):
-            print('SSH key configuration')
-            print("> '%s' doesn't exist" % target)
-            print("> Put public key as '%s' for target machines" % target)
 
-        if os.path.exists(sshkey):
-            print("> copy '%s' to '%s'? [y/N]" % (sshkey, target))
+            if os.path.exists(sshkey):
+                print("> path to SSH key? (%s) [y/N]" % sshkey)
+            else:
+                print("> path to SSH key?")
             ans = raw_input().strip()
             if ans.lower() == "y" or ans.lower() == "yes":
-                if not os.path.exists("%s/.ssh" % os.getenv('HOME')):
-                    os.mkdir("%s/.ssh" % os.getenv('HOME'))
                 shutil.copyfile(sshkey, target)
+            elif ans.lower() == "n" or ans.lower() == "no":
+                pass
+            else:
+                if (ans != '') and (not os.path.exists(ans)):
+                    print("> %s does not exist" % ans)
+                else:
+                    shutil.copyfile(sshkey, target)
+
 
     def confirm_proxy(self):
         """Check http_proxy setting"""
@@ -42,14 +52,11 @@ class DpdkInstaller(object):
         for proxy in ['http_proxy', 'https_proxy']:
             if yobj[proxy] is None:
                 env_pxy = os.getenv(proxy)
-                if env_pxy != '' or (env_pxy != yobj[proxy]):
-                    print("Check proxy (Type enter with no input" +
-                          " if you don't use proxy)")
-                    print("> '%s' is set as '%s'" % (proxy, yobj[proxy]))
-                    print("> Use proxy env ? (%s) [Y/n]: " % env_pxy)
+                if env_pxy != '':
+                    print("> use $%s ? (%s) [Y/n]: " % (proxy, env_pxy))
                     ans = raw_input().strip()
                     if ans.lower() == 'n' or ans.lower() == 'no':
-                        print('> %s: ' % proxy)
+                        print('> input %s, or empty: ' % proxy)
                         new_proxy = raw_input().strip()
                     else:
                         new_proxy = env_pxy
@@ -67,10 +74,6 @@ class DpdkInstaller(object):
 
                     f = open(vars_file, 'w+')
                     f.write(contents)
-                    print("> update %s to '%s' in 'group_vars/all'" % (
-                        proxy, new_proxy))
-                else:
-                    print('> proxy is not changed')
 
     def confirm_account(self):
         """Update user account
@@ -88,8 +91,11 @@ class DpdkInstaller(object):
             cur_info = yobj[account_info]
             # Check if cur_info is described in the vars_file
             if cur_info is None:
-                print("> input new %s" % account_info)
+                print("> input %s" % account_info)
                 input_info = raw_input().strip()
+                while input_info == '':
+                    print("> input %s" % account_info)
+                    input_info = raw_input().strip()
 
                 # Overwrite vars_file with new one
                 msg = ""
@@ -104,8 +110,6 @@ class DpdkInstaller(object):
                 f = open(vars_file, "w+")
                 f.write(msg)
                 f.close()
-                print("> update '%s' to '%s' in 'group_vars/all'" % (
-                    account_info, input_info))
 
     def confirm_dpdk(self):
         """Setup DPDK params
@@ -124,18 +128,14 @@ class DpdkInstaller(object):
         target_params = {
             'hugepage_size': None,
             'nr_hugepages': None,
+            'dpdk_ver': None,
+            'dpdk_target': None,
             'dpdk_interfaces': None}
-
-        # Check if all params are filled for confirm vars_file is already setup
-        for param, val in target_params.items():
-            if yobj[param] is None:
-                print("Input params for DPDK")
-                break
 
         for param, val in target_params.items():
             if param == 'hugepage_size':
                 if yobj['hugepage_size'] is None:
-                    print("> hugepage_size (must be 2m(2M) or 1g(1G)):")
+                    print("> input hugepage_size (must be 2m(2M) or 1g(1G)):")
                     ans = ""
                     while not (ans == "2M" or ans == "1G"):
                         ans = raw_input().strip().upper()
@@ -155,9 +155,13 @@ class DpdkInstaller(object):
             #  because it's required for.
             elif param == 'nr_hugepages':
                 if yobj['nr_hugepages'] is None:
-                    print("> nr_hugepages")
+                    print("> input nr_hugepages")
                     ans = raw_input().strip()
+                    while re.match(r'\d+', ans) is None:
+                        print("> input nr_hugepages")
+                        ans = raw_input().strip()
                     nr_hp = ans
+
                     hp_size = target_params['hugepage_size']
 
                     if hp_size == '2M':
@@ -175,18 +179,118 @@ class DpdkInstaller(object):
                 else:
                     target_params[param] = yobj[param]
 
-            elif 'dpdk_interfaces':
-                if yobj["dpdk_interfaces"] is None:
-                    print("> dpdk_interfaces (separate by ' '):")
+            elif param == 'dpdk_ver':
+                if yobj[param] is None:
+                    print("> use default DPDK version '%s' ? [Y/n]" % default_dpdk_ver)
+                    ans = raw_input().strip()
+                    if ans == '':
+                        ans = 'y'
+                    if (ans.lower() == "n" or
+                            ans.lower() == "no" or
+                            not (ans.lower() == "y" or ans.lower() == "yes")):
+                        print(ans)
+                        print("> input DPDK version, or empty for latest")
+                        ans = raw_input().strip()
+                        dpdk_ver = ans
+                    else:
+                        dpdk_ver = default_dpdk_ver
+
+                    target_params[param] = dpdk_ver
+                    make_utils.update_var(
+                        vars_file, param, dpdk_ver, False)
+                else:
+                    target_params[param] = yobj[param]
+
+            elif param == 'dpdk_target':
+                if yobj[param] is None:
+                    print("> use DPDK target '%s' ? [Y/n]" % default_dpdk_target)
+                    ans = raw_input().strip()
+                    if ans == '':
+                        ans = 'y'
+                    if (ans.lower() == "n" or
+                            ans.lower() == "no" or
+                            not (ans.lower() == "y" or ans.lower() == "yes")):
+                        print("> input DPDK target")
+                        ans = raw_input().strip()
+                        while ans == '':
+                            print("> input DPDK target")
+                            ans = raw_input().strip()
+                        dpdk_target = ans
+                    dpdk_target = default_dpdk_target
+                    target_params[param] = dpdk_target
+                    make_utils.update_var(
+                        vars_file, param, dpdk_target, False)
+                else:
+                    target_params[param] = yobj[param]
+
+            elif param == 'dpdk_interfaces':
+                if yobj[param] is None:
+                    print("> input dpdk_interfaces (separate by white space), or empty:")
                     delim = " "  # input is separated with white spaces
                     ans = raw_input().strip()
+                    nw_ifs = re.sub(r'\s+', ' ', ans)
+                    if nw_ifs == ' ':
+                        nw_ifs = ''
 
-                    # formatting by removing nouse chars
-                    nw_ifs = ans.split(delim)
-                    nw_ifs = delim.join(delim)
                     make_utils.update_var(
                         vars_file, 'dpdk_interfaces', nw_ifs, False)
                     target_params[param] = nw_ifs
+                else:
+                    target_params[param] = yobj[param]
+
+        vars_file = 'group_vars/pktgen'
+        yobj = yaml.load(open(vars_file))
+
+        target_params = {'pktgen_ver': None}
+        for param, val in target_params.items():
+            if param == 'pktgen_ver':
+                if yobj[param] is None:
+                    print("> use default pktgen version '%s' ? [Y/n]" %
+                          default_pktgen_ver)
+                    ans = raw_input().strip()
+                    if ans == '':
+                        ans = 'y'
+                    if (ans.lower() == "n" or
+                            ans.lower() == "no" or
+                            not (ans.lower() == "y" or ans.lower() == "yes")):
+                        print(ans)
+                        print("> input pktgen version, or empty for latest")
+                        ans = raw_input().strip()
+                        pktgen_ver = ans
+                    else:
+                        pktgen_ver = default_pktgen_ver
+
+                    target_params[param] = pktgen_ver
+                    make_utils.update_var(
+                        vars_file, param, pktgen_ver, False)
+                else:
+                    target_params[param] = yobj[param]
+
+        vars_file = 'group_vars/spp'
+        yobj = yaml.load(open(vars_file))
+
+        target_params = {'spp_ver': None}
+        for param, val in target_params.items():
+            if param == 'spp_ver':
+                if yobj[param] is None:
+                    print("> use default SPP version '%s' ? [Y/n]" %
+                          default_spp_ver)
+                    ans = raw_input().strip()
+                    if ans == '':
+                        ans = 'y'
+                    if (ans.lower() == "n" or
+                            ans.lower() == "no" or
+                            not (ans.lower() == "y" or ans.lower() == "yes")):
+                        print(ans)
+                        print("> input pktgen version, or empty for latest")
+                        ans = raw_input().strip()
+                        spp_ver = ans
+                    else:
+                        spp_ver = default_spp_ver
+
+                    target_params[param] = spp_ver
+                    make_utils.update_var(
+                        vars_file, param, spp_ver, False)
                 else:
                     target_params[param] = yobj[param]
 
@@ -231,9 +335,25 @@ class DpdkInstaller(object):
         target_params = [
             "hugepage_size",
             "nr_hugepages",
+            "dpdk_ver",
+            "dpdk_target",
             "dpdk_interfaces"]
 
         vars_file = "group_vars/all"
+        for key in target_params:
+            make_utils.update_var(vars_file, key, "", True)
+            print("> clean '%s' in '%s'" % (key, vars_file))
+
+        # group_vars/pktgen
+        target_params = ["pktgen_ver"]
+        vars_file = "group_vars/pktgen"
+        for key in target_params:
+            make_utils.update_var(vars_file, key, "", True)
+            print("> clean '%s' in '%s'" % (key, vars_file))
+
+        # group_vars/spp
+        target_params = ["spp_ver"]
+        vars_file = "group_vars/spp"
         for key in target_params:
             make_utils.update_var(vars_file, key, "", True)
             print("> clean '%s' in '%s'" % (key, vars_file))
@@ -297,6 +417,8 @@ class DpdkInstaller(object):
             self.confirm_dpdk()
         else:
             print("Error: invalid target '%s'" % target)
+            exit()
+        print('> Done setup configuration')
 
     def do_config_install(self):
         if self.check_hosts() is not True:

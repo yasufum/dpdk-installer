@@ -1,7 +1,7 @@
 ---
 # pktgen
+pktgen_ver:
 
 # Do not edit understanding risk
-pktgen_ver: "pktgen-3.4.9"
 pktgen_repo: "http://dpdk.org/git/apps/pktgen-dpdk"
 pktgen_dir: "{{ dpdk_home }}/pktgen-dpdk"

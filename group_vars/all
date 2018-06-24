@@ -3,21 +3,21 @@
 # all
 
 # Edit params
-remote_user: 
-ansible_ssh_pass: 
-ansible_sudo_pass: 
-http_proxy: 
-https_proxy: 
+remote_user:
+ansible_ssh_pass:
+ansible_sudo_pass:
+http_proxy:
+https_proxy:
 
 # hugepage_size must be 2M or 1G
-hugepage_size: 
-nr_hugepages: 
-dpdk_interfaces: 
+hugepage_size:
+nr_hugepages:
+dpdk_interfaces:
+dpdk_ver:
+dpdk_target:
 
 # Do not edit without understanding risk
 # dpdk
-dpdk_ver: "v18.02"
-dpdk_target: "x86_64-native-linuxapp-gcc"
 dpdk_repo: "http://dpdk.org/git/dpdk"
 dpdk_home: "{{ ansible_env.HOME }}/dpdk-home"
 dpdk_dir: "{{ dpdk_home }}/dpdk"

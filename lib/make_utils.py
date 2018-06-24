@@ -29,7 +29,7 @@ def update_var(vars_file, key, val, clean_flg=False):
             if clean_flg is not True:
                 contents += '%s: "%s"\n' % (key, val)
             else:
-                contents += '%s: %s\n' % (key, val)
+                contents += '%s:%s\n' % (key, val)
         else:
             contents += l
     f.close()
