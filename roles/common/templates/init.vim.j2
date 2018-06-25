@@ -1,24 +1,3 @@
-syntax on
-set number
-set showcmd
-set showmatch
-set hlsearch
-set encoding=utf-8
-set fileencoding=utf-8
-set termencoding=utf-8
-set autoindent
-
-set visualbell t_vb=
-set noerrorbells
-
-"colorscheme darkblue
-
-" Cancel auto comment out
-autocmd FileType * setlocal formatoptions-=ro
-
-" Show multiple candidates of tags
-nnoremap <C-]> g<C-]>
-
 "dein Scripts-----------------------------
 if &compatible
   set nocompatible               " Be iMproved
@@ -40,7 +19,7 @@ if dein#load_state('{{ dein_home }}')
   call dein#add('Shougo/neosnippet-snippets')
 
   " You can specify revision/branch/tag.
-  "call dein#add('Shougo/deol.nvim', { 'rev': 'a1b5108fd' })
+  call dein#add('Shougo/deol.nvim', { 'rev': '01203d4c9' })
 
   " Required:
   call dein#end()

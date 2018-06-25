@@ -2,9 +2,9 @@
 - include: base.yml
 - include: hugepage-setup.yml
 - include: dpdk.yml
-- include: vim.yml
 - include: nmon.yml
 - include: tmux.yml
+#- include: nvim.yml
 # - include: emacs.yml
 #- include: netsniff-ng.yml
 #- include: ruby.yml

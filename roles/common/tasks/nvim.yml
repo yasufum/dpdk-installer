@@ -1,0 +1,28 @@
+---
+- name: install software-properties-common
+  become: yes
+  apt: name=software-properties-common state=present
+
+- name: add neovim repository
+  become: yes
+  apt_repository:
+    repo: ppa:neovim-ppa/stable
+
+- name: install neovim
+  become: yes
+  apt:
+    name: neovim
+    update_cache: yes
+
+- name: get dein
+  git: repo={{ dein_repo }}
+       dest={{ dein_tmp_dir }}
+
+- name: install dein
+  command: sh {{ dein_tmp_dir }}/bin/installer.sh {{ dein_home }}
+
+- name: remove install.sh
+  command: rm -rf {{ dein_tmp_dir }}
+
+- name: put init.vim
+  template: src=templates/init.vim.j2 dest={{ ansible_env.HOME }}/.config/nvim/init.vim mode=664
