@@ -6,6 +6,9 @@ sudo modprobe uio_pci_generic
 echo sudo modprobe vfio-pci
 sudo modprobe vfio-pci
 
+echo sudo sysctl -w kernel.randomize_va_space=0
+sudo sysctl -w kernel.randomize_va_space=0
+
 # setup vars for nic bind.
 script=${RTE_SDK}/usertools/dpdk-devbind.py
 opt="--bind=uio_pci_generic"
