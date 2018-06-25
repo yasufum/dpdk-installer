@@ -8,6 +8,7 @@ ansible_ssh_pass:
 ansible_sudo_pass:
 http_proxy:
 https_proxy:
+no_proxy:
 
 # hugepage_size must be 2M or 1G
 hugepage_size:

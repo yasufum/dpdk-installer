@@ -49,7 +49,7 @@ class DpdkInstaller(object):
 
         vars_file = "group_vars/all"
         yobj = yaml.load(open(vars_file))
-        for proxy in ['http_proxy', 'https_proxy']:
+        for proxy in ['http_proxy', 'https_proxy', 'no_proxy']:
             if yobj[proxy] is None:
                 env_pxy = os.getenv(proxy)
                 if env_pxy != '':
@@ -320,9 +320,7 @@ class DpdkInstaller(object):
             print("> clean '%s' in '%s'" % (key, vars_file))
 
     def clean_proxy(self):
-        target_params = [
-            "http_proxy",
-            "https_proxy"]
+        target_params = ['http_proxy', 'https_proxy', 'no_proxy']
 
         # remove ssh user account form vars file.
         vars_file = "group_vars/all"

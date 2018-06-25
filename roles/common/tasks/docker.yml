@@ -1,0 +1,18 @@
+---
+- name: install docker
+  become: yes
+  apt: name=docker.io state=present
+
+- name: groupadd docker
+  become: yes
+  shell: groupadd docker
+
+- name: add user to docker group
+  become: yes
+  shell: usermod -aG docker '{{ remote_user }}'
+
+- name: config proxy for docker
+  become: yes
+  template: src=templates/http-proxy.conf.j2
+            dest=/etc/systemd/system/docker.service.d/http-proxy.conf
+  when: http_proxy != ""
