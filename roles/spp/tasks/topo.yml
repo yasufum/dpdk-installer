@@ -1,0 +1,16 @@
+---
+- name: install graphviz
+  become: yes
+  apt: name=graphviz state=present
+
+- name: install imagemagick
+  become: yes
+  apt: name=imagemagick state=present
+
+- name: install libsixel-bin
+  become: yes
+  apt: name=libsixel-bin state=present
+
+- name: install mlterm
+  become: yes
+  apt: name=mlterm state=present
