@@ -52,7 +52,7 @@ class DpdkInstaller(object):
         for proxy in ['http_proxy', 'https_proxy', 'no_proxy']:
             if yobj[proxy] is None:
                 env_pxy = os.getenv(proxy)
-                if env_pxy != '':
+                if env_pxy != '' and env_pxy is not None:
                     print("> use $%s ? (%s) [Y/n]: " % (proxy, env_pxy))
                     ans = raw_input().strip()
                     if ans.lower() == 'n' or ans.lower() == 'no':
