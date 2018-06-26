@@ -24,5 +24,8 @@
 - name: remove install.sh
   command: rm -rf {{ dein_tmp_dir }}
 
+- name: create neovim config directory
+  shell: mkdir -p {{ ansible_env.HOME }}/.config/nvim
+
 - name: put init.vim
   template: src=templates/init.vim.j2 dest={{ ansible_env.HOME }}/.config/nvim/init.vim mode=664
