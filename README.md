@@ -142,7 +142,7 @@ and add following account info in `group_vars/all`.
   - ansible_sudo_pass: password for doing sudo
   - http_proxy: proxy for ansible-client.
 
-You can also setup this params by running rake command as detailed in later.
+You can also setup this params by running make.py as detailed in later.
 
 Create an account and add it as sudoer.
 
@@ -162,12 +162,10 @@ $ sudo userdel -r dpdk1805
 
 ### (Optional) Using Proxy
 
-[NOTE] You can skip it if you use `rake`.
-
-If you are in proxy environment, set http_proxy while running rake or define
+If you are in proxy environment, set http_proxy while running make.py or define
 it directly in `group_vars/all` and use `site_proxy.yml` instead of `site.yml`
 at running ansible playbook.
-Rake script asks you to use proxy by checking your proxy environment.
+This script asks you to use proxy by checking your proxy environment.
 
 
 ### Configuration for DPDK
@@ -251,7 +249,7 @@ You can setup configurations and install DPDK, pktgen and SPP  by running
 `make.py` install script.
 
 Type simply `python make.py all` to run default task for setup and install at once.
-At first time you run rake, it asks you some questions for configuration.
+At first time you run this script, it asks you some questions for configuration.
 
 ```sh
 $ python make.py all
