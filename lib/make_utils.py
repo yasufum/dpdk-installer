@@ -6,20 +6,18 @@ import re
 
 
 def update_var(vars_file, key, val, clean_flg=False):
-    '''Update variable defined in group_vars
+    '''Update parameter defined in var_files
 
-    [memo] This script asks user specific params and is sensitive for
-    the difference between "" and nil loaded from YAML to recognize
-    it is already set or not("" means already set).
-    It doesn't ask for params which are set "" to avoid redundant
-    question. If you run 'rake clean', target params are set to nil.
+    Last arg 'clean_flg' is for running 'clean' task in which the
+    parameter is set to nil. If clean_flg is False, the parameter
+    is set to "" which means this is empty value but nil.
+      key:     # if clean_flg is True
+      key: ""  # or False
 
-    Overwrite conf in a vars_file stored in group_vars.
-    Last arg 'clean_flg' is true if running 'rake clean' to make val
-    empty, or false to set val as "" which means it's set to no value
-    but not empty for recognizing it's already set.
-      key:     # true
-      key: ""  # false
+    Using "" is for avoiding to be asked for empty value. It is sensitive
+    for the difference between "" and nil in from YAML to recognize
+    the param is already set or not ("" means empty value). It does
+    not ask for params which are set "" to avoid redundant questions.
     '''
 
     contents = ''
