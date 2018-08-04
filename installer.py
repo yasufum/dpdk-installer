@@ -504,6 +504,7 @@ def arg_parser():
     # add install option
     parser_install = subparsers.add_parser(
         'install',
+        usage='installer.py install [-h]',
         help='Run ansible for installation')
     parser_install.add_argument(
         'install_all',  # install does not take opt, but needed from main()
@@ -525,7 +526,7 @@ def arg_parser():
 
     parser_save = subparsers.add_parser(
         'save',  # install does not take opt, but needed from main()
-        usage='make.py save [-h]',
+        usage='installer.py save [-h]',
         help='Save configurations')
     parser_save.add_argument(
         'save_all',
@@ -536,7 +537,7 @@ def arg_parser():
 
     parser_restore = subparsers.add_parser(
         'restore',  # restore does not take option, but needed from main()
-        usage='make.py restore [-h]',
+        usage='installer.py restore [-h]',
         help='Restore configurations')
     parser_restore.add_argument(
         'restore_all',
