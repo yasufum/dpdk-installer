@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+from __future__ import print_function
 import argparse
 from lib import make_utils
 import os
@@ -9,15 +10,16 @@ import shutil
 import subprocess
 import yaml
 
-default_dpdk_target= 'x86_64-native-linuxapp-gcc'
-default_dpdk_ver = 'v18.02'
-default_pktgen_ver = 'pktgen-3.4.9'
-default_spp_ver = ''
+DPDK_TARGET = 'x86_64-native-linuxapp-gcc'
+DPDK_VER = 'v18.02'
+PKTGEN_VER = 'pktgen-3.4.9'
+SPP_VER = ''
 
 class DpdkInstaller(object):
     """Run install tasks"""
 
-    def confirm_sshkey(self):
+    @staticmethod
+    def confirm_sshkey():
         """Check if sshkey exists
 
         Check if sshkey exists and copy from your $HOME/.ssh/id_rsa.pub
@@ -44,7 +46,8 @@ class DpdkInstaller(object):
                     shutil.copyfile(sshkey, target)
 
 
-    def confirm_proxy(self):
+    @staticmethod
+    def confirm_proxy():
         """Check http_proxy setting"""
 
         vars_file = "group_vars/all"
@@ -64,18 +67,19 @@ class DpdkInstaller(object):
                     if yobj[proxy] != new_proxy:
                         # update proxy conf
                         contents = ''  # updated contents of vars_file
-                        f = open(vars_file)
-                        for ss in f.read().splitlines():
-                            if ('%s:' % proxy) in ss:
+                        vars_f = open(vars_file)
+                        for split in vars_f.read().splitlines():
+                            if '%s:' % proxy in split:
                                 contents += '%s: "%s"\n' % (proxy, new_proxy)
                             else:
-                                contents += ss + "\n"
-                        f.close()
+                                contents += split + "\n"
+                        vars_f.close()
 
-                    f = open(vars_file, 'w+')
-                    f.write(contents)
+                    vars_f = open(vars_file, 'w+')
+                    vars_f.write(contents)
 
-    def confirm_account(self):
+    @staticmethod
+    def confirm_account():
         """Update user account
 
         Update remote_user, ansible_ssh_pass and ansible_sudo_pass.
@@ -99,23 +103,24 @@ class DpdkInstaller(object):
 
                 # Overwrite vars_file with new one
                 msg = ""
-                f = open(vars_file)
-                for l in f.readlines():
-                    if account_info in l:
+                vars_f = open(vars_file)
+                for line in vars_f.readlines():
+                    if account_info in line:
                         msg += "%s: %s\n" % (account_info, input_info)
                     else:
-                        msg += l
-                f.close()
+                        msg += line
+                vars_f.close()
 
-                f = open(vars_file, "w+")
-                f.write(msg)
-                f.close()
+                vars_f = open(vars_file, "w+")
+                vars_f.write(msg)
+                vars_f.close()
 
-    def confirm_dpdk(self):
+    @staticmethod
+    def confirm_dpdk():
         """Setup DPDK params
 
-        Setup DPDK params for hugepages and network interfaces. In this
-        task, setup "group_vars/dpdk" by asking user some questions.
+        Setup for hugepages and network interfaces defined in "group_vars/dpdk"
+        by asking user some questions.
 
         It only asks for dpdk role and not others because all of
         vars are included in dpdk's var file. It's needed to be asked for
@@ -132,7 +137,7 @@ class DpdkInstaller(object):
             'dpdk_target': None,
             'dpdk_interfaces': None}
 
-        for param, val in target_params.items():
+        for param in target_params.keys():
             if param == 'hugepage_size':
                 if yobj['hugepage_size'] is None:
                     print("> input hugepage_size (must be 2m(2M) or 1g(1G)):")
@@ -181,7 +186,7 @@ class DpdkInstaller(object):
 
             elif param == 'dpdk_ver':
                 if yobj[param] is None:
-                    print("> use default DPDK version '%s' ? [Y/n]" % default_dpdk_ver)
+                    print("> use default DPDK version '%s' ? [Y/n]" % DPDK_VER)
                     ans = raw_input().strip()
                     if ans == '':
                         ans = 'y'
@@ -193,7 +198,7 @@ class DpdkInstaller(object):
                         ans = raw_input().strip()
                         dpdk_ver = ans
                     else:
-                        dpdk_ver = default_dpdk_ver
+                        dpdk_ver = DPDK_VER
 
                     target_params[param] = dpdk_ver
                     make_utils.update_var(
@@ -203,7 +208,7 @@ class DpdkInstaller(object):
 
             elif param == 'dpdk_target':
                 if yobj[param] is None:
-                    print("> use DPDK target '%s' ? [Y/n]" % default_dpdk_target)
+                    print("> use DPDK target '%s' ? [Y/n]" % DPDK_TARGET)
                     ans = raw_input().strip()
                     if ans == '':
                         ans = 'y'
@@ -216,7 +221,7 @@ class DpdkInstaller(object):
                             print("> input DPDK target")
                             ans = raw_input().strip()
                         dpdk_target = ans
-                    dpdk_target = default_dpdk_target
+                    dpdk_target = DPDK_TARGET
                     target_params[param] = dpdk_target
                     make_utils.update_var(
                         vars_file, param, dpdk_target, False)
@@ -226,7 +231,6 @@ class DpdkInstaller(object):
             elif param == 'dpdk_interfaces':
                 if yobj[param] is None:
                     print("> input dpdk_interfaces (separate by white space), or empty:")
-                    delim = " "  # input is separated with white spaces
                     ans = raw_input().strip()
                     nw_ifs = re.sub(r'\s+', ' ', ans)
                     if nw_ifs == ' ':
@@ -242,11 +246,11 @@ class DpdkInstaller(object):
         yobj = yaml.load(open(vars_file))
 
         target_params = {'pktgen_ver': None}
-        for param, val in target_params.items():
+        for param in target_params.keys():
             if param == 'pktgen_ver':
                 if yobj[param] is None:
                     print("> use default pktgen version '%s' ? [Y/n]" %
-                          default_pktgen_ver)
+                          PKTGEN_VER)
                     ans = raw_input().strip()
                     if ans == '':
                         ans = 'y'
@@ -258,7 +262,7 @@ class DpdkInstaller(object):
                         ans = raw_input().strip()
                         pktgen_ver = ans
                     else:
-                        pktgen_ver = default_pktgen_ver
+                        pktgen_ver = PKTGEN_VER
 
                     target_params[param] = pktgen_ver
                     make_utils.update_var(
@@ -270,11 +274,11 @@ class DpdkInstaller(object):
         yobj = yaml.load(open(vars_file))
 
         target_params = {'spp_ver': None}
-        for param, val in target_params.items():
+        for param in target_params.keys():
             if param == 'spp_ver':
                 if yobj[param] is None:
                     print("> use default SPP version '%s' ? [Y/n]" %
-                          default_spp_ver)
+                          SPP_VER)
                     ans = raw_input().strip()
                     if ans == '':
                         ans = 'y'
@@ -286,7 +290,7 @@ class DpdkInstaller(object):
                         ans = raw_input().strip()
                         spp_ver = ans
                     else:
-                        spp_ver = default_spp_ver
+                        spp_ver = SPP_VER
 
                     target_params[param] = spp_ver
                     make_utils.update_var(
@@ -295,6 +299,8 @@ class DpdkInstaller(object):
                     target_params[param] = yobj[param]
 
     def install(self):
+        """Run installation"""
+
         if self.check_hosts() is not True:
             exit()
 
@@ -307,7 +313,10 @@ class DpdkInstaller(object):
             subprocess.call(
                 "ansible-playbook -i hosts site_proxy.yml", shell=True)
 
-    def clean_account(self):
+    @staticmethod
+    def clean_account():
+        """Clean username and password"""
+
         target_params = [
             "remote_user",
             "ansible_ssh_pass",
@@ -319,7 +328,10 @@ class DpdkInstaller(object):
             make_utils.update_var(vars_file, key, "", True)
             print("> clean '%s' in '%s'" % (key, vars_file))
 
-    def clean_proxy(self):
+    @staticmethod
+    def clean_proxy():
+        """Clean proxy environments"""
+
         target_params = ['http_proxy', 'https_proxy', 'no_proxy']
 
         # remove ssh user account form vars file.
@@ -328,7 +340,10 @@ class DpdkInstaller(object):
             make_utils.update_var(vars_file, key, "", True)
             print("> clean '%s' in '%s'" % (key, vars_file))
 
-    def clean_dpdk(self):
+    @staticmethod
+    def clean_dpdk():
+        """Clean params for DPDK"""
+
         # group_vars/all
         target_params = [
             "hugepage_size",
@@ -356,14 +371,20 @@ class DpdkInstaller(object):
             make_utils.update_var(vars_file, key, "", True)
             print("> clean '%s' in '%s'" % (key, vars_file))
 
-    def check_hosts(self):
+    @staticmethod
+    def check_hosts():
+        """Check if inventry file is setup"""
+
         if make_utils.is_hosts_configured() is not True:
             print("Error: You must setup 'hosts' first")
             return False
         else:
             return True
 
-    def save_conf(self):
+    @staticmethod
+    def save_conf():
+        """Save config as a backup and to be restored"""
+
         dst_dir = "tmp/config"
         # mkdir dst and child dir
         subprocess.call(
@@ -376,7 +397,10 @@ class DpdkInstaller(object):
 
         print("> save configurations to '%s'" % dst_dir)
 
-    def restore_conf(self):
+    @staticmethod
+    def restore_conf():
+        """Restore saved config"""
+
         dst_dir = "tmp/config"
 
         subprocess.call(
@@ -386,12 +410,14 @@ class DpdkInstaller(object):
 
         print("> restore configurations from '%s'" % dst_dir)
 
-    def clean_hosts(self):
+    @staticmethod
+    def clean_hosts():
         """Clean hosts file"""
         make_utils.clean_hosts()
         print("> clean hosts")
 
-    def remove_sshkey(self):
+    @staticmethod
+    def remove_sshkey():
         """Remove public key from templates"""
 
         target = "./roles/common/templates/id_rsa.pub"
@@ -400,6 +426,8 @@ class DpdkInstaller(object):
         print("> remove '%s'" % target)
 
     def setup_config(self, target):
+        """Run config task"""
+
         if target == 'account':
             self.confirm_account()
         elif target == 'sshkey':
@@ -419,12 +447,16 @@ class DpdkInstaller(object):
         print('> Done setup configuration')
 
     def do_config_install(self):
+        """Run config and install tasks at once"""
+
         if self.check_hosts() is not True:
             exit()
         self.setup_config('all')
         self.install()
 
     def clean(self, target='all'):
+        """Clean all of config"""
+
         if target == 'account':
             self.clean_account()
         elif target == 'proxy':
@@ -446,6 +478,7 @@ class DpdkInstaller(object):
 
 
 def arg_parser():
+    """Parse arguments of main and sub commands"""
 
     parser = argparse.ArgumentParser(
         description="Install DPDK, pktgen and SPP.")
@@ -515,24 +548,25 @@ def arg_parser():
 
 
 def main():
+    """Main method of this tool"""
 
-    di = DpdkInstaller()
+    dinstaller = DpdkInstaller()
 
     parser = arg_parser()
     args = parser.parse_args()
 
     if hasattr(args, 'clean_target'):
-        di.clean(args.clean_target)
+        dinstaller.clean(args.clean_target)
     elif hasattr(args, 'config_target'):
-        di.setup_config(args.config_target)
+        dinstaller.setup_config(args.config_target)
     elif hasattr(args, 'install_target'):
-        di.install()
+        dinstaller.install()
     elif hasattr(args, 'install_all'):
-        di.do_config_install()
+        dinstaller.do_config_install()
     elif hasattr(args, 'save_all'):
-        di.save_conf()
+        dinstaller.save_conf()
     elif hasattr(args, 'restore_all'):
-        di.restore_conf()
+        dinstaller.restore_conf()
     else:
         parser.print_help()
 
