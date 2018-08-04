@@ -15,7 +15,7 @@ default_pktgen_ver = 'pktgen-3.4.9'
 default_spp_ver = ''
 
 class DpdkInstaller(object):
-    """Run DPDK install tasks"""
+    """Run install tasks"""
 
     def confirm_sshkey(self):
         """Check if sshkey exists
@@ -448,10 +448,7 @@ class DpdkInstaller(object):
 def arg_parser():
 
     parser = argparse.ArgumentParser(
-        description="%s %s %s" % (
-            "DPDK application installer for SPP and pktgen.",
-            "This script runs ansible scripts in which installation of",
-            "application is defined."))
+        description="Install DPDK, pktgen and SPP.")
 
     # Add subparsers as positinal arguments and its help message.
     subparsers = parser.add_subparsers(help="%s %s %s" % (
@@ -462,7 +459,7 @@ def arg_parser():
     # add config option
     parser_config = subparsers.add_parser(
         'config',
-        help="setup all of configs, or for given category")
+        help="Setup all of configs, or for given category")
     parser_config.add_argument(
         'config_target',
         type=str,
@@ -474,17 +471,17 @@ def arg_parser():
     # add install option
     parser_install = subparsers.add_parser(
         'install',
-        help='run ansible scripts')
+        help='Run ansible for installation')
     parser_install.add_argument(
         'install_all',  # install does not take opt, but needed from main()
         type=str,
         nargs='?',
         choices=['install_all'],
-        help='run ansible scripts')
+        help='Run ansible for installation')
 
     parser_clean = subparsers.add_parser(
         'clean',
-        help="reset all of configs, or for given category")
+        help="Reset all of configs, or for given category")
     parser_clean.add_argument(
         'clean_target',
         type=str,
@@ -496,24 +493,24 @@ def arg_parser():
     parser_save = subparsers.add_parser(
         'save',  # install does not take opt, but needed from main()
         usage='make.py save [-h]',
-        help='save configurations')
+        help='Save configurations')
     parser_save.add_argument(
         'save_all',
         type=str,
         nargs='?',
         choices=['save_all'],
-        help='save configurations')
+        help='Save configurations')
 
     parser_restore = subparsers.add_parser(
         'restore',  # restore does not take option, but needed from main()
         usage='make.py restore [-h]',
-        help='restore configurations')
+        help='Restore configurations')
     parser_restore.add_argument(
         'restore_all',
         type=str,
         nargs='?',
         choices=['restore_all'],
-        help='restore configurations')
+        help='Restore configurations')
     return parser
 
 
