@@ -112,6 +112,9 @@ installation.
 There are several roles defined in `hosts` file.
 Role is a kind of group of installation tasks.
 Each of tasks of the role is listed in "roles/[role_name]/tasks/main.yml".
+`common` role defines the default tasks and applied for all of other roles.
+It means that you do not need to register a client in `common` explicitly
+if it is registered to others.
 
 Remote clients are registered as a list of IP address or hostname in `hosts`.
 Empty entry means the role is not effective and does not run install tasks.
@@ -122,12 +125,20 @@ For example, if you only use DPDK, make entries of pktgen and SPP empty.
 Applied for all of other roles as common tasks.
 
 This role runs tasks listed as below. Each of common tasks is defined
-as YAML in "roles/common/tasks/".
+as YAML in `roles/common/tasks/`.
+There are two utility scripts.
+`sshkey-setup.yml` is for registering public key in remote clients to login
+without password.
+`sudo-without-pw.yml` registers the user as sudoer to not be asked password
+for sudo.
+If you do not want to activate this settings, comment out them in `main.yml`.
 
 - base.yml (git, curl, wget)
 - hugepage-setup.yml
 - dpdk.yml
 - docker.yml
+- sshkey-setup.yml
+- sudo-without-pw.yml
 
 In addition, you can install following application as optional.
 To install them, edit `roles/common/tasks/main.yml` in which all of tasks
