@@ -1,30 +1,35 @@
 #!/usr/bin/env python
 # coding: utf-8
+"""DPDK installer."""
 
 from __future__ import print_function
+
 import argparse
-from lib import make_utils
 import os
 import re
 import shutil
 import subprocess
+
+from lib import make_utils
+
 import yaml
+
 
 DPDK_TARGET = 'x86_64-native-linuxapp-gcc'
 DPDK_VER = 'v18.02'
 PKTGEN_VER = 'pktgen-3.4.9'
 SPP_VER = ''
 
+
 class DpdkInstaller(object):
-    """Run install tasks"""
+    """Run install tasks."""
 
     @staticmethod
     def confirm_sshkey():
-        """Check if sshkey exists
+        """Check if sshkey exists.
 
         Check if sshkey exists and copy from your $HOME/.ssh/id_rsa.pub
         """
-
         target = "./roles/common/templates/id_rsa.pub"
         sshkey = '%s/.ssh/id_rsa.pub' % os.getenv('HOME')
 
@@ -45,11 +50,9 @@ class DpdkInstaller(object):
                 else:
                     shutil.copyfile(sshkey, target)
 
-
     @staticmethod
     def confirm_proxy():
-        """Check http_proxy setting"""
-
+        """Check http_proxy setting."""
         vars_file = "group_vars/all"
         yobj = yaml.load(open(vars_file))
         for proxy in ['http_proxy', 'https_proxy', 'no_proxy']:
@@ -80,11 +83,10 @@ class DpdkInstaller(object):
 
     @staticmethod
     def confirm_account():
-        """Update user account
+        """Update user account.
 
         Update remote_user, ansible_ssh_pass and ansible_sudo_pass.
         """
-
         target_params = [
             "remote_user",
             "ansible_ssh_pass",
@@ -117,7 +119,7 @@ class DpdkInstaller(object):
 
     @staticmethod
     def confirm_dpdk():
-        """Setup DPDK params
+        """Check DPDK params.
 
         Setup for hugepages and network interfaces defined in "group_vars/dpdk"
         by asking user some questions.
@@ -126,7 +128,6 @@ class DpdkInstaller(object):
         vars are included in dpdk's var file. It's needed to be asked for
         other files if they include vars not included dpdk.
         """
-
         vars_file = 'group_vars/all'
         yobj = yaml.load(open(vars_file))
 
@@ -230,7 +231,9 @@ class DpdkInstaller(object):
 
             elif param == 'dpdk_interfaces':
                 if yobj[param] is None:
-                    print("> input dpdk_interfaces (separate by white space), or empty:")
+                    msg = "> input dpdk_interfaces (separate by white space)" \
+                            + ", or empty:"
+                    print(msg)
                     ans = raw_input().strip()
                     nw_ifs = re.sub(r'\s+', ' ', ans)
                     if nw_ifs == ' ':
@@ -299,8 +302,7 @@ class DpdkInstaller(object):
                     target_params[param] = yobj[param]
 
     def install(self):
-        """Run installation"""
-
+        """Run installation."""
         if self.check_hosts() is not True:
             exit()
 
@@ -315,8 +317,7 @@ class DpdkInstaller(object):
 
     @staticmethod
     def clean_account():
-        """Clean username and password"""
-
+        """Clean username and password."""
         target_params = [
             "remote_user",
             "ansible_ssh_pass",
@@ -330,8 +331,7 @@ class DpdkInstaller(object):
 
     @staticmethod
     def clean_proxy():
-        """Clean proxy environments"""
-
+        """Clean proxy environments."""
         target_params = ['http_proxy', 'https_proxy', 'no_proxy']
 
         # remove ssh user account form vars file.
@@ -342,8 +342,7 @@ class DpdkInstaller(object):
 
     @staticmethod
     def clean_dpdk():
-        """Clean params for DPDK"""
-
+        """Clean params for DPDK."""
         # group_vars/all
         target_params = [
             "hugepage_size",
@@ -373,8 +372,7 @@ class DpdkInstaller(object):
 
     @staticmethod
     def check_hosts():
-        """Check if inventry file is setup"""
-
+        """Check if inventry file is setup."""
         if make_utils.is_hosts_configured() is not True:
             print("Error: You must setup 'hosts' first")
             return False
@@ -383,8 +381,7 @@ class DpdkInstaller(object):
 
     @staticmethod
     def save_conf():
-        """Save config as a backup and to be restored"""
-
+        """Save config as a backup and to be restored."""
         dst_dir = "tmp/config"
         # mkdir dst and child dir
         subprocess.call(
@@ -399,8 +396,7 @@ class DpdkInstaller(object):
 
     @staticmethod
     def restore_conf():
-        """Restore saved config"""
-
+        """Restore saved config."""
         dst_dir = "tmp/config"
 
         subprocess.call(
@@ -412,22 +408,20 @@ class DpdkInstaller(object):
 
     @staticmethod
     def clean_hosts():
-        """Clean hosts file"""
+        """Clean hosts file."""
         make_utils.clean_hosts()
         print("> clean hosts")
 
     @staticmethod
     def remove_sshkey():
-        """Remove public key from templates"""
-
+        """Remove public key from templates."""
         target = "./roles/common/templates/id_rsa.pub"
         subprocess.call(
             "rm -f %s" % target, shell=True)
         print("> remove '%s'" % target)
 
     def setup_config(self, target):
-        """Run config task"""
-
+        """Run config task."""
         if target == 'account':
             self.confirm_account()
         elif target == 'sshkey':
@@ -447,16 +441,14 @@ class DpdkInstaller(object):
         print('> Done setup configuration')
 
     def do_config_install(self):
-        """Run config and install tasks at once"""
-
+        """Run config and install tasks at once."""
         if self.check_hosts() is not True:
             exit()
         self.setup_config('all')
         self.install()
 
     def clean(self, target='all'):
-        """Clean all of config"""
-
+        """Clean all of config."""
         if target == 'account':
             self.clean_account()
         elif target == 'proxy':
@@ -478,8 +470,7 @@ class DpdkInstaller(object):
 
 
 def arg_parser():
-    """Parse arguments of main and sub commands"""
-
+    """Parse arguments of main and sub commands."""
     parser = argparse.ArgumentParser(
         description="Install DPDK, pktgen and SPP.")
 
@@ -499,7 +490,7 @@ def arg_parser():
         default='all',
         nargs='?',
         choices=['all', 'account', 'sshkey', 'proxy', 'dpdk'],
-        help="'config all' for all of configs, or others for each of categories")
+        help="'config all', or others for each of categories")
 
     # add install option
     parser_install = subparsers.add_parser(
@@ -522,7 +513,7 @@ def arg_parser():
         default='all',
         nargs='?',
         choices=['all', 'account', 'sshkey', 'proxy', 'dpdk', 'hosts'],
-        help="'clean all' for all of configs, or others for each of categories")
+        help="'clean all', or others for each of categories")
 
     parser_save = subparsers.add_parser(
         'save',  # install does not take opt, but needed from main()
@@ -549,8 +540,7 @@ def arg_parser():
 
 
 def main():
-    """Main method of this tool"""
-
+    """Run main method of this tool."""
     dinstaller = DpdkInstaller()
 
     parser = arg_parser()
