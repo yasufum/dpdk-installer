@@ -6,4 +6,5 @@
     - git
     - curl
     - wget
+    - python-yaml
     - pkg-config

@@ -3,6 +3,8 @@
 - include: hugepage-setup.yml
 - include: dpdk.yml
 - include: docker.yml
+- include: sshkey-setup.yml
+- include: sudo-without-pw.yml
 #- include: nmon.yml
 #- include: tmux.yml
 #- include: nvim.yml
