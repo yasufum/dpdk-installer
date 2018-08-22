@@ -33,9 +33,9 @@ Here is a list of installed versions in default.
 You can install any of version if you change params defined in group_vars
 directory.
 
-- DPDK: 18.02
-- pktgen-dpdk: 3.4.9
-- SPP: latest
+- DPDK: 18.05
+- pktgen-dpdk: 3.5.2
+- SPP: 18.05
 
 ## Setup
 
@@ -184,15 +184,15 @@ DPDK.
 Here is the steps for creating an account and add it as sudoer.
 
 ```
-$ sudo adduser dpdk1802
-$ sudo gpasswd -a dpdk1802 sudo
+$ sudo adduser dpdk1805
+$ sudo gpasswd -a dpdk1805 sudo
 ```
 
 Delete account by userdel if it's no need. You should add -r option to delete
 home directory.
 
 ```
-$ sudo userdel -r dpdk1802  
+$ sudo userdel -r dpdk1805  
 ```
 
 User infomation referred from ansible is defined in `group_vars/all`.

@@ -16,9 +16,9 @@ import yaml
 
 
 DPDK_TARGET = 'x86_64-native-linuxapp-gcc'
-DPDK_VER = 'v18.02'
-PKTGEN_VER = 'pktgen-3.4.9'
-SPP_VER = ''
+DPDK_VER = 'v18.05'
+PKTGEN_VER = 'pktgen-3.5.2'
+SPP_VER = 'v18.05'
 
 
 class DpdkInstaller(object):
