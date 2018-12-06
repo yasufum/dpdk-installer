@@ -3,6 +3,10 @@
   become: yes
   apt: pkg=libpcap-dev state=present
 
+- name: install liblua5.3-dev
+  become: yes
+  apt: pkg=liblua5.3-dev state=present
+
 - name: get pktgen
   git: repo={{ pktgen_repo }}
        dest={{ pktgen_dir }}
