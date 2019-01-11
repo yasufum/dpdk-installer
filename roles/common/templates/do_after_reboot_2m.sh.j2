@@ -24,6 +24,6 @@ opt="--bind=uio_pci_generic"
 for eth in {{ dpdk_interfaces }}
 do
   sudo ifconfig ${eth} down
-  echo python ${script} ${opt} ${eth} 
+  echo sudo python ${script} ${opt} ${eth} 
   sudo python ${script} ${opt} ${eth}
 done
