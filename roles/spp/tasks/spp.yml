@@ -1,4 +1,13 @@
 ---
+- name: apt install for SPP
+  become: yes
+  apt: name={{ item }} state=present update_cache=yes
+  with_items:
+    - libpcap-dev
+    - liblz4-dev
+    - liblz4-tool
+    - wireshark
+
 - name: get spp
   git: repo={{ spp_repo }}
        dest={{ spp_dir }}
@@ -6,3 +15,6 @@
 
 - name: make spp
   command: make RTE_SDK={{ dpdk_dir }} RTE_TARGET={{ dpdk_target }} chdir={{ spp_dir }}
+
+- name: pip3 for SPP
+  shell: pip3 install -r {{ spp_dir }}/requirements.txt
