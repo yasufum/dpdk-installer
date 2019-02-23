@@ -5,7 +5,6 @@
 from __future__ import print_function
 
 import argparse
-import di_conf
 import os
 import re
 import shutil
@@ -18,6 +17,11 @@ import yaml
 
 class DpdkInstaller(object):
     """Run install tasks."""
+
+    def __init__(self):
+        fname = 'di_conf.yml'
+        self.di_conf = yaml.load(open('{}/{}'.format(
+            os.path.dirname(__file__), fname)))
 
     @staticmethod
     def confirm_sshkey():
@@ -112,8 +116,7 @@ class DpdkInstaller(object):
                 vars_f.write(msg)
                 vars_f.close()
 
-    @staticmethod
-    def confirm_dpdk():
+    def confirm_dpdk(self):
         """Check DPDK params.
 
         Setup for hugepages and network interfaces defined in "group_vars/dpdk"
@@ -183,7 +186,7 @@ class DpdkInstaller(object):
             elif param == 'dpdk_ver':
                 if yobj[param] is None:
                     print("> use default DPDK version '%s' ? [Y/n]" %
-                            di_conf.DPDK_VER)
+                            self.di_conf["DPDK_VER"])
                     ans = raw_input().strip()
                     if ans == '':
                         ans = 'y'
@@ -195,7 +198,7 @@ class DpdkInstaller(object):
                         ans = raw_input().strip()
                         dpdk_ver = ans
                     else:
-                        dpdk_ver = di_conf.DPDK_VER
+                        dpdk_ver = self.di_conf["DPDK_VER"]
 
                     target_params[param] = dpdk_ver
                     make_utils.update_var(
@@ -205,7 +208,7 @@ class DpdkInstaller(object):
 
             elif param == 'dpdk_target':
                 if yobj[param] is None:
-                    print("> use DPDK target '%s' ? [Y/n]" % di_conf.DPDK_TARGET)
+                    print("> use DPDK target '%s' ? [Y/n]" % self.di_conf["DPDK_TARGET"])
                     ans = raw_input().strip()
                     if ans == '':
                         ans = 'y'
@@ -218,7 +221,7 @@ class DpdkInstaller(object):
                             print("> input DPDK target")
                             ans = raw_input().strip()
                         dpdk_target = ans
-                    dpdk_target = di_conf.DPDK_TARGET
+                    dpdk_target = self.di_conf["DPDK_TARGET"]
                     target_params[param] = dpdk_target
                     make_utils.update_var(
                         vars_file, param, dpdk_target, False)
@@ -249,7 +252,7 @@ class DpdkInstaller(object):
             if param == 'pktgen_ver':
                 if yobj[param] is None:
                     print("> use default pktgen version '%s' ? [Y/n]" %
-                          di_conf.PKTGEN_VER)
+                          self.di_conf["PKTGEN_VER"])
                     ans = raw_input().strip()
                     if ans == '':
                         ans = 'y'
@@ -261,7 +264,7 @@ class DpdkInstaller(object):
                         ans = raw_input().strip()
                         pktgen_ver = ans
                     else:
-                        pktgen_ver = di_conf.PKTGEN_VER
+                        pktgen_ver = self.di_conf["PKTGEN_VER"]
 
                     target_params[param] = pktgen_ver
                     make_utils.update_var(
@@ -277,7 +280,7 @@ class DpdkInstaller(object):
             if param == 'spp_ver':
                 if yobj[param] is None:
                     print("> use default SPP version '%s' ? [Y/n]" %
-                          di_conf.SPP_VER)
+                          self.di_conf["SPP_VER"])
                     ans = raw_input().strip()
                     if ans == '':
                         ans = 'y'
@@ -289,7 +292,7 @@ class DpdkInstaller(object):
                         ans = raw_input().strip()
                         spp_ver = ans
                     else:
-                        spp_ver = di_conf.SPP_VER
+                        spp_ver = self.di_conf["SPP_VER"]
 
                     target_params[param] = spp_ver
                     make_utils.update_var(
