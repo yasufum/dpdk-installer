@@ -3,13 +3,13 @@
   become: yes
   apt: name=software-properties-common state=present
 
-- name: add neovim repository
+- name: add jonathonf vim repository
   become: yes
   apt_repository:
-    repo: ppa:neovim-ppa/stable
+    repo: ppa:jonathonf/vim
 
-- name: install neovim
+- name: install vim
   become: yes
   apt:
-    name: neovim
+    name: vim
     update_cache: yes

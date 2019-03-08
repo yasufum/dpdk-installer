@@ -36,3 +36,26 @@ syntax enable
 "endif
 
 "End dein Scripts-------------------------
+
+syntax on
+set shiftwidth=4
+set tabstop=4
+set expandtab
+set number
+set showcmd
+set showmatch
+set hlsearch
+set laststatus=2
+set encoding=utf-8
+set fileencoding=utf-8
+set termencoding=utf-8
+set autoindent
+
+set visualbell t_vb=
+set noerrorbells
+
+augroup fileTypeIndent
+    autocmd BufRead,BufNewFile *.c setlocal noexpandtab tabstop=8 softtabstop=8 shiftwidth=8
+    autocmd BufRead,BufNewFile *.h setlocal noexpandtab tabstop=8 softtabstop=8 shiftwidth=8
+augroup END
+

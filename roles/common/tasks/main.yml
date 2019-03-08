@@ -10,7 +10,9 @@
 # optional
 - include: nmon.yml
 - include: tmux.yml
-- include: nvim.yml
+- include: vim-latest.yml
+#- include: nvim.yml
+- include: dein.yml
 #- include: emacs.yml
 #- include: ruby.yml
 #- include: rbenv.yml
