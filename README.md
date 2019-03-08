@@ -33,9 +33,9 @@ Here is a list of installed versions in default.
 You can install any of version if you change params defined in group_vars
 directory.
 
-- DPDK: 18.05
-- pktgen-dpdk: 3.5.2
-- SPP: 18.05
+- DPDK: 18.08
+- pktgen-dpdk: 3.5.7
+- SPP: latest
 
 ## Setup
 
@@ -148,11 +148,8 @@ Optional tasks:
 
 - nmon.yml (vim + .vimrc, dein)
 - tmux.yml (tmux + .tmux.conf)
-- nvim.yml (nvim, dein)
-- emacs.yml
-- netsniff-ng.yml
-- ruby.yml
-- rbenv.yml
+- include: vim-latest.yml
+- ...
 
 Configuration files in `roles/common/templates` are also installed
 on remote clients.
@@ -184,15 +181,15 @@ DPDK.
 Here is the steps for creating an account and add it as sudoer.
 
 ```
-$ sudo adduser dpdk1805
-$ sudo gpasswd -a dpdk1805 sudo
+$ sudo adduser dpdk
+$ sudo gpasswd -a dpdk sudo
 ```
 
 Delete account by userdel if it's no need. You should add -r option to delete
 home directory.
 
 ```
-$ sudo userdel -r dpdk1805  
+$ sudo userdel -r dpdk
 ```
 
 User infomation referred from ansible is defined in `group_vars/all`.
