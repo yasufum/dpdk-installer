@@ -23,14 +23,15 @@ class DpdkInstaller(object):
         self.di_conf = yaml.load(open('{}/{}'.format(
             os.path.dirname(__file__), fname)))
 
-    @staticmethod
-    def confirm_sshkey():
+    def confirm_sshkey(self, os_release):
         """Check if sshkey exists.
 
         Check if sshkey exists and copy from your $HOME/.ssh/id_rsa.pub
         """
-        target = "./roles/common/templates/id_rsa.pub"
-        sshkey = '%s/.ssh/id_rsa.pub' % os.getenv('HOME')
+
+        dist_dir = "{}{}".format(os_release['name'], os_release['ver'])
+        target = "./roles/{}_common/templates/id_rsa.pub".format(dist_dir)
+        sshkey = '{}/.ssh/id_rsa.pub'.format(os.getenv('HOME'))
 
         if not os.path.exists(target):
 
@@ -307,12 +308,17 @@ class DpdkInstaller(object):
 
         vars_file = "group_vars/all"
         yobj = yaml.load(open(vars_file))
+        os_rel = self._os_release()
         if yobj["http_proxy"] is None or yobj["http_proxy"] == "":
             subprocess.call(
-                "ansible-playbook -i hosts site.yml", shell=True)
+                "ansible-playbook -i hosts site_{}{}.yml".format(
+                    os_rel['name'], os_rel['ver']),
+                shell=True)
         else:
             subprocess.call(
-                "ansible-playbook -i hosts site_proxy.yml", shell=True)
+                "ansible-playbook -i hosts site_{}{}_proxy.yml".format(
+                    os_rel['name'], os_rel['ver']),
+                shell=True)
 
     @staticmethod
     def clean_account():
@@ -414,24 +420,25 @@ class DpdkInstaller(object):
     @staticmethod
     def remove_sshkey():
         """Remove public key from templates."""
-        target = "./roles/common/templates/id_rsa.pub"
+        target = "./roles/*_common/templates/id_rsa.pub"
         subprocess.call(
             "rm -f %s" % target, shell=True)
         print("> remove '%s'" % target)
 
     def setup_config(self, target):
         """Run config task."""
+
         if target == 'account':
             self.confirm_account()
         elif target == 'sshkey':
-            self.confirm_sshkey()
+            self.confirm_sshkey(self._os_release())
         elif target == 'proxy':
             self.confirm_proxy()
         elif target == 'dpdk':
             self.confirm_dpdk()
         elif target == 'all':
             self.confirm_account()
-            self.confirm_sshkey()
+            self.confirm_sshkey(self._os_release())
             self.confirm_proxy()
             self.confirm_dpdk()
         else:
@@ -446,6 +453,33 @@ class DpdkInstaller(object):
         self.setup_config('all')
         self.install()
 
+    def _os_release(self):
+        """Return distribution and number of ver."""
+
+        patterns = {
+            "name": r"^NAME=\"([\w\s]+)\"$",
+            "ver": r"^VERSION_ID=\"(\d+)\"$"}
+
+        regexps = {}
+        for k, ptn in patterns.items():
+            regexps[k] = re.compile(ptn)
+
+        res = {}
+        for line in open("/etc/os-release", "r"):
+            for k, regexp in regexps.items():
+                m = regexp.match(line)
+                if m:
+                    if k == 'name':
+                        if m.group(1).startswith('CentOS'):
+                            res[k] = 'centos'
+                        elif m.group(1).startswith('Ubuntu'):
+                            res[k] = 'ubuntu'
+                        elif m.group(1).startswith('Fedora'):
+                            res[k] = 'fedora'
+                    else:
+                        res[k] = m.group(1)
+        return res
+        
     def clean(self, target='all'):
         """Clean all of config."""
         if target == 'account':
