@@ -1,0 +1,27 @@
+---
+- name: install cmake
+  become: yes
+  yum: name={{ item }}  state=latest update_cache=yes
+  with_items:
+    - gcc-c++
+    - cmake
+    - libtool
+
+- name: check neovim exists
+  stat: path={{ dpdk_home }}/neovim
+  register: does_neovim_exist
+
+- name: git clone neovim
+  git: repo=https://github.com/neovim/neovim
+       dest={{ dpdk_home }}/neovim
+  when: not does_neovim_exist.stat.exists
+
+- name: make neovim
+  command: make chdir={{ dpdk_home }}/neovim
+
+- name: install neovim
+  become: yes
+  command: make install chdir={{ dpdk_home }}/neovim
+
+- name: remove neovim directory
+  command: rm -rf neovim chdir={{ dpdk_home }}

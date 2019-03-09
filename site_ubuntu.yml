@@ -5,22 +5,22 @@
   hosts: all
   remote_user: "{{ remote_user }}"
   roles:
-    - common
+    - ubuntu_common
 
 - name: install kvm
   hosts: dpdk
   remote_user: "{{ remote_user }}"
   roles:
-    - kvm
+    - ubuntu_kvm
 
 - name: install spp and qemu
   hosts: spp
   remote_user: "{{ remote_user }}"
   roles:
-    - spp
+    - ubuntu_spp
 
 - name: install pktgen
   hosts: pktgen
   remote_user: "{{ remote_user }}"
   roles:
-    - pktgen
+    - ubuntu_pktgen

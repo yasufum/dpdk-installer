@@ -1,0 +1,4 @@
+---
+- name: install emacs
+  become: yes
+  yum: name=emacs state=latest

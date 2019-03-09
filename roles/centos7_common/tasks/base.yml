@@ -1,0 +1,25 @@
+---
+- name: add ius-release
+  become: yes
+  yum:
+    name: https://centos7.iuscommunity.org/ius-release.rpm
+    state: latest
+    update_cache: yes
+
+- name: install mandated packages
+  become: yes
+  yum: name={{ item }} state=latest update_cache=yes
+  with_items:
+    - git
+    - patch
+    - curl
+    - wget
+    - gcc
+    - glibc-devel
+    - python-pip
+    - python36
+    - python36-pip
+
+- name: install pyyaml for python3
+  become: yes
+  command: pip3.6 install pyyaml

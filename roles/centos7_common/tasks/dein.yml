@@ -1,0 +1,26 @@
+---
+- name: get dein
+  git: repo={{ dein_repo }}
+       dest={{ dein_tmp_dir }}
+
+- name: install dein
+  command: sh {{ dein_tmp_dir }}/bin/installer.sh {{ dein_home }}
+
+- name: remove install.sh
+  command: rm -rf {{ dein_tmp_dir }}
+
+- command: which nvim
+  register: nvim_path
+  ignore_errors: True
+
+- name: create neovim config directory
+  shell: mkdir -p {{ ansible_env.HOME }}/.config/nvim
+  when: nvim_path['rc'] == 0
+
+- name: put init.vim for neovim
+  template: src=templates/vimrc.j2 dest={{ ansible_env.HOME }}/.config/nvim/init.vim mode=664
+  when: nvim_path['rc'] == 0
+
+- name: put .vimrc for vim
+  template: src=templates/vimrc.j2 dest={{ ansible_env.HOME }}/.vimrc mode=664
+  when: nvim_path['rc'] == 1

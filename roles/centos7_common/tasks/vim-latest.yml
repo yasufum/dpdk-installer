@@ -1,0 +1,14 @@
+---
+- name: add repository for vim8
+  become: yes
+  command: curl -L https://copr.fedorainfracloud.org/coprs/unixcommunity/vim/repo/epel-7/unixcommunity-vim-epel-7.repo -o /etc/yum.repos.d/unixcommunity-vim-epel-7.repo
+
+- name: update repository
+  become: yes
+  command: yum update vim* -y
+
+- name: install vim
+  become: yes
+  yum:
+    name: vim
+    update_cache: yes

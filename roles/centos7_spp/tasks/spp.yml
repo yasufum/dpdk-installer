@@ -1,0 +1,22 @@
+---
+- name: yum install for SPP
+  become: yes
+  yum: name={{ item }} state=present update_cache=yes
+  with_items:
+    - libpcap
+    - libpcap-devel
+    - lz4
+    - lz4-devel
+    - wireshark
+    - wireshark-devel
+
+- name: get spp
+  git: repo={{ spp_repo }}
+       dest={{ spp_dir }}
+       #version={{ spp_ver }}
+
+- name: make spp
+  command: make RTE_SDK={{ dpdk_dir }} RTE_TARGET={{ dpdk_target }} chdir={{ spp_dir }}
+
+- name: install pip3 packages for SPP
+  shell: pip3.6 install -r {{ spp_dir }}/requirements.txt
