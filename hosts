@@ -10,26 +10,20 @@
 [ubuntu_libvirt]
 #127.0.0.1
 
-[centos6_common]
-#127.0.0.1
-
-[centos6_pktgen]
-#127.0.0.1
-
-[centos6_spp]
-#127.0.0.1
-
-[centos6_libvirt]
-#127.0.0.1
-
 [centos7_common]
-#127.0.0.1
-
-[centos7_pktgen]
 #127.0.0.1
 
 [centos7_spp]
 #127.0.0.1
 
 [centos7_libvirt]
+#127.0.0.1
+
+[centos6_common]
+#127.0.0.1
+
+[centos6_spp]
+#127.0.0.1
+
+[centos6_libvirt]
 #127.0.0.1

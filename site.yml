@@ -44,12 +44,6 @@
   roles:
     - centos7_spp
 
-#- name: install pktgen
-#  hosts: centos7_pktgen
-#  remote_user: "{{ remote_user }}"
-#  roles:
-#    - centos7_pktgen
-
 # CentOS 6
 - name: apply all base packages
   hosts: centos6_common
