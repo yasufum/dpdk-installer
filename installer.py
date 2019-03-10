@@ -25,23 +25,23 @@ class DpdkInstaller(object):
         if curdir == "":
             curdir = "."
         self.di_conf = yaml.load(open('{}/{}'.format(curdir, fname)))
-            
-    def confirm_sshkey(self, os_release):
+
+    def confirm_sshkey(self):
         """Check if sshkey exists.
 
         Check if sshkey exists and copy from your $HOME/.ssh/id_rsa.pub
         """
 
-        dist_dir = "{}{}".format(os_release['name'], os_release['ver'])
-        target = "./roles/{}_common/templates/id_rsa.pub".format(dist_dir)
         sshkey = '{}/.ssh/id_rsa.pub'.format(os.getenv('HOME'))
+        do_copy = False
+        valid_ans = False
 
-        if not os.path.exists(target):
-
+        while valid_ans is not True:
             if os.path.exists(sshkey):
-                print("> path to SSH key? (%s) [y/N]" % sshkey)
+                print("> use this SSH key? [y/N], or input path")
+                print("> ({})".format(sshkey))
             else:
-                print("> path to SSH key?")
+                print("> input path of SSH key if you use?")
 
             if sys.version_info.major == 2:
                 ans = raw_input().strip()
@@ -49,13 +49,23 @@ class DpdkInstaller(object):
                 ans = input().strip()
 
             if ans.lower() == "y" or ans.lower() == "yes":
-                shutil.copyfile(sshkey, target)
+                valid_ans = True
+                do_copy = True
             elif ans.lower() == "n" or ans.lower() == "no":
+                valid_ans = True
                 pass
-            else:
-                if (ans != '') and (not os.path.exists(ans)):
-                    print("> %s does not exist" % ans)
+            elif (ans != ''):  # path to sshkey
+                if (not os.path.exists(ans)):
+                    print("> '{}' does not exist".format(ans))
                 else:
+                    sshkey = ans
+                    valid_ans = True
+                    do_copy = True
+
+        if do_copy is True:
+            for dist in ['ubuntu', 'centos7', 'centos6']:
+                target = "./roles/{}_common/templates/id_rsa.pub".format(dist)
+                if not os.path.exists(target):
                     shutil.copyfile(sshkey, target)
 
     @staticmethod
@@ -379,16 +389,13 @@ class DpdkInstaller(object):
 
         vars_file = "group_vars/all"
         yobj = yaml.load(open(vars_file))
-        os_rel = self._os_release()
         if yobj["http_proxy"] is None or yobj["http_proxy"] == "":
             subprocess.call(
-                "ansible-playbook -i hosts site_{}{}.yml".format(
-                    os_rel['name'], os_rel['ver']),
+                "ansible-playbook -i hosts site.yml",
                 shell=True)
         else:
             subprocess.call(
-                "ansible-playbook -i hosts site_{}{}_proxy.yml".format(
-                    os_rel['name'], os_rel['ver']),
+                "ansible-playbook -i hosts site_proxy.yml",
                 shell=True)
 
     @staticmethod
@@ -502,14 +509,14 @@ class DpdkInstaller(object):
         if target == 'account':
             self.confirm_account()
         elif target == 'sshkey':
-            self.confirm_sshkey(self._os_release())
+            self.confirm_sshkey()
         elif target == 'proxy':
             self.confirm_proxy()
         elif target == 'dpdk':
             self.confirm_dpdk()
         elif target == 'all':
             self.confirm_account()
-            self.confirm_sshkey(self._os_release())
+            self.confirm_sshkey()
             self.confirm_proxy()
             self.confirm_dpdk()
         else:
@@ -523,39 +530,6 @@ class DpdkInstaller(object):
             exit()
         self.setup_config('all')
         self.install()
-
-    def _os_release(self):
-        """Return distribution and number of ver."""
-
-        res = {}
-        if os.path.exists('/etc/os-release'):
-            patterns = {
-                "name": r"^NAME=\"([\w\s]+)\"$",
-                "ver": r"^VERSION_ID=\"(\d+)\"$"}
-
-            regexps = {}
-            for k, ptn in patterns.items():
-                regexps[k] = re.compile(ptn)
-
-            for line in open("/etc/os-release", "r"):
-                for k, regexp in regexps.items():
-                    m = regexp.match(line)
-                    if m:
-                        if k == 'name':
-                            if m.group(1).startswith('CentOS'):
-                                res[k] = 'centos'
-                            elif m.group(1).startswith('Ubuntu'):
-                                res[k] = 'ubuntu'
-                            elif m.group(1).startswith('Fedora'):
-                                res[k] = 'fedora'
-                        else:
-                            res[k] = m.group(1)
-
-        if os.path.exists('/etc/redhat-release'):  # CentOS 6
-            res['name'] = 'centos'
-            res['ver'] = '6'
-
-        return res
 
     def clean(self, target='all'):
         """Clean all of config."""

@@ -1,1 +1,70 @@
 ---
+
+# Ubuntu
+- name: apply all base packages
+  hosts: ubuntu_common
+  remote_user: "{{ remote_user }}"
+  roles:
+    - ubuntu_common
+
+- name: install libvirt
+  hosts: ubuntu_libvirt
+  remote_user: "{{ remote_user }}"
+  roles:
+    - ubuntu_libvirt
+
+- name: install spp and qemu
+  hosts: ubuntu_spp
+  remote_user: "{{ remote_user }}"
+  roles:
+    - ubuntu_spp
+
+- name: install pktgen
+  hosts: ubuntu_pktgen
+  remote_user: "{{ remote_user }}"
+  roles:
+    - ubuntu_pktgen
+
+# CentOS 7
+- name: apply all base packages
+  hosts: centos7_common
+  remote_user: "{{ remote_user }}"
+  roles:
+    - centos7_common
+
+- name: install libvirt
+  hosts: centos7_libvirt
+  remote_user: "{{ remote_user }}"
+  roles:
+    - centos7_libvirt
+
+- name: install spp and qemu
+  hosts: centos7_spp
+  remote_user: "{{ remote_user }}"
+  roles:
+    - centos7_spp
+
+#- name: install pktgen
+#  hosts: centos7_pktgen
+#  remote_user: "{{ remote_user }}"
+#  roles:
+#    - centos7_pktgen
+
+# CentOS 6
+- name: apply all base packages
+  hosts: centos6_common
+  remote_user: "{{ remote_user }}"
+  roles:
+    - centos6_common
+
+- name: install libvirt
+  hosts: centos6_libvirt
+  remote_user: "{{ remote_user }}"
+  roles:
+    - centos6_libvirt
+
+- name: install spp and qemu
+  hosts: centos6_spp
+  remote_user: "{{ remote_user }}"
+  roles:
+    - centos6_spp

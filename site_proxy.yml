@@ -1,38 +1,103 @@
 ---
-# Deploys the whole application stack in this site.
 
+# Ubuntu
 - name: apply all base packages
-  hosts: all
+  hosts: ubuntu_common
   remote_user: "{{ remote_user }}"
   roles:
-    - common
+    - ubuntu_common
   environment:
     http_proxy: "{{ http_proxy }}"
     https_proxy: "{{ https_proxy }}"
 
-- name: install kvm 
-  hosts: dpdk 
+- name: install libvirt
+  hosts: ubuntu_libvirt
   remote_user: "{{ remote_user }}"
   roles:
-    - kvm
+    - ubuntu_libvirt
   environment:
     http_proxy: "{{ http_proxy }}"
     https_proxy: "{{ https_proxy }}"
 
-- name: install spp and qemu 
-  hosts: spp
+- name: install spp and qemu
+  hosts: ubuntu_spp
   remote_user: "{{ remote_user }}"
   roles:
-    - spp
+    - ubuntu_spp
   environment:
     http_proxy: "{{ http_proxy }}"
     https_proxy: "{{ https_proxy }}"
 
 - name: install pktgen
-  hosts: pktgen 
+  hosts: ubuntu_pktgen
   remote_user: "{{ remote_user }}"
   roles:
-    - pktgen
+    - ubuntu_pktgen
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
+
+# CentOS 7
+- name: apply all base packages
+  hosts: centos7_common
+  remote_user: "{{ remote_user }}"
+  roles:
+    - centos7_common
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
+
+- name: install libvirt
+  hosts: centos7_libvirt
+  remote_user: "{{ remote_user }}"
+  roles:
+    - centos7_libvirt
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
+
+- name: install spp and qemu
+  hosts: centos7_spp
+  remote_user: "{{ remote_user }}"
+  roles:
+    - centos7_spp
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
+
+#- name: install pktgen
+#  hosts: centos7_pktgen
+#  remote_user: "{{ remote_user }}"
+#  roles:
+#    - centos7_pktgen
+#  environment:
+#    http_proxy: "{{ http_proxy }}"
+#    https_proxy: "{{ https_proxy }}"
+
+# CentOS 6
+- name: apply all base packages
+  hosts: centos6_common
+  remote_user: "{{ remote_user }}"
+  roles:
+    - centos6_common
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
+
+- name: install libvirt
+  hosts: centos6_libvirt
+  remote_user: "{{ remote_user }}"
+  roles:
+    - centos6_libvirt
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
+
+- name: install spp and qemu
+  hosts: centos6_spp
+  remote_user: "{{ remote_user }}"
+  roles:
+    - centos6_spp
   environment:
     http_proxy: "{{ http_proxy }}"
     https_proxy: "{{ https_proxy }}"
