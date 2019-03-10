@@ -69,14 +69,19 @@ def clean_hosts():
     """Clean hosts file"""
 
     contents = ""
-    attrs = ['common', 'pktgen', 'spp', 'kvm']
+
+    dists = ['ubuntu', 'centos6', 'centos7']
+    attrs = ['common', 'pktgen', 'spp', 'libvirt']
+
     sample_ipaddr = '127.0.0.1'
     hosts_file = "hosts"
     f = open(hosts_file)
 
     tmplist = []
-    for a in attrs:
-        tmplist.append('[%s]\n#%s' % (a, sample_ipaddr))
+    for dist in dists:
+        for attr in attrs:
+            tmplist.append(
+                '[{}_{}]\n#{}'.format(dist, attr, sample_ipaddr))
 
     f = open(hosts_file, "w+")
     f.write('\n\n'.join(tmplist))

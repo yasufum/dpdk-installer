@@ -1,0 +1,9 @@
+---
+- name: install kvm
+  become: yes
+  yum: pkg={{ item }} update_cache=yes state=latest
+  with_items:
+    - qemu-kvm
+    - virt-manager
+    - libvirt
+    - bridge-utils

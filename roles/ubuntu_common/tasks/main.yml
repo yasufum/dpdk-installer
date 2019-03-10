@@ -14,5 +14,3 @@
 #- include: nvim.yml
 - include: dein.yml
 #- include: emacs.yml
-#- include: ruby.yml
-#- include: rbenv.yml

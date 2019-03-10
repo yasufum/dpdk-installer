@@ -1,0 +1,52 @@
+---
+- name: install graphviz
+  become: yes
+  yum: name={{ item }} state=latest
+  with_items:
+    - graphviz
+    - ImageMagick
+    - libX11-devel
+
+- name: check libsixel exists
+  stat: path={{ dpdk_home }}/libsixel
+  register: does_libsixel_exist
+
+- name: get libsixel
+  git: repo=https://github.com/saitoha/libsixel.git
+       dest={{ dpdk_home }}/libsixel
+  when: not does_libsixel_exist.stat.exists
+
+- name: configure libsixel
+  command: ./configure chdir={{ dpdk_home }}/libsixel
+
+- name: make libsixel
+  command: make chdir={{ dpdk_home }}/libsixel
+
+- name: install libsixel
+  become: yes
+  command: make install chdir={{ dpdk_home }}/libsixel
+
+- name: remove libsixel directory
+  command: rm -rf libsixel chdir={{ dpdk_home }}
+
+- name: check mlterm exists
+  stat: path={{ dpdk_home }}/mlterm
+  register: does_mlterm_exist
+
+- name: get mlterm
+  git: repo=https://github.com/brunoduran/mlterm.git
+       dest={{ dpdk_home }}/mlterm
+  when: not does_mlterm_exist.stat.exists
+
+- name: configure mlterm
+  command: ./configure chdir={{ dpdk_home }}/mlterm
+
+- name: make mlterm
+  command: make chdir={{ dpdk_home }}/mlterm
+
+- name: install mlterm
+  become: yes
+  command: make install chdir={{ dpdk_home }}/mlterm
+
+- name: remove mlterm directory 
+  command: rm -rf mlterm chdir={{ dpdk_home }}

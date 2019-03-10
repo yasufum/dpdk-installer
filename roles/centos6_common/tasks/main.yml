@@ -9,7 +9,4 @@
 
 # optional
 - include: tmux.yml
-#- include: vim-latest.yml
-- include: nvim.yml
-- include: dein.yml
 #- include: emacs.yml

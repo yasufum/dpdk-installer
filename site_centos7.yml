@@ -2,25 +2,25 @@
 # Deploys the whole application stack in this site.
 
 - name: apply all base packages
-  hosts: all
+  hosts: centos7_common
   remote_user: "{{ remote_user }}"
   roles:
     - centos7_common
 
-#- name: install kvm
-#  hosts: dpdk
-#  remote_user: "{{ remote_user }}"
-#  roles:
-#    - centos7_kvm
-#
-#- name: install spp and qemu
-#  hosts: spp
-#  remote_user: "{{ remote_user }}"
-#  roles:
-#    - centos7_spp
-#
+- name: install libvirt
+  hosts: centos7_libvirt
+  remote_user: "{{ remote_user }}"
+  roles:
+    - centos7_libvirt
+
+- name: install spp and qemu
+  hosts: centos7_spp
+  remote_user: "{{ remote_user }}"
+  roles:
+    - centos7_spp
+
 #- name: install pktgen
-#  hosts: pktgen
+#  hosts: centos7_pktgen
 #  remote_user: "{{ remote_user }}"
 #  roles:
 #    - centos7_pktgen

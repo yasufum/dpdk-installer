@@ -1,0 +1,48 @@
+---
+- name: mkdir dpdk_home
+  file: path={{ dpdk_home }} state=directory
+
+- name: install archive.h
+  become: yes
+  yum: name={{ item }} state=latest update_cache=yes
+  with_items:
+    - libarchive-devel
+    - numactl-devel
+    - kernel-headers
+    - kernel-devel
+
+- name: git clone dpdk
+  git: repo={{ dpdk_repo }}
+       dest={{ dpdk_dir }}
+       version={{ dpdk_ver }}
+
+- name: install dpdk
+  command: make install T={{ dpdk_target }} chdir={{ dpdk_dir }}
+
+- name: put do_after_reboot.sh 2m
+  when: hugepage_size == "2M"
+  template: src=templates/do_after_reboot_2m.sh.j2
+            dest={{ dpdk_home }}/do_after_reboot.sh
+            mode=775
+
+- name: put do_after_reboot.sh 1g
+  when: hugepage_size == "1G"
+  template: src=templates/do_after_reboot_1g.sh.j2
+            dest={{ dpdk_home }}/do_after_reboot.sh
+            mode=775
+
+- name: put env.sh
+  template: src=templates/env_dpdk.sh.j2
+            dest={{ dpdk_home }}/env.sh
+            mode=775
+
+- name: put update_bashrc.py
+  template: src=templates/update_bashrc.py.j2
+            dest={{ dpdk_home }}/update_bashrc.py
+            mode=775
+
+- name: update .bashrc
+  command: python update_bashrc.py chdir={{ dpdk_home }}
+
+- name: remove update_bashrc.py
+  command: rm -f {{ dpdk_home }}/update_bashrc.py

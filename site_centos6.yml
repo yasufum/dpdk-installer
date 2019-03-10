@@ -2,25 +2,19 @@
 # Deploys the whole application stack in this site.
 
 - name: apply all base packages
-  hosts: ubuntu_common
+  hosts: centos6_common
   remote_user: "{{ remote_user }}"
   roles:
-    - ubuntu_common
+    - centos6_common
 
 - name: install libvirt
-  hosts: ubuntu_libvirt
+  hosts: centos6_libvirt
   remote_user: "{{ remote_user }}"
   roles:
-    - ubuntu_libvirt
+    - centos6_libvirt
 
 - name: install spp and qemu
-  hosts: ubuntu_spp
+  hosts: centos6_spp
   remote_user: "{{ remote_user }}"
   roles:
-    - ubuntu_spp
-
-- name: install pktgen
-  hosts: ubuntu_pktgen
-  remote_user: "{{ remote_user }}"
-  roles:
-    - ubuntu_pktgen
+    - centos6_spp

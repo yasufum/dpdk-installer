@@ -8,6 +8,7 @@ import argparse
 import os
 import re
 import shutil
+import sys
 import subprocess
 
 from lib import make_utils
@@ -20,9 +21,11 @@ class DpdkInstaller(object):
 
     def __init__(self):
         fname = 'di_conf.yml'
-        self.di_conf = yaml.load(open('{}/{}'.format(
-            os.path.dirname(__file__), fname)))
-
+        curdir = os.path.dirname(__file__)
+        if curdir == "":
+            curdir = "."
+        self.di_conf = yaml.load(open('{}/{}'.format(curdir, fname)))
+            
     def confirm_sshkey(self, os_release):
         """Check if sshkey exists.
 
@@ -39,7 +42,12 @@ class DpdkInstaller(object):
                 print("> path to SSH key? (%s) [y/N]" % sshkey)
             else:
                 print("> path to SSH key?")
-            ans = raw_input().strip()
+
+            if sys.version_info.major == 2:
+                ans = raw_input().strip()
+            elif sys.version_info.major == 3:
+                ans = input().strip()
+
             if ans.lower() == "y" or ans.lower() == "yes":
                 shutil.copyfile(sshkey, target)
             elif ans.lower() == "n" or ans.lower() == "no":
@@ -60,10 +68,16 @@ class DpdkInstaller(object):
                 env_pxy = os.getenv(proxy)
                 if env_pxy != '' and env_pxy is not None:
                     print("> use $%s ? (%s) [Y/n]: " % (proxy, env_pxy))
-                    ans = raw_input().strip()
+                    if sys.version_info.major == 2:
+                        ans = raw_input().strip()
+                    elif sys.version_info.major == 3:
+                        ans = input().strip()
                     if ans.lower() == 'n' or ans.lower() == 'no':
                         print('> input %s, or empty: ' % proxy)
-                        new_proxy = raw_input().strip()
+                        if sys.version_info.major == 2:
+                            new_proxy = raw_input().strip()
+                        elif sys.version_info.major == 3:
+                            new_proxy = input().strip()
                     else:
                         new_proxy = env_pxy
 
@@ -98,10 +112,18 @@ class DpdkInstaller(object):
             # Check if cur_info is described in the vars_file
             if cur_info is None:
                 print("> input %s" % account_info)
-                input_info = raw_input().strip()
+
+                if sys.version_info.major == 2:
+                    input_info = raw_input().strip()
+                elif sys.version_info.major == 3:
+                    input_info = input().strip()
+
                 while input_info == '':
                     print("> input %s" % account_info)
-                    input_info = raw_input().strip()
+                    if sys.version_info.major == 2:
+                        input_info = raw_input().strip()
+                    elif sys.version_info.major == 3:
+                        input_info = input().strip()
 
                 # Overwrite vars_file with new one
                 msg = ""
@@ -143,7 +165,12 @@ class DpdkInstaller(object):
                     print("> input hugepage_size (must be 2m(2M) or 1g(1G)):")
                     ans = ""
                     while not (ans == "2M" or ans == "1G"):
-                        ans = raw_input().strip().upper()
+
+                        if sys.version_info.major == 2:
+                            ans = raw_input().strip().upper()
+                        elif sys.version_info.major == 3:
+                            ans = input().strip().upper()
+
                         if not (ans == "2M" or ans == "1G"):
                             print("> Error! Invalid parameter")
                             print("> hugepage_size (2m(2M) or 1g(1G)):")
@@ -161,10 +188,16 @@ class DpdkInstaller(object):
             elif param == 'nr_hugepages':
                 if yobj['nr_hugepages'] is None:
                     print("> input nr_hugepages")
-                    ans = raw_input().strip()
+                    if sys.version_info.major == 2:
+                        ans = raw_input().strip()
+                    elif sys.version_info.major == 3:
+                        ans = input().strip()
                     while re.match(r'\d+', ans) is None:
                         print("> input nr_hugepages")
-                        ans = raw_input().strip()
+                        if sys.version_info.major == 2:
+                            ans = raw_input().strip()
+                        elif sys.version_info.major == 3:
+                            ans = input().strip()
                     nr_hp = ans
 
                     hp_size = target_params['hugepage_size']
@@ -188,7 +221,12 @@ class DpdkInstaller(object):
                 if yobj[param] is None:
                     print("> use default DPDK version '%s' ? [Y/n]" %
                             self.di_conf["DPDK_VER"])
-                    ans = raw_input().strip()
+
+                    if sys.version_info.major == 2:
+                        ans = raw_input().strip()
+                    elif sys.version_info.major == 3:
+                        ans = input().strip()
+
                     if ans == '':
                         ans = 'y'
                     if (ans.lower() == "n" or
@@ -196,7 +234,10 @@ class DpdkInstaller(object):
                             not (ans.lower() == "y" or ans.lower() == "yes")):
                         print(ans)
                         print("> input DPDK version, or empty for latest")
-                        ans = raw_input().strip()
+                        if sys.version_info.major == 2:
+                            ans = raw_input().strip()
+                        elif sys.version_info.major == 3:
+                            ans = input().strip()
                         dpdk_ver = ans
                     else:
                         dpdk_ver = self.di_conf["DPDK_VER"]
@@ -210,17 +251,32 @@ class DpdkInstaller(object):
             elif param == 'dpdk_target':
                 if yobj[param] is None:
                     print("> use DPDK target '%s' ? [Y/n]" % self.di_conf["DPDK_TARGET"])
-                    ans = raw_input().strip()
+
+                    if sys.version_info.major == 2:
+                        ans = raw_input().strip()
+                    elif sys.version_info.major == 3:
+                        ans = input().strip()
+
                     if ans == '':
                         ans = 'y'
                     if (ans.lower() == "n" or
                             ans.lower() == "no" or
                             not (ans.lower() == "y" or ans.lower() == "yes")):
                         print("> input DPDK target")
-                        ans = raw_input().strip()
+
+                        if sys.version_info.major == 2:
+                            ans = raw_input().strip()
+                        elif sys.version_info.major == 3:
+                            ans = input().strip()
+
                         while ans == '':
                             print("> input DPDK target")
-                            ans = raw_input().strip()
+
+                            if sys.version_info.major == 2:
+                                ans = raw_input().strip()
+                            elif sys.version_info.major == 3:
+                                ans = input().strip()
+
                         dpdk_target = ans
                     dpdk_target = self.di_conf["DPDK_TARGET"]
                     target_params[param] = dpdk_target
@@ -234,7 +290,10 @@ class DpdkInstaller(object):
                     msg = "> input dpdk_interfaces (separate by white space)" \
                             + ", or empty:"
                     print(msg)
-                    ans = raw_input().strip()
+                    if sys.version_info.major == 2:
+                        ans = raw_input().strip()
+                    elif sys.version_info.major == 3:
+                        ans = input().strip()
                     nw_ifs = re.sub(r'\s+', ' ', ans)
                     if nw_ifs == ' ':
                         nw_ifs = ''
@@ -254,7 +313,10 @@ class DpdkInstaller(object):
                 if yobj[param] is None:
                     print("> use default pktgen version '%s' ? [Y/n]" %
                           self.di_conf["PKTGEN_VER"])
-                    ans = raw_input().strip()
+                    if sys.version_info.major == 2:
+                        ans = raw_input().strip()
+                    elif sys.version_info.major == 3:
+                        ans = input().strip()
                     if ans == '':
                         ans = 'y'
                     if (ans.lower() == "n" or
@@ -262,7 +324,10 @@ class DpdkInstaller(object):
                             not (ans.lower() == "y" or ans.lower() == "yes")):
                         print(ans)
                         print("> input pktgen version, or empty for latest")
-                        ans = raw_input().strip()
+                        if sys.version_info.major == 2:
+                            ans = raw_input().strip()
+                        elif sys.version_info.major == 3:
+                            ans = input().strip()
                         pktgen_ver = ans
                     else:
                         pktgen_ver = self.di_conf["PKTGEN_VER"]
@@ -282,7 +347,10 @@ class DpdkInstaller(object):
                 if yobj[param] is None:
                     print("> use default SPP version '%s' ? [Y/n]" %
                           self.di_conf["SPP_VER"])
-                    ans = raw_input().strip()
+                    if sys.version_info.major == 2:
+                        ans = raw_input().strip()
+                    elif sys.version_info.major == 3:
+                        ans = input().strip()
                     if ans == '':
                         ans = 'y'
                     if (ans.lower() == "n" or
@@ -290,7 +358,10 @@ class DpdkInstaller(object):
                             not (ans.lower() == "y" or ans.lower() == "yes")):
                         print(ans)
                         print("> input pktgen version, or empty for latest")
-                        ans = raw_input().strip()
+                        if sys.version_info.major == 2:
+                            ans = raw_input().strip()
+                        elif sys.version_info.major == 3:
+                            ans = input().strip()
                         spp_ver = ans
                     else:
                         spp_ver = self.di_conf["SPP_VER"]
@@ -456,30 +527,36 @@ class DpdkInstaller(object):
     def _os_release(self):
         """Return distribution and number of ver."""
 
-        patterns = {
-            "name": r"^NAME=\"([\w\s]+)\"$",
-            "ver": r"^VERSION_ID=\"(\d+)\"$"}
-
-        regexps = {}
-        for k, ptn in patterns.items():
-            regexps[k] = re.compile(ptn)
-
         res = {}
-        for line in open("/etc/os-release", "r"):
-            for k, regexp in regexps.items():
-                m = regexp.match(line)
-                if m:
-                    if k == 'name':
-                        if m.group(1).startswith('CentOS'):
-                            res[k] = 'centos'
-                        elif m.group(1).startswith('Ubuntu'):
-                            res[k] = 'ubuntu'
-                        elif m.group(1).startswith('Fedora'):
-                            res[k] = 'fedora'
-                    else:
-                        res[k] = m.group(1)
+        if os.path.exists('/etc/os-release'):
+            patterns = {
+                "name": r"^NAME=\"([\w\s]+)\"$",
+                "ver": r"^VERSION_ID=\"(\d+)\"$"}
+
+            regexps = {}
+            for k, ptn in patterns.items():
+                regexps[k] = re.compile(ptn)
+
+            for line in open("/etc/os-release", "r"):
+                for k, regexp in regexps.items():
+                    m = regexp.match(line)
+                    if m:
+                        if k == 'name':
+                            if m.group(1).startswith('CentOS'):
+                                res[k] = 'centos'
+                            elif m.group(1).startswith('Ubuntu'):
+                                res[k] = 'ubuntu'
+                            elif m.group(1).startswith('Fedora'):
+                                res[k] = 'fedora'
+                        else:
+                            res[k] = m.group(1)
+
+        if os.path.exists('/etc/redhat-release'):  # CentOS 6
+            res['name'] = 'centos'
+            res['ver'] = '6'
+
         return res
-        
+
     def clean(self, target='all'):
         """Clean all of config."""
         if target == 'account':

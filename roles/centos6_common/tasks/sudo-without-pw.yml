@@ -1,0 +1,6 @@
+---
+- name: add sudoer entry
+  become: yes
+  template: src=templates/sudo_user.j2
+            dest=/etc/sudoers.d/{{ remote_user }}
+            mode=0400

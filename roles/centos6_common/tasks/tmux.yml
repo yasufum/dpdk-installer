@@ -1,0 +1,7 @@
+---
+- name: install tmux
+  become: yes
+  yum: name=tmux state=present
+
+- name: put .tmux.conf
+  copy: src=templates/tmux.conf dest={{ ansible_env.HOME }}/.tmux.conf mode=664
