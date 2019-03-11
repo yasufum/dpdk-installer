@@ -239,11 +239,21 @@ on Ubuntu. For running DPDK's application, the user should be a privileged
 user.
 
 ```sh
+# Ubuntu
 $ sudo adduser dpdk
 $ sudo gpasswd -a dpdk sudo
 ```
-For CentOS, add not to `sudo` group but `wheel` group. You might need to edit
-`/etc/sudoers` if `wheel` is not activated for sudoers on CentOS 6.
+
+For CentOS, set password and add not to `sudo` group but `wheel` group.
+You might need to edit `/etc/sudoers` if `wheel` is not activated for
+sudoers on CentOS 6.
+
+```sh
+# CentOS
+$ sudo adduser dpdk
+$ sudo passwd dpdk
+$ sudo gpasswd -a dpdk wheel
+```
 
 If you do not need the user anymore, delete account by using `userdel`.
 You should add `-r` option to delete its home directory cleanly.
