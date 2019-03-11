@@ -25,7 +25,10 @@ def update_var(vars_file, key, val, clean_flg=False):
     for l in f.readlines():
         if ('%s:' % key) in l:
             if clean_flg is not True:
-                contents += '%s: "%s"\n' % (key, val)
+                if val is not None:
+                    contents += '%s: "%s"\n' % (key, val)
+                else:
+                    contents += '%s:\n' % (key)
             else:
                 contents += '%s:%s\n' % (key, val)
         else:
