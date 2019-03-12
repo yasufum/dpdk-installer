@@ -10,13 +10,30 @@
     - wireshark
     - wireshark-devel
 
-- name: get spp
+- name: check spp exists
+  stat: path={{ spp_dir }}
+  register: has_spp
+
+- name: get spp with version
+  when:
+    - spp_ver == ""
+    - not has_spp.stat.exists
   git: repo={{ spp_repo }}
        dest={{ spp_dir }}
-       #version={{ spp_ver }}
+       version={{ spp_ver }}
 
+- name: get latest spp
+  when:
+    - spp_ver != ""
+    - not has_spp.stat.exists
+  git: repo={{ spp_repo }}
+       dest={{ spp_dir }}
+
+# [TODO] remove EXTRA_CFLAGS after refactoring spp for compilatino
 - name: make spp
-  command: make RTE_SDK={{ dpdk_dir }} RTE_TARGET={{ dpdk_target }} chdir={{ spp_dir }}
+  command: make RTE_SDK={{ dpdk_dir }} RTE_TARGET={{ dpdk_target }} EXTRA_CFLAGS='-std=gnu99'
+           chdir={{ spp_dir }}
 
 - name: install pip3 packages for SPP
+  become: yes
   shell: pip3.6 install -r {{ spp_dir }}/requirements.txt
