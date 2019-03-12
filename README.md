@@ -10,7 +10,7 @@
   - [2.5. Prepare public key](#25-prepare-public-key)
 - [3. Getting started](#3-getting-started)
 - [4. Usage](#4-usage)
-  - [4.1. Understand roles](#41-understand-roles)
+  - [4.1. Edit inventory file](#41-edit-inventory-file)
   - [4.2. Add user account](#42-add-user-account)
   - [4.3. Using Proxy](#43-using-proxy)
   - [4.4. Configuration for DPDK](#44-configuration-for-dpdk)
@@ -162,10 +162,29 @@ for understanding ansible and
 .
 
 
-### 4.1. Understand roles
+### 4.1. Edit inventory file
 
 There are several roles defined in inventory file `hosts`.
 Role is a kind of group of installation tasks.
+
+You should add IP address or hostname of your remote nodes to each of
+entries in `hosts`.
+
+Here is an example of inventory file for two nodes of Ubuntu server.
+`ubuntu_common` task should be applied to all of nodes.
+
+```
+[ubuntu_common]
+192.168.1.100
+192.168.1.101
+[ubuntu_pktgen]
+192.168.1.101
+[ubuntu_spp]
+192.168.1.100
+[ubuntu_libvirt]
+192.168.1.100
+...
+```
 
 Each of tasks of the role is listed in "roles/[role_name]/tasks/main.yml".
 `common` role defines the default tasks and applied for all of other roles.
