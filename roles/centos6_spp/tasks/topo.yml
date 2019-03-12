@@ -9,12 +9,12 @@
 
 - name: check libsixel exists
   stat: path={{ dpdk_home }}/libsixel
-  register: does_libsixel_exist
+  register: hass_libsixel
 
 - name: get libsixel
   git: repo=https://github.com/saitoha/libsixel.git
        dest={{ dpdk_home }}/libsixel
-  when: not does_libsixel_exist.stat.exists
+  when: not has_libsixel.stat.exists
 
 - name: configure libsixel
   command: ./configure chdir={{ dpdk_home }}/libsixel
@@ -31,12 +31,12 @@
 
 - name: check mlterm exists
   stat: path={{ dpdk_home }}/mlterm
-  register: does_mlterm_exist
+  register: hass_mlterm
 
 - name: get mlterm
   git: repo=https://github.com/brunoduran/mlterm.git
        dest={{ dpdk_home }}/mlterm
-  when: not does_mlterm_exist.stat.exists
+  when: not has_mlterm.stat.exists
 
 - name: configure mlterm
   command: ./configure chdir={{ dpdk_home }}/mlterm

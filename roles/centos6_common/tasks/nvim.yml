@@ -9,12 +9,12 @@
 
 - name: check neovim exists
   stat: path={{ dpdk_home }}/neovim
-  register: does_neovim_exist
+  register: has_neovim
 
 - name: git clone neovim
   git: repo=https://github.com/neovim/neovim
        dest={{ dpdk_home }}/neovim
-  when: not does_neovim_exist.stat.exists
+  when: not has_neovim.stat.exists
 
 - name: make neovim
   command: make chdir={{ dpdk_home }}/neovim
