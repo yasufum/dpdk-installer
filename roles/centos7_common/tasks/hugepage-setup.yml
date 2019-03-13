@@ -21,7 +21,7 @@
   replace:
     dest=/etc/default/grub
     regexp='^GRUB_CMDLINE_LINUX="(?!default_hugepagesz=)'
-    replace='GRUB_CMDLINE_LINUX="default_hugepagesz=1G hugepagesz=1G hugepages={{ nr_hugepages }}'
+    replace='GRUB_CMDLINE_LINUX="default_hugepagesz=1G hugepagesz=1G hugepages={{ nr_hugepages }} '
 
 - name: update grub
   become: yes
