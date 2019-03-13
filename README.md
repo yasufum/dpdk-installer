@@ -92,7 +92,7 @@ installation is terminated for prompt for first ssh login.
 You need to install packages for running installer script `installer.py`.
 
 - ansible
-- pyyaml
+- pyyaml (or PyYAML for CentOS7)
 
 If you run installer on CentOS 6, you also install `python-argparse`.
 
@@ -150,6 +150,40 @@ for DPDK.
 $ ls $HOME/dpdk-home
 do_after_reboot.sh  dpdk/  env.sh  pktgen-dpdk/  spp/
 ```
+
+### Note
+
+On CentOS 7, you might fail to compile DPDK because of not found error for
+kernel source code. It is because symbolic link for source is invalid for some
+of versions, and the reason is wrong usage of `ln` command while creating this
+symbolic link.
+
+In my environment, it can be referred as following, but does not work because
+this link is corrupted.
+
+```sh
+$ ls -al /lib/modules/3.10.0-957.el7.x86_64
+lrwxrwxrwx.  1 root root     38  3月 13 18:36 build -> /usr/src/kernels/3.10.0-957.el7.x86_64
+drwxr-xr-x.  2 root root      6 11月  9 08:43 extra
+drwxr-xr-x. 12 root root    128  3月 13 18:36 kernel
+....
+lrwxrwxrwx.  1 root root      5  3月 13 18:36 source -> build
+....
+```
+
+You can avoid this error by installing kernel. After installation, you need
+to reboot to activate.
+
+```sh
+$ sudo yum install kernel kernel-devel -y
+...
+$ sudo reboot
+```
+
+This installer runs the installation, but terminated while compiling DPDK
+for the error. Or you can avoid to be terminated if you install them and reboot
+before running this installer.
+
 
 ## 4. Usage
 
