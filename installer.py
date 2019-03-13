@@ -5,6 +5,7 @@
 from __future__ import print_function
 
 import argparse
+import glob
 import os
 import re
 import shutil
@@ -15,16 +16,25 @@ from lib import make_utils
 
 import yaml
 
+OS_DISTS = ['ubuntu', 'centos7', 'centos6']
+DI_ROLES = ['common', 'spp', 'pktgen', 'libvirt']
 
 class DpdkInstaller(object):
     """Run install tasks."""
 
     def __init__(self):
         fname = 'di_conf.yml'
-        curdir = os.path.dirname(__file__)
-        if curdir == "":
-            curdir = "."
-        self.di_conf = yaml.load(open('{}/{}'.format(curdir, fname)))
+        self.di_conf = yaml.load(
+            open('{}/{}'.format(self.get_working_dir(), fname)))
+
+    @staticmethod
+    def get_working_dir():
+        """Return path of dir of this script."""
+
+        wdir = os.path.dirname(__file__)
+        if wdir == "":
+            wdir = "."
+        return wdir
 
     def confirm_sshkey(self):
         """Check if sshkey exists.
@@ -33,6 +43,8 @@ class DpdkInstaller(object):
         """
 
         sshkey = '{}/.ssh/id_rsa.pub'.format(os.getenv('HOME'))
+
+        # Flags for holding context of user's input
         do_copy = False
         valid_ans = False
 
@@ -43,6 +55,7 @@ class DpdkInstaller(object):
             else:
                 print("> input path of SSH key if you use?")
 
+            # TODO(yasufum) move this selection of versions to a method over the class
             if sys.version_info.major == 2:
                 ans = raw_input().strip()
             elif sys.version_info.major == 3:
@@ -63,15 +76,16 @@ class DpdkInstaller(object):
                     do_copy = True
 
         if do_copy is True:
-            for dist in ['ubuntu', 'centos7', 'centos6']:
-                target = "./roles/{}_common/templates/id_rsa.pub".format(dist)
+            for dist in OS_DISTS:
+                target = "{}/roles/{}_common/templates/id_rsa.pub".format(
+                    self.get_working_dir(), dist)
                 if not os.path.exists(target):
                     shutil.copyfile(sshkey, target)
 
-    @staticmethod
-    def confirm_proxy():
+    def confirm_proxy(self):
         """Check http_proxy setting."""
-        vars_file = "group_vars/all"
+
+        vars_file = "{}/group_vars/all".format(self.get_working_dir())
         yobj = yaml.load(open(vars_file))
         for proxy in ['http_proxy', 'https_proxy', 'no_proxy']:
             if yobj[proxy] is None:
@@ -105,18 +119,20 @@ class DpdkInstaller(object):
                     vars_f = open(vars_file, 'w+')
                     vars_f.write(contents)
 
-    @staticmethod
-    def confirm_account():
+    def confirm_account(self):
         """Update user account.
 
         Update remote_user, ansible_ssh_pass and ansible_sudo_pass.
         """
+
+        vars_file = '{}/group_vars/all'.format(self.get_working_dir())
+        yobj = yaml.load(open(vars_file))
+
         target_params = [
             "remote_user",
             "ansible_ssh_pass",
             "ansible_sudo_pass"]
-        vars_file = "group_vars/all"
-        yobj = yaml.load(open(vars_file))
+
         for account_info in target_params:
             cur_info = yobj[account_info]
             # Check if cur_info is described in the vars_file
@@ -149,18 +165,34 @@ class DpdkInstaller(object):
                 vars_f.write(msg)
                 vars_f.close()
 
-    def confirm_dpdk(self):
-        """Check DPDK params.
+    def setup_dpdk_vars(self):
+        """Update vars for DPDK from user input."""
 
-        Setup for hugepages and network interfaces defined in "group_vars/dpdk"
+        work_dir = self.get_working_dir()
+        vars_file = '{wd}/group_vars/{dist}_common'.format(
+            wd=work_dir, dist=OS_DISTS[0])
+        self._confirm_dpdk(vars_file)
+        for dist in OS_DISTS[1:]:
+            src = '{wd}/group_vars/{dist}_common'.format(
+                wd=work_dir, dist=OS_DISTS[0])
+            dst = '{wd}/group_vars/{dist}_common'.format(
+                wd=work_dir, dist=dist)
+            shutil.copyfile(src, dst)
+
+    def _confirm_dpdk(self, vars_file):
+        """Check DPDK's params.
+
+        Setup for hugepages and network interfaces defined in "group_vars/"
         by asking user some questions.
 
         It only asks for dpdk role and not others because all of
         vars are included in dpdk's var file. It's needed to be asked for
         other files if they include vars not included dpdk.
         """
-        vars_file = 'group_vars/all'
+
         yobj = yaml.load(open(vars_file))
+        if yobj is None:
+            return None
 
         target_params = {
             'hugepage_size': None,
@@ -228,7 +260,7 @@ class DpdkInstaller(object):
                     target_params[param] = yobj[param]
 
             elif param == 'dpdk_ver':
-                if yobj[param] is None:
+                if yobj.has_key(param) and yobj[param] is None:
                     print("> use default DPDK version '%s' ? [Y/n]" %
                             self.di_conf["DPDK_VER"])
 
@@ -260,7 +292,8 @@ class DpdkInstaller(object):
 
             elif param == 'dpdk_target':
                 if yobj[param] is None:
-                    print("> use DPDK target '%s' ? [Y/n]" % self.di_conf["DPDK_TARGET"])
+                    print("> use DPDK target '{}' ? [Y/n]".format(
+                        self.di_conf["DPDK_TARGET"]))
 
                     if sys.version_info.major == 2:
                         ans = raw_input().strip()
@@ -314,15 +347,30 @@ class DpdkInstaller(object):
                 else:
                     target_params[param] = yobj[param]
 
-        vars_file = 'group_vars/pktgen'
-        yobj = yaml.load(open(vars_file))
+    def setup_pktgen_vars(self):
+        """Update vars for pktgen from user input."""
 
+        work_dir = self.get_working_dir()
+        dists = [dist for dist in OS_DISTS if not dist.startswith('centos')]
+        vars_file = '{wd}/group_vars/{dist}_pktgen'.format(
+            wd=work_dir, dist=dists[0])
+        self._confirm_pktgen(vars_file)
+        if len(dists) > 1:
+            for dist in OS_DISTS[1:]:
+                src = '{wd}/group_vars/{dist}_pktgen'.format(
+                    wd=work_dir, dist=dists[0])
+                dst = '{wd}/group_vars/{dist}_pktgen'.format(
+                    wd=work_dir, dist=dist)
+                shutil.copyfile(src, dst)
+
+    def _confirm_pktgen(self, vars_file):
+        yobj = yaml.load(open(vars_file))
         target_params = {'pktgen_ver': None}
         for param in target_params.keys():
             if param == 'pktgen_ver':
                 if yobj[param] is None:
-                    print("> use default pktgen version '%s' ? [Y/n]" %
-                          self.di_conf["PKTGEN_VER"])
+                    print("> use default pktgen version '{}' ? [Y/n]".format(
+                          self.di_conf["PKTGEN_VER"]))
                     if sys.version_info.major == 2:
                         ans = raw_input().strip()
                     elif sys.version_info.major == 3:
@@ -348,15 +396,32 @@ class DpdkInstaller(object):
                 else:
                     target_params[param] = yobj[param]
 
-        vars_file = 'group_vars/spp'
-        yobj = yaml.load(open(vars_file))
+    def setup_spp_vars(self):
+        """Update vars for SPP from user input."""
 
+        work_dir = self.get_working_dir()
+        vars_file = '{wd}/group_vars/{dist}_spp'.format(
+            wd=work_dir, dist=OS_DISTS[0])
+        self._confirm_spp(vars_file)
+        for dist in OS_DISTS[1:]:
+            src = '{wd}/group_vars/{dist}_spp'.format(
+                wd=work_dir, dist=OS_DISTS[0])
+            dst = '{wd}/group_vars/{dist}_spp'.format(
+                wd=work_dir, dist=dist)
+            shutil.copyfile(src, dst)
+
+
+    def _confirm_spp(self, vars_file):
+        yobj = yaml.load(open(vars_file))
         target_params = {'spp_ver': None}
         for param in target_params.keys():
             if param == 'spp_ver':
                 if yobj[param] is None:
-                    print("> use default SPP version '%s' ? [Y/n]" %
-                          self.di_conf["SPP_VER"])
+                    if self.di_conf["SPP_VER"] is None:
+                        ver = ''
+                    else:
+                        ver = self.di_conf["SPP_VER"]
+                    print("> use default SPP version '{}' ? [Y/n]".format(ver))
                     if sys.version_info.major == 2:
                         ans = raw_input().strip()
                     elif sys.version_info.major == 3:
@@ -407,10 +472,11 @@ class DpdkInstaller(object):
             "ansible_sudo_pass"]
 
         # remove ssh user account form vars file.
-        vars_file = "group_vars/all"
-        for key in target_params:
-            make_utils.update_var(vars_file, key, "", True)
-            print("> clean '%s' in '%s'" % (key, vars_file))
+        for dist in OS_DISTS:
+            vars_file = "group_vars/{}_common".format(dist)
+            for key in target_params:
+                make_utils.update_var(vars_file, key, "", True)
+                print("> clean '%s' in '%s'" % (key, vars_file))
 
     @staticmethod
     def clean_proxy():
@@ -418,94 +484,151 @@ class DpdkInstaller(object):
         target_params = ['http_proxy', 'https_proxy', 'no_proxy']
 
         # remove ssh user account form vars file.
-        vars_file = "group_vars/all"
-        for key in target_params:
-            make_utils.update_var(vars_file, key, "", True)
-            print("> clean '%s' in '%s'" % (key, vars_file))
+        for dist in OS_DISTS:
+            vars_file = "group_vars/{}_common".format(dist)
+            for key in target_params:
+                make_utils.update_var(vars_file, key, "", True)
+                print("> clean '%s' in '%s'" % (key, vars_file))
 
     @staticmethod
     def clean_dpdk():
         """Clean params for DPDK."""
-        # group_vars/all
-        target_params = [
-            "hugepage_size",
-            "nr_hugepages",
-            "dpdk_ver",
-            "dpdk_target",
-            "dpdk_interfaces"]
 
-        vars_file = "group_vars/all"
-        for key in target_params:
-            make_utils.update_var(vars_file, key, "", True)
-            print("> clean '%s' in '%s'" % (key, vars_file))
-
-        # group_vars/pktgen
-        target_params = ["pktgen_ver"]
-        vars_file = "group_vars/pktgen"
-        for key in target_params:
-            make_utils.update_var(vars_file, key, "", True)
-            print("> clean '%s' in '%s'" % (key, vars_file))
-
-        # group_vars/spp
-        target_params = ["spp_ver"]
-        vars_file = "group_vars/spp"
-        for key in target_params:
-            make_utils.update_var(vars_file, key, "", True)
-            print("> clean '%s' in '%s'" % (key, vars_file))
+        for dist in OS_DISTS:
+            target_params = [
+                "hugepage_size",
+                "nr_hugepages",
+                "dpdk_ver",
+                "dpdk_target",
+                "dpdk_interfaces"]
+            vars_file = "group_vars/{}_common".format(dist)
+            for key in target_params:
+                make_utils.update_var(vars_file, key, "", True)
+                print("> clean '%s' in '%s'" % (key, vars_file))
 
     @staticmethod
-    def check_hosts():
+    def clean_pktgen():
+        """Clean params for pktgen."""
+
+        for dist in OS_DISTS:
+            if not dist.startswith('centos'):
+                target_params = ["pktgen_ver"]
+                vars_file = "group_vars/{}_pktgen".format(dist)
+                for key in target_params:
+                    make_utils.update_var(vars_file, key, "", True)
+                    print("> clean '%s' in '%s'" % (key, vars_file))
+
+    @staticmethod
+    def clean_spp():
+        """Clean params for SPP."""
+
+        for dist in OS_DISTS:
+            target_params = ["spp_ver"]
+            vars_file = "group_vars/{}_spp".format(dist)
+            for key in target_params:
+                make_utils.update_var(vars_file, key, "", True)
+                print("> clean '%s' in '%s'" % (key, vars_file))
+
+    def check_hosts(self):
         """Check if inventry file is setup."""
-        if make_utils.is_hosts_configured() is not True:
+
+        hosts_file = "{}/hosts".format(self.get_working_dir())
+        if make_utils.is_hosts_configured(hosts_file) is not True:
             print("Error: You must setup 'hosts' first")
             return False
         else:
             return True
 
-    @staticmethod
-    def save_conf():
+    def save_conf(self):
         """Save config as a backup and to be restored."""
-        dst_dir = "tmp/config"
+
+        work_dir = self.get_working_dir()
+        dst_dir = "{}/tmp/config".format(work_dir)
+
         # mkdir dst and child dir
         subprocess.call(
-            "mkdir -p %s/group_vars" % dst_dir, shell=True)
+            "mkdir -p {}/group_vars".format(dst_dir), shell=True)
 
         subprocess.call(
-            "cp hosts %s/" % dst_dir, shell=True)
+            "cp hosts {}/".format(dst_dir), shell=True)
         subprocess.call(
-            "cp group_vars/* %s/group_vars/" % dst_dir, shell=True)
+            "cp -r {wd}/group_vars/* {dst}/group_vars/".format(
+                wd=work_dir, dst=dst_dir),
+            shell=True)
 
         print("> save configurations to '%s'" % dst_dir)
 
-    @staticmethod
-    def restore_conf():
+    def restore_conf(self):
         """Restore saved config."""
-        dst_dir = "tmp/config"
+
+        work_dir = self.get_working_dir()
+        dst_dir = "{}/tmp/config".format(work_dir)
 
         subprocess.call(
-            "cp %s/hosts hosts" % dst_dir, shell=True)
+            "cp {dst}/hosts {wd}/hosts".format(dst=dst_dir, wd=work_dir),
+            shell=True)
         subprocess.call(
-            "cp %s/group_vars/* group_vars/" % dst_dir, shell=True)
+            "cp -r {dst}/group_vars/* {wd}/group_vars/".format(
+                dst=dst_dir, wd=work_dir),
+            shell=True)
 
-        print("> restore configurations from '%s'" % dst_dir)
+        print("> restore configurations from '{}'".format(dst_dir))
 
-    @staticmethod
-    def clean_hosts():
+    def clean_hosts(self):
         """Clean hosts file."""
-        make_utils.clean_hosts()
-        print("> clean hosts")
 
-    @staticmethod
-    def remove_sshkey():
+        work_dir = self.get_working_dir()
+        make_utils.clean_hosts(work_dir)
+        print("> clean {}/hosts".format(work_dir))
+
+    def remove_sshkey(self):
         """Remove public key from templates."""
-        target = "./roles/*_common/templates/id_rsa.pub"
+
+        target = "{}/roles/*_common/templates/id_rsa.pub".format(
+            self.get_working_dir())
         subprocess.call(
-            "rm -f %s" % target, shell=True)
-        print("> remove '%s'" % target)
+            "rm -f {}".format(target), shell=True)
+        print("> rm {}".format(target))
+
+    def remove_group_vars(self):
+        work_dir = self.get_working_dir()
+        for dist in OS_DISTS:
+            target = "{}/group_vars/{}_*".format(work_dir, dist)
+            subprocess.call(
+                "rm -f {}".format(target), shell=True)
+            print("> rm {}".format(target))
+
+        target = "{}/group_vars/all".format(work_dir)
+        subprocess.call("rm -f {}".format(target), shell=True)
 
     def setup_config(self, target):
         """Run config task."""
 
+        work_dir = self.get_working_dir()
+        for dist in OS_DISTS:
+            fpaths = []
+            for role in DI_ROLES:
+                fpaths.append('{}/group_vars/templates/{}'.format(
+                    work_dir, role))
+
+            for fpath in fpaths:
+                if (dist.startswith('centos')) and (fpath.endswith('pktgen')):
+                    pass
+                else:
+                    fn = os.path.basename(fpath)
+                    fn = "{}_{}".format(dist, fn)
+                    if not os.path.exists(
+                            '{}/group_vars/{}'.format(work_dir, fn)):
+                        shutil.copyfile(
+                            fpath,
+                            '{}/group_vars/{}'.format(work_dir, fn))
+
+        if not os.path.exists('{}/group_vars/all'.format(work_dir)):
+            shutil.copyfile(
+                '{}/group_vars/templates/all'.format(work_dir),
+                '{}/group_vars/all'.format(work_dir))
+
+        # Setup vars fiies
         if target == 'account':
             self.confirm_account()
         elif target == 'sshkey':
@@ -513,12 +636,18 @@ class DpdkInstaller(object):
         elif target == 'proxy':
             self.confirm_proxy()
         elif target == 'dpdk':
-            self.confirm_dpdk()
+            self.setup_dpdk_vars()
+        elif target == 'spp':
+            self.setup_spp_vars()
+        elif target == 'pktgen':
+            self.setup_pktgen_vars()
         elif target == 'all':
             self.confirm_account()
             self.confirm_sshkey()
             self.confirm_proxy()
-            self.confirm_dpdk()
+            self.setup_dpdk_vars()
+            self.setup_pktgen_vars()
+            self.setup_spp_vars()
         else:
             print("Error: invalid target '%s'" % target)
             exit()
@@ -539,14 +668,16 @@ class DpdkInstaller(object):
             self.clean_proxy()
         elif target == 'dpdk':
             self.clean_dpdk()
+        elif target == 'pktgen':
+            self.clean_pktgen()
+        elif target == 'spp':
+            self.clean_spp()
         elif target == 'hosts':
             self.clean_hosts()
         elif target == 'sshkey':
             self.remove_sshkey()
         elif target == 'all':
-            self.clean_account()
-            self.clean_proxy()
-            self.clean_dpdk()
+            self.remove_group_vars()
             self.clean_hosts()
             self.remove_sshkey()
         else:
@@ -573,7 +704,8 @@ def arg_parser():
         type=str,
         default='all',
         nargs='?',
-        choices=['all', 'account', 'sshkey', 'proxy', 'dpdk'],
+        choices=['all', 'account', 'sshkey', 'proxy', 'dpdk', 'spp',
+                 'pktgen'],
         help="'config all', or others for each of categories")
 
     # add install option
@@ -596,7 +728,8 @@ def arg_parser():
         type=str,
         default='all',
         nargs='?',
-        choices=['all', 'account', 'sshkey', 'proxy', 'dpdk', 'hosts'],
+        choices=['all', 'account', 'sshkey', 'proxy', 'dpdk', 'hosts',
+                 'spp', 'pktgen'],
         help="'clean all', or others for each of categories")
 
     parser_save = subparsers.add_parser(

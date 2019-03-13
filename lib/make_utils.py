@@ -6,7 +6,7 @@ import re
 
 
 def update_var(vars_file, key, val, clean_flg=False):
-    '''Update parameter defined in var_files
+    '''Update parameter defined in var_files.
 
     Last arg 'clean_flg' is for running 'clean' task in which the
     parameter is set to nil. If clean_flg is False, the parameter
@@ -44,13 +44,12 @@ def update_var(vars_file, key, val, clean_flg=False):
     f.close()
 
 
-def is_hosts_configured():
-    '''Check if "hosts" is valid
+def is_hosts_configured(hosts_file):
+    """Check if `hosts` is valid.
 
-    Return True if "hosts" is valid, or False if it's invalid
-    '''
+    Return True if `hosts` is valid, or False if it's invalid.
+    """
 
-    hosts_file = "hosts"
     f = open(hosts_file)
 
     # match lines doesn't start from "[", "#" or "\n"
@@ -68,7 +67,7 @@ def is_hosts_configured():
         return True
 
 
-def clean_hosts():
+def clean_hosts(work_dir):
     """Clean hosts file"""
 
     contents = ""
@@ -77,7 +76,7 @@ def clean_hosts():
     attrs = ['common', 'pktgen', 'spp', 'libvirt']
 
     exp_ipaddr = '127.0.0.1'
-    hosts_file = "hosts"
+    hosts_file = "{}/hosts".format(work_dir)
     f = open(hosts_file)
 
     tmplist = []
@@ -94,10 +93,10 @@ def clean_hosts():
 
 
 def pretty_memsize(memsize, unit=None):
-    '''Return pretty format memsize
+    """Return pretty format memsize.
 
     For example, '100000000' is formatted as '100 MB'
-    '''
+    """
 
     un = None
     if unit is None:

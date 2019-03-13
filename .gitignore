@@ -2,4 +2,6 @@
 *.pyc
 tmp/*
 site*.retry
-roles/common/templates/id_rsa.pub
+roles/*_common/templates/id_rsa.pub
+group_vars/all
+group_vars/*_*
