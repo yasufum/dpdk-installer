@@ -9,6 +9,7 @@
     - lz4-devel
     - wireshark
     - wireshark-devel
+    - libX11-devel
 
 - name: check spp exists
   stat: path={{ spp_dir }}

@@ -6,6 +6,7 @@
     - gcc-c++
     - cmake
     - libtool
+    - unzip
 
 - name: check neovim exists
   stat: path={{ dpdk_home }}/neovim
