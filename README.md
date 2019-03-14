@@ -153,7 +153,7 @@ do_after_reboot.sh  dpdk/  env.sh  pktgen-dpdk/  spp/
 
 ### Note
 
-On CentOS 7, you might fail to compile DPDK because of not found error for
+For CentOS 7, you might fail to compile DPDK because of not found error for
 kernel source code. It is because symbolic link for source is invalid for some
 of versions, and the reason is wrong usage of `ln` command while creating this
 symbolic link.
