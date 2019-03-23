@@ -1,8 +1,4 @@
 ---
-- name: install kvm
-  become: yes
-  apt: pkg=linux-kvm update_cache=no state=present
-
 - name: install virt-manager
   become: yes
   apt: pkg=virt-manager update_cache=no state=present
